@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Danh mục thuốc – PharmaPro</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+/* Kế thừa 100% CSS cốt lõi từ index.html */
+:root{
+  --bg:#f5f7f6; --surface:#fff; --line:#e6ebe8;
+  --ink:#16221d; --muted:#6b7a73;
+  --brand:#0f766e; --brand-dark:#0b5a54; --brand-soft:#e3f3f0;
+  --warn:#b45309; --warn-soft:#fef3e2;
+  --danger:#b42318; --danger-soft:#fdeceb;
+  --ok:#15803d; --ok-soft:#e5f5ea;
+  --radius:12px;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:'Be Vietnam Pro',sans-serif;font-size:14px;overflow-x:hidden}
+a{text-decoration:none}
+:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+
+/* Sidebar & Topbar */
+.sidebar{position:fixed;inset:0 auto 0 0;width:248px;background:var(--surface);border-right:1px solid var(--line);padding:20px 14px;display:flex;flex-direction:column;overflow-y:auto;z-index:20}
+.brand{display:flex;align-items:center;gap:10px;padding:4px 10px 22px;font-weight:700;font-size:1.15rem;color:var(--ink)}
+.brand-mark{width:34px;height:34px;border-radius:9px;background:var(--brand);color:#fff;display:grid;place-items:center;font-size:1rem}
+.nav-group{font-size:12px;color:var(--muted);padding:16px 12px 6px;font-weight:500}
+.sidebar .nav-item{display:flex;align-items:center;gap:12px;padding:10px 12px;margin-bottom:2px;border-radius:9px;color:#43524b;font-weight:500;transition:background .15s,color .15s}
+.sidebar .nav-item i{width:18px;text-align:center;color:#8a9a92}
+.sidebar .nav-item:hover{background:#f0f4f2;color:var(--ink)}
+.sidebar .nav-item.active{background:var(--brand-soft);color:var(--brand-dark)}
+.sidebar .nav-item.active i{color:var(--brand)}
+.nav-item .badge-count{margin-left:auto;background:var(--danger);color:#fff;border-radius:20px;font-size:11px;padding:1px 7px;font-weight:600}
+
+/* Main */
+.main{margin-left:248px;padding:0 32px 40px}
+.topbar{position:sticky;top:0;z-index:10;background:rgba(245,247,246,.92);backdrop-filter:blur(8px);display:flex;align-items:center;gap:16px;padding:16px 0}
+.search{flex:1;max-width:460px;position:relative}
+.search i{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:#8a9a92}
+.search input{width:100%;border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:10px 14px 10px 40px;font:inherit}
+.search input:focus{border-color:var(--brand);outline:none;box-shadow:0 0 0 3px var(--brand-soft)}
+.search kbd{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:#eef2f0;color:var(--muted);border-radius:6px;font-size:11px;padding:2px 6px}
+.btn-new{background:var(--brand);color:#fff;font-weight:600;border-radius:10px;padding:10px 18px;display:inline-flex;align-items:center;gap:8px;border:0;transition:background .15s; cursor:pointer}
+.btn-new:hover{background:var(--brand-dark);color:#fff}
+.btn-new small{opacity:.75;font-weight:500}
+.user{display:flex;align-items:center;gap:10px;margin-left:8px}
+.avatar{width:38px;height:38px;border-radius:50%;background:var(--brand-soft);color:var(--brand-dark);display:grid;place-items:center;font-weight:700;font-size:13px}
+.user b{display:block;font-size:13px;line-height:1.2}
+.user span{font-size:12px;color:var(--muted)}
+
+.page-title{margin:10px 0 20px; display:flex; justify-content:space-between; align-items:flex-end}
+.page-title h1{font-size:1.5rem;font-weight:700;margin:0}
+.page-title p{margin:4px 0 0;color:var(--muted)}
+
+/* Panel & Chips */
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:20px;}
+.chip{display:inline-block; white-space:nowrap;font-size:12px;font-weight:600;border-radius:20px;padding:3px 10px}
+.chip.warn{background:var(--warn-soft);color:var(--warn)}
+.chip.danger{background:var(--danger-soft);color:var(--danger)}
+.chip.ok{background:var(--ok-soft);color:var(--ok)}
+.chip.gray{background:#eef2f0;color:#43524b}
+
+/* Table Specific cho Phân hệ */
+.tbl{width:100%;border-collapse:collapse}
+.tbl th{font-weight:600;color:var(--muted);font-size:12px;text-align:left;padding:12px 10px;border-bottom:1px solid var(--line); background:#f8fbfa; white-space:nowrap}
+.tbl td{padding:14px 10px;border-bottom:1px solid var(--line); vertical-align:middle}
+.tbl tr:last-child td{border-bottom:0}
+.tbl tbody tr:hover{background:#f8fbfa}
+.tbl .r{text-align:right}
+.drug-name{font-weight:600; color:var(--ink); display:block; margin-bottom:2px}
+.drug-meta{font-size:12px; color:var(--muted)}
+.action-btn{background:none; border:none; color:var(--muted); padding:4px 8px; cursor:pointer; border-radius:6px; transition:0.2s}
+.action-btn:hover{background:var(--line); color:var(--ink)}
+
+/* Thanh công cụ Bảng */
+.table-toolbar{display:flex; gap:12px; margin-bottom:16px}
+.filter-select{border:1px solid var(--line); padding:8px 12px; border-radius:8px; outline:none; font-size:13px; color:var(--ink); background:var(--surface)}
+.filter-select:focus{border-color:var(--brand)}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<!-- Cập nhật khối SIDEBAR (Thay thế toàn bộ thẻ <aside> cũ) -->
+<aside class="sidebar">
+  <div class="brand"><span class="brand-mark"><i class="fa-solid fa-staff-snake"></i></span>PharmaPro</div>
+
+  <div class="nav-group">Bán hàng</div>
+  <a href="index.html" class="nav-item"><i class="fa-solid fa-chart-pie"></i>Tổng quan</a>
+  <a href="pos.html" class="nav-item"><i class="fa-solid fa-desktop"></i>Bán hàng (POS)</a>
+  <a href="orders.html" class="nav-item"><i class="fa-solid fa-file-invoice-dollar"></i>Đơn hàng</a>
+
+  <div class="nav-group">Hàng hóa</div>
+  <a href="products.html" class="nav-item" class="active"><i class="fa-solid fa-pills"></i>Danh mục thuốc</a>
+  <a href="inventory.html" class="nav-item"><i class="fa-solid fa-boxes-stacked"></i>Quản lý kho<span class="badge-count">5</span></a>
+
+  <div class="nav-group">Quản lý</div>
+  <a href="customers.html" class="nav-item"><i class="fa-solid fa-users"></i>Khách hàng</a>
+  <a href="users.html" class="nav-item"><i class="fa-solid fa-gear"></i>Cài đặt</a>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+  <header class="topbar">
+    <div class="search">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <input type="search" placeholder="Tìm thuốc, mã vạch, thành phần..." aria-label="Tìm kiếm">
+      <kbd>Ctrl K</kbd>
+    </div>
+    <div class="user ms-auto">
+      <div class="avatar">TS</div>
+      <div><b>Phạm Trường Sơn</b><span>Dược sĩ</span></div>
+    </div>
+  </header>
+
+  <div class="page-title">
+    <div>
+        <h1>Danh mục thuốc</h1>
+        <p>Quản lý toàn bộ danh sách dược phẩm và vật tư y tế</p>
+    </div>
+    <button class="btn-new"><i class="fa-solid fa-plus"></i>Thêm thuốc mới</button>
+  </div>
+
+  <!-- PANEL CHỨA BẢNG DỮ LIỆU -->
+  <div class="panel">
+    <!-- Bộ lọc -->
+    <div class="table-toolbar">
+        <select class="filter-select">
+            <option>Tất cả danh mục</option>
+            <option>Thuốc kê đơn</option>
+            <option>Thực phẩm chức năng</option>
+            <option>Vật tư y tế</option>
+        </select>
+        <select class="filter-select">
+            <option>Trạng thái tồn kho</option>
+            <option>Sắp hết hàng</option>
+            <option>Đã hết hàng</option>
+        </select>
+        <button class="btn btn-light btn-sm border ms-auto"><i class="fa-solid fa-file-export"></i> Xuất Excel</button>
+    </div>
+
+    <!-- Bảng Dữ liệu -->
+    <div class="table-responsive">
+      <table class="tbl" id="productTable">
+        <thead>
+            <tr>
+                <th>Mã SKU</th>
+                <th>Sản phẩm & Hoạt chất</th>
+                <th>Danh mục</th>
+                <th>Quy cách</th>
+                <th class="r">Giá bán lẻ</th>
+                <th>Trạng thái Tồn</th>
+                <th class="r">Hành động</th>
+            </tr>
+        </thead>
+        <tbody>
+          <!-- Dữ liệu mẫu chờ API đắp vào -->
+          <tr>
+            <td><b class="text-secondary">VD-1234</b></td>
+            <td>
+                <span class="drug-name">Paracetamol 500mg</span>
+                <span class="drug-meta">Hoạt chất: Paracetamol</span>
+            </td>
+            <td>Giảm đau hạ sốt</td>
+            <td>Hộp 10 vỉ</td>
+            <td class="r fw-bold">35.000đ</td>
+            <td><span class="chip ok">Còn 120 hộp</span></td>
+            <td class="r">
+                <button class="action-btn" title="Chỉnh sửa"><i class="fa-solid fa-pen"></i></button>
+                <button class="action-btn" title="Xóa"><i class="fa-solid fa-trash"></i></button>
+            </td>
+          </tr>
+          <tr>
+            <td><b class="text-secondary">VD-9981</b></td>
+            <td>
+                <span class="drug-name">Amoxicillin 500mg</span>
+                <span class="drug-meta">Hoạt chất: Amoxicillin trihydrate</span>
+            </td>
+            <td>Kháng sinh (Kê đơn)</td>
+            <td>Hộp 5 vỉ</td>
+            <td class="r fw-bold">75.000đ</td>
+            <td><span class="chip warn">Còn 8 hộp</span></td>
+            <td class="r">
+                <button class="action-btn" title="Chỉnh sửa"><i class="fa-solid fa-pen"></i></button>
+                <button class="action-btn" title="Xóa"><i class="fa-solid fa-trash"></i></button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</main>
+
+<script>
+  // Kích hoạt phím tắt tìm kiếm đồng bộ
+  document.addEventListener('keydown', e => {
+    if (e.ctrlKey && e.key.toLowerCase() === 'k') { e.preventDefault(); document.querySelector('.search input').focus(); }
+  });
+
+  // Gọi API và đổ dữ liệu vào bảng
+  async function loadDanhSachThuoc() {
+    const tbody = document.querySelector('#productTable tbody');
+    tbody.innerHTML = '<tr><td colspan="7" class="text-center py-4 text-muted">Đang tải dữ liệu...</td></tr>';
+    
+    try {
+      const response = await fetch('http://localhost:3000/api/thuoc/danhsach');
+      const data = await response.json();
+      
+      tbody.innerHTML = data.map(thuoc => {
+        // Logic tính toán trạng thái tồn kho
+        let tonKho = thuoc.TongTonKho;
+        let trangThaiClass = tonKho > 30 ? 'ok' : (tonKho > 0 ? 'warn' : 'danger');
+        let trangThaiText = tonKho > 30 ? `Còn ${tonKho}` : (tonKho > 0 ? `Sắp hết (${tonKho})` : 'Hết hàng');
+
+        return `
+        <tr>
+          <td><b class="text-secondary">${thuoc.SoDangKy || thuoc.MaThuoc}</b></td>
+          <td>
+              <span class="drug-name">${thuoc.TenThuoc}</span>
+              <span class="drug-meta">Hoạt chất: ${thuoc.HoatChat}</span>
+          </td>
+          <td>${thuoc.TenNhom || 'Chưa phân loại'}</td>
+          <td>${thuoc.QuyCach}</td>
+          <td class="r fw-bold text-success">Liên hệ</td>
+          <td><span class="chip ${trangThaiClass}">${trangThaiText}</span></td>
+          <td class="r">
+              <button class="action-btn" title="Chỉnh sửa"><i class="fa-solid fa-pen"></i></button>
+              <button class="action-btn" title="Xóa"><i class="fa-solid fa-trash"></i></button>
+          </td>
+        </tr>
+        `;
+      }).join('');
+    } catch (error) {
+      console.error('Lỗi API:', error);
+      tbody.innerHTML = '<tr><td colspan="7" class="text-center py-4 text-danger">Không thể kết nối đến máy chủ.</td></tr>';
+    }
+  }
+
+  window.onload = loadDanhSachThuoc;
+</script>
+</body>
+</html>

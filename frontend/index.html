@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PharmaPro – Tổng quan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+:root{
+  --bg:#f5f7f6; --surface:#fff; --line:#e6ebe8;
+  --ink:#16221d; --muted:#6b7a73;
+  --brand:#0f766e; --brand-dark:#0b5a54; --brand-soft:#e3f3f0;
+  --warn:#b45309; --warn-soft:#fef3e2;
+  --danger:#b42318; --danger-soft:#fdeceb;
+  --ok:#15803d; --ok-soft:#e5f5ea;
+  --radius:12px;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:'Be Vietnam Pro','Segoe UI',sans-serif;font-size:14px;overflow-x:hidden}
+a{text-decoration:none}
+:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+
+/* Sidebar */
+.sidebar{position:fixed;inset:0 auto 0 0;width:248px;background:var(--surface);border-right:1px solid var(--line);padding:20px 14px;display:flex;flex-direction:column;overflow-y:auto}
+.brand{display:flex;align-items:center;gap:10px;padding:4px 10px 22px;font-weight:700;font-size:1.15rem;color:var(--ink)}
+.brand-mark{width:34px;height:34px;border-radius:9px;background:var(--brand);color:#fff;display:grid;place-items:center;font-size:1rem}
+.nav-group{font-size:12px;color:var(--muted);padding:16px 12px 6px;font-weight:500}
+.sidebar .nav-item{display:flex;align-items:center;gap:12px;padding:10px 12px;margin-bottom:2px;border-radius:9px;color:#43524b;font-weight:500;transition:background .15s,color .15s}
+.sidebar .nav-item i{width:18px;text-align:center;color:#8a9a92}
+.sidebar .nav-item:hover{background:#f0f4f2;color:var(--ink)}
+.sidebar .nav-item.active{background:var(--brand-soft);color:var(--brand-dark)}
+.sidebar .nav-item.active i{color:var(--brand)}
+.nav-item .badge-count{margin-left:auto;background:var(--danger);color:#fff;border-radius:20px;font-size:11px;padding:1px 7px;font-weight:600}
+.store-box{margin-top:auto;border:1px solid var(--line);border-radius:10px;padding:12px;background:#fafcfb}
+.store-box b{display:block;font-size:13px}
+.store-box span{font-size:12px;color:var(--muted)}
+
+/* Main */
+.main{margin-left:248px;padding:0 32px 40px}
+.topbar{position:sticky;top:0;z-index:10;background:rgba(245,247,246,.92);backdrop-filter:blur(8px);display:flex;align-items:center;gap:16px;padding:16px 0}
+.search{flex:1;max-width:460px;position:relative}
+.search i{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:#8a9a92}
+.search input{width:100%;border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:10px 14px 10px 40px;font:inherit}
+.search input:focus{border-color:var(--brand);outline:none;box-shadow:0 0 0 3px var(--brand-soft)}
+.search kbd{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:#eef2f0;color:var(--muted);border-radius:6px;font-size:11px;padding:2px 6px}
+.btn-new{background:var(--brand);color:#fff;font-weight:600;border-radius:10px;padding:10px 18px;display:inline-flex;align-items:center;gap:8px;border:0;transition:background .15s}
+.btn-new:hover{background:var(--brand-dark);color:#fff}
+.btn-new small{opacity:.75;font-weight:500}
+.user{display:flex;align-items:center;gap:10px;margin-left:8px}
+.avatar{width:38px;height:38px;border-radius:50%;background:var(--brand-soft);color:var(--brand-dark);display:grid;place-items:center;font-weight:700;font-size:13px}
+.user b{display:block;font-size:13px;line-height:1.2}
+.user span{font-size:12px;color:var(--muted)}
+
+.page-title{margin:10px 0 20px}
+.page-title h1{font-size:1.5rem;font-weight:700;margin:0}
+.page-title p{margin:2px 0 0;color:var(--muted)}
+
+/* Panels */
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:20px;height:100%}
+.panel-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.panel-head h2{font-size:1rem;font-weight:600;margin:0}
+.panel-head a{font-size:13px;color:var(--brand);font-weight:500}
+
+/* Hero: doanh thu */
+.hero{background:var(--brand);color:#fff;border:0;display:flex;flex-direction:column;justify-content:space-between;min-height:100%}
+.hero .label{opacity:.8;font-size:13px}
+.hero .big{font-size:2.3rem;font-weight:700;letter-spacing:-.5px;line-height:1.1;margin:6px 0}
+.hero .delta{display:inline-flex;gap:6px;align-items:center;background:rgba(255,255,255,.16);border-radius:20px;padding:3px 10px;font-size:12px;font-weight:500}
+.hero-stats{display:flex;gap:28px;margin-top:22px;padding-top:16px;border-top:1px solid rgba(255,255,255,.2)}
+.hero-stats b{display:block;font-size:1.15rem}
+.hero-stats span{font-size:12px;opacity:.8}
+
+/* Chart */
+.bars{display:flex;align-items:flex-end;gap:14px;height:170px;padding-top:10px}
+.bar{flex:1;display:flex;flex-direction:column;align-items:center;gap:8px;height:100%;justify-content:flex-end;font-size:12px;color:var(--muted)}
+.bar i{display:block;width:100%;max-width:38px;border-radius:7px 7px 3px 3px;background:#c9e4e0;font-style:normal}
+.bar.today i{background:var(--brand)}
+.bar.today{color:var(--ink);font-weight:600}
+
+/* Cần xử lý */
+.alert-row{display:flex;align-items:center;gap:12px;padding:11px 0;border-top:1px solid var(--line)}
+.alert-row:first-of-type{border-top:0}
+.alert-ico{width:36px;height:36px;border-radius:9px;display:grid;place-items:center;flex:none}
+.alert-ico.warn{background:var(--warn-soft);color:var(--warn)}
+.alert-ico.danger{background:var(--danger-soft);color:var(--danger)}
+.alert-row .name{font-weight:600;line-height:1.3}
+.alert-row .meta{font-size:12px;color:var(--muted)}
+.chip{margin-left:auto;white-space:nowrap;font-size:12px;font-weight:600;border-radius:20px;padding:3px 10px}
+.chip.warn{background:var(--warn-soft);color:var(--warn)}
+.chip.danger{background:var(--danger-soft);color:var(--danger)}
+.chip.ok{background:var(--ok-soft);color:var(--ok)}
+.chip.gray{background:#eef2f0;color:#43524b}
+
+/* Table */
+.tbl{width:100%;border-collapse:collapse}
+.tbl th{font-weight:500;color:var(--muted);font-size:12px;text-align:left;padding:8px 10px;border-bottom:1px solid var(--line)}
+.tbl td{padding:12px 10px;border-bottom:1px solid var(--line)}
+.tbl tr:last-child td{border-bottom:0}
+.tbl tbody tr:hover{background:#f8fbfa}
+.tbl .r{text-align:right}
+
+/* Top thuốc */
+.rank{display:flex;align-items:center;gap:12px;padding:10px 0}
+.rank .bar-bg{flex:1;height:6px;background:#eef2f0;border-radius:6px;overflow:hidden}
+.rank .bar-bg span{display:block;height:100%;background:var(--brand);border-radius:6px}
+.rank .nm{width:130px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rank .qty{width:44px;text-align:right;color:var(--muted);font-size:13px}
+
+#dynamic-content:empty{display:none}
+
+@media (max-width:991px){
+  .sidebar{transform:translateX(-100%)}
+  .main{margin-left:0;padding:0 16px 30px}
+  .btn-new small,.user div{display:none}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<!-- Cập nhật khối SIDEBAR (Thay thế toàn bộ thẻ <aside> cũ) -->
+<aside class="sidebar">
+  <div class="brand"><span class="brand-mark"><i class="fa-solid fa-staff-snake"></i></span>PharmaPro</div>
+
+  <div class="nav-group">Bán hàng</div>
+  <a href="index.html" class="nav-item" class="active"><i class="fa-solid fa-chart-pie"></i>Tổng quan</a>
+  <a href="pos.html" class="nav-item"><i class="fa-solid fa-desktop"></i>Bán hàng (POS)</a>
+  <a href="orders.html" class="nav-item"><i class="fa-solid fa-file-invoice-dollar"></i>Đơn hàng</a>
+
+  <div class="nav-group">Hàng hóa</div>
+  <a href="products.html" class="nav-item"><i class="fa-solid fa-pills"></i>Danh mục thuốc</a>
+  <a href="inventory.html" class="nav-item"><i class="fa-solid fa-boxes-stacked"></i>Quản lý kho<span class="badge-count">5</span></a>
+
+  <div class="nav-group">Quản lý</div>
+  <a href="customers.html" class="nav-item"><i class="fa-solid fa-users"></i>Khách hàng</a>
+  <a href="users.html" class="nav-item"><i class="fa-solid fa-gear"></i>Cài đặt</a>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+  <header class="topbar">
+    <div class="search">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <input type="search" placeholder="Tìm thuốc, mã vạch, đơn hàng, khách hàng" aria-label="Tìm kiếm">
+      <kbd>Ctrl K</kbd>
+    </div>
+    <a href="pos.html" class="btn-new ms-auto"><i class="fa-solid fa-plus"></i>Tạo đơn mới <small>F1</small></a>
+    <div class="user">
+      <div class="avatar">TS</div>
+      <div><b>Phạm Trường Sơn</b><span>Dược sĩ</span></div>
+    </div>
+  </header>
+
+  <div class="page-title">
+    <h1>Tổng quan</h1>
+    <p>Thứ Hai, 26/10/2026 · hôm nay bán được gì, kho cần xử lý gì</p>
+  </div>
+
+  <!-- Hàng 1: doanh thu + biểu đồ + cần xử lý -->
+  <div class="row g-3 mb-3">
+    <div class="col-xl-4 col-md-6">
+      <div class="panel hero">
+        <div>
+          <div class="label">Doanh thu hôm nay</div>
+          <div class="big">8.450.000đ</div>
+          <span class="delta"><i class="fa-solid fa-arrow-trend-up"></i>+12% so với hôm qua</span>
+        </div>
+        <div class="hero-stats">
+          <div><b>42</b><span>Đơn hàng</span></div>
+          <div><b>3,2 tr</b><span>Lợi nhuận gộp</span></div>
+          <div><b>18</b><span>Khách mới</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-xl-8 col-md-6">
+      <div class="panel">
+        <div class="panel-head"><h2>Doanh thu 7 ngày gần nhất</h2><a href="#orders">Xem báo cáo</a></div>
+        <div class="bars">
+          <div class="bar"><i style="height:55%"></i>T3</div>
+          <div class="bar"><i style="height:70%"></i>T4</div>
+          <div class="bar"><i style="height:48%"></i>T5</div>
+          <div class="bar"><i style="height:82%"></i>T6</div>
+          <div class="bar"><i style="height:92%"></i>T7</div>
+          <div class="bar"><i style="height:64%"></i>CN</div>
+          <div class="bar today"><i style="height:74%"></i>Nay</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hàng 2: cần xử lý + top bán chạy -->
+  <div class="row g-3 mb-3">
+    <div class="col-xl-7">
+      <div class="panel">
+        <div class="panel-head"><h2>Cần xử lý trong kho</h2><a href="#inventory">Mở kho</a></div>
+        <div class="alert-row">
+          <div class="alert-ico danger"><i class="fa-solid fa-triangle-exclamation"></i></div>
+          <div><div class="name">Amoxicillin 500mg</div><div class="meta">Lô A2408 · hết hạn 02/11/2026 · còn 36 hộp</div></div>
+          <span class="chip danger">Còn 7 ngày</span>
+        </div>
+        <div class="alert-row">
+          <div class="alert-ico warn"><i class="fa-regular fa-clock"></i></div>
+          <div><div class="name">Vitamin C 500mg</div><div class="meta">Lô C1107 · hết hạn 20/12/2026 · còn 120 vỉ</div></div>
+          <span class="chip warn">Còn 55 ngày</span>
+        </div>
+        <div class="alert-row">
+          <div class="alert-ico danger"><i class="fa-solid fa-box-open"></i></div>
+          <div><div class="name">Paracetamol 500mg</div><div class="meta">Tồn 8 hộp · mức tối thiểu 30 hộp</div></div>
+          <span class="chip danger">Sắp hết hàng</span>
+        </div>
+        <div class="alert-row">
+          <div class="alert-ico warn"><i class="fa-solid fa-box-open"></i></div>
+          <div><div class="name">Berberin 100mg</div><div class="meta">Tồn 15 lọ · mức tối thiểu 20 lọ</div></div>
+          <span class="chip warn">Sắp hết hàng</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-xl-5">
+      <div class="panel">
+        <div class="panel-head"><h2>Bán chạy hôm nay</h2><a href="#products">Tất cả</a></div>
+        <div class="rank"><span class="nm">Paracetamol 500mg</span><div class="bar-bg"><span style="width:100%"></span></div><span class="qty">64</span></div>
+        <div class="rank"><span class="nm">Vitamin C 500mg</span><div class="bar-bg"><span style="width:78%"></span></div><span class="qty">50</span></div>
+        <div class="rank"><span class="nm">Khẩu trang y tế</span><div class="bar-bg"><span style="width:62%"></span></div><span class="qty">40</span></div>
+        <div class="rank"><span class="nm">Oresol</span><div class="bar-bg"><span style="width:45%"></span></div><span class="qty">29</span></div>
+        <div class="rank"><span class="nm">Berberin 100mg</span><div class="bar-bg"><span style="width:30%"></span></div><span class="qty">19</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hàng 3: đơn gần đây -->
+  <div class="panel">
+    <div class="panel-head"><h2>Đơn hàng gần đây</h2><a href="#orders">Xem tất cả</a></div>
+    <div class="table-responsive">
+      <table class="tbl">
+        <thead><tr><th>Mã đơn</th><th>Khách hàng</th><th>Thời gian</th><th>Thanh toán</th><th>Trạng thái</th><th class="r">Tổng tiền</th></tr></thead>
+        <tbody>
+          <tr><td><b>#DH0142</b></td><td>Khách lẻ</td><td>14:32</td><td>Tiền mặt</td><td><span class="chip ok" style="margin:0">Hoàn tất</span></td><td class="r"><b>185.000đ</b></td></tr>
+          <tr><td><b>#DH0141</b></td><td>Nguyễn Thị Lan</td><td>14:10</td><td>Chuyển khoản</td><td><span class="chip ok" style="margin:0">Hoàn tất</span></td><td class="r"><b>420.000đ</b></td></tr>
+          <tr><td><b>#DH0140</b></td><td>Trần Văn Minh</td><td>13:45</td><td>Ghi nợ</td><td><span class="chip warn" style="margin:0">Chưa thanh toán</span></td><td class="r"><b>1.250.000đ</b></td></tr>
+          <tr><td><b>#DH0139</b></td><td>Khách lẻ</td><td>13:20</td><td>Tiền mặt</td><td><span class="chip gray" style="margin:0">Đã hủy</span></td><td class="r"><b>96.000đ</b></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Khung nội dung động: các trang khác đổ dữ liệu vào đây -->
+  <div id="dynamic-content" class="mt-3"></div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  // Active menu khi click (bỏ qua link sang trang POS)
+  document.querySelectorAll('.sidebar .nav-item').forEach(link => {
+    link.addEventListener('click', function () {
+      if (this.getAttribute('href') !== 'pos.html') {
+        document.querySelectorAll('.sidebar .nav-item').forEach(l => l.classList.remove('active'));
+        this.classList.add('active');
+      }
+    });
+  });
+  // Phím tắt: F1 = tạo đơn, Ctrl+K = tìm kiếm
+  document.addEventListener('keydown', e => {
+    if (e.key === 'F1') { e.preventDefault(); location.href = 'pos.html'; }
+    if (e.ctrlKey && e.key.toLowerCase() === 'k') { e.preventDefault(); document.querySelector('.search input').focus(); }
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,198 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quản lý kho – PharmaPro</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+/* Kế thừa Design System */
+:root{
+  --bg:#f5f7f6; --surface:#fff; --line:#e6ebe8;
+  --ink:#16221d; --muted:#6b7a73;
+  --brand:#0f766e; --brand-dark:#0b5a54; --brand-soft:#e3f3f0;
+  --warn:#b45309; --warn-soft:#fef3e2;
+  --danger:#b42318; --danger-soft:#fdeceb;
+  --ok:#15803d; --ok-soft:#e5f5ea;
+  --radius:12px;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:'Be Vietnam Pro',sans-serif;font-size:14px;overflow-x:hidden}
+a{text-decoration:none}
+.sidebar{position:fixed;inset:0 auto 0 0;width:248px;background:var(--surface);border-right:1px solid var(--line);padding:20px 14px;display:flex;flex-direction:column;z-index:20}
+.brand{display:flex;align-items:center;gap:10px;padding:4px 10px 22px;font-weight:700;font-size:1.15rem;color:var(--ink)}
+.brand-mark{width:34px;height:34px;border-radius:9px;background:var(--brand);color:#fff;display:grid;place-items:center;font-size:1rem}
+.nav-group{font-size:12px;color:var(--muted);padding:16px 12px 6px;font-weight:500}
+.sidebar .nav-item{display:flex;align-items:center;gap:12px;padding:10px 12px;margin-bottom:2px;border-radius:9px;color:#43524b;font-weight:500;transition:0.15s}
+.sidebar .nav-item i{width:18px;text-align:center;color:#8a9a92}
+.sidebar .nav-item:hover{background:#f0f4f2;color:var(--ink)}
+.sidebar .nav-item.active{background:var(--brand-soft);color:var(--brand-dark)}
+.sidebar .nav-item.active i{color:var(--brand)}
+.nav-item .badge-count{margin-left:auto;background:var(--danger);color:#fff;border-radius:20px;font-size:11px;padding:1px 7px;font-weight:600}
+.main{margin-left:248px;padding:0 32px 40px}
+.topbar{position:sticky;top:0;z-index:10;background:rgba(245,247,246,.92);backdrop-filter:blur(8px);display:flex;align-items:center;gap:16px;padding:16px 0}
+.search{flex:1;max-width:460px;position:relative}
+.search i{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:#8a9a92}
+.search input{width:100%;border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:10px 14px 10px 40px;font:inherit}
+.search input:focus{border-color:var(--brand);outline:none;box-shadow:0 0 0 3px var(--brand-soft)}
+.user{display:flex;align-items:center;gap:10px;margin-left:auto}
+.avatar{width:38px;height:38px;border-radius:50%;background:var(--brand-soft);color:var(--brand-dark);display:grid;place-items:center;font-weight:700;font-size:13px}
+.user b{display:block;font-size:13px;line-height:1.2}
+.user span{font-size:12px;color:var(--muted)}
+.page-title{margin:10px 0 20px; display:flex; justify-content:space-between; align-items:flex-end}
+.page-title h1{font-size:1.5rem;font-weight:700;margin:0}
+.page-title p{margin:4px 0 0;color:var(--muted)}
+.btn-new{background:var(--brand);color:#fff;font-weight:600;border-radius:10px;padding:10px 18px;display:inline-flex;align-items:center;gap:8px;border:0;transition:0.15s; cursor:pointer}
+.btn-new:hover{background:var(--brand-dark);color:#fff}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:20px;}
+.chip{display:inline-block; white-space:nowrap;font-size:12px;font-weight:600;border-radius:20px;padding:3px 10px}
+.chip.warn{background:var(--warn-soft);color:var(--warn)}
+.chip.danger{background:var(--danger-soft);color:var(--danger)}
+.chip.ok{background:var(--ok-soft);color:var(--ok)}
+.tbl{width:100%;border-collapse:collapse}
+.tbl th{font-weight:600;color:var(--muted);font-size:12px;text-align:left;padding:12px 10px;border-bottom:1px solid var(--line); background:#f8fbfa}
+.tbl td{padding:14px 10px;border-bottom:1px solid var(--line); vertical-align:middle}
+.tbl tbody tr:hover{background:#f8fbfa}
+.tbl .r{text-align:right}
+.drug-name{font-weight:600; color:var(--ink); display:block; margin-bottom:2px}
+.drug-meta{font-size:12px; color:var(--muted)}
+.table-toolbar{display:flex; gap:12px; margin-bottom:16px}
+.filter-select{border:1px solid var(--line); padding:8px 12px; border-radius:8px; outline:none; font-size:13px; color:var(--ink); background:var(--surface)}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="brand"><span class="brand-mark"><i class="fa-solid fa-staff-snake"></i></span>PharmaPro</div>
+  <div class="nav-group">Bán hàng</div>
+  <a href="index.html" class="nav-item"><i class="fa-solid fa-chart-pie"></i>Tổng quan</a>
+  <a href="pos.html" class="nav-item"><i class="fa-solid fa-desktop"></i>Bán hàng (POS)</a>
+  <a href="orders.html" class="nav-item"><i class="fa-solid fa-file-invoice-dollar"></i>Đơn hàng</a>
+  <div class="nav-group">Hàng hóa</div>
+  <a href="products.html" class="nav-item"><i class="fa-solid fa-pills"></i>Danh mục thuốc</a>
+  <a href="inventory.html" class="nav-item active"><i class="fa-solid fa-boxes-stacked"></i>Quản lý kho<span class="badge-count" id="alertCount">0</span></a>
+  <div class="nav-group">Quản lý</div>
+  <a href="customers.html" class="nav-item"><i class="fa-solid fa-users"></i>Khách hàng</a>
+  <a href="users.html" class="nav-item"><i class="fa-solid fa-gear"></i>Cài đặt</a>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+  <header class="topbar">
+    <div class="search">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <input type="search" placeholder="Tìm theo số lô, mã thuốc..." aria-label="Tìm kiếm">
+    </div>
+    <div class="user">
+      <div class="avatar">TS</div>
+      <div><b>Phạm Trường Sơn</b><span>Dược sĩ</span></div>
+    </div>
+  </header>
+
+  <div class="page-title">
+    <div>
+        <h1>Quản lý Kho & Lô Thuốc</h1>
+        <p>Theo dõi hạn sử dụng và số lượng tồn theo từng lô sản xuất</p>
+    </div>
+    <button class="btn-new"><i class="fa-solid fa-truck-ramp-box"></i>Nhập hàng mới</button>
+  </div>
+
+  <div class="panel">
+    <div class="table-toolbar">
+        <select class="filter-select">
+            <option>Tất cả các lô</option>
+            <option>Sắp hết hạn (< 6 tháng)</option>
+            <option>Đã hết hạn</option>
+        </select>
+    </div>
+    <div class="table-responsive">
+      <table class="tbl" id="inventoryTable">
+        <thead>
+            <tr>
+                <th>Số Lô (Batch)</th>
+                <th>Sản phẩm</th>
+                <th>Ngày SX</th>
+                <th>Hạn Sử Dụng</th>
+                <th class="r">Tồn kho</th>
+                <th>Trạng thái Date</th>
+            </tr>
+        </thead>
+        <tbody>
+          <tr><td colspan="6" class="text-center py-4 text-muted">Đang tải dữ liệu...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</main>
+
+<script>
+  async function loadKho() {
+    const tbody = document.querySelector('#inventoryTable tbody');
+    let alertCount = 0;
+    
+    try {
+      const response = await fetch('http://localhost:3000/api/kho/danhsach');
+      const data = await response.json();
+      
+      tbody.innerHTML = data.map(lo => {
+        // Tính toán số ngày còn lại đến hạn sử dụng
+        const hanSD = new Date(lo.HanSuDung);
+        const homNay = new Date();
+        const diffTime = hanSD - homNay;
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        
+        let dateClass = 'ok';
+        let dateText = 'An toàn';
+        
+        if (diffDays <= 0) {
+            dateClass = 'danger';
+            dateText = 'Đã hết hạn';
+            alertCount++;
+        } else if (diffDays <= 180) { // Cảnh báo dưới 6 tháng
+            dateClass = 'warn';
+            dateText = `Còn ${diffDays} ngày`;
+            alertCount++;
+        } else {
+            // Định dạng ngày tháng VN nếu còn xa
+            dateClass = 'ok';
+            dateText = 'An toàn';
+        }
+
+        const ngaySXFmt = new Date(lo.NgaySanXuat).toLocaleDateString('vi-VN');
+
+        return `
+        <tr>
+          <td><b class="text-secondary">${lo.SoLo}</b></td>
+          <td>
+              <span class="drug-name">${lo.TenThuoc}</span>
+              <span class="drug-meta">Mã: ${lo.SoDangKy} | Q/C: ${lo.QuyCach}</span>
+          </td>
+          <td>${ngaySXFmt}</td>
+          <td class="fw-bold">${hanSD.toLocaleDateString('vi-VN')}</td>
+          <td class="r fw-bold ${lo.SoLuongTon < 20 ? 'text-danger' : ''}">${lo.SoLuongTon}</td>
+          <td><span class="chip ${dateClass}">${dateText}</span></td>
+        </tr>
+        `;
+      }).join('');
+
+      // Cập nhật số lượng cảnh báo trên Sidebar
+      if(alertCount > 0) {
+          document.getElementById('alertCount').innerText = alertCount;
+      } else {
+          document.getElementById('alertCount').style.display = 'none';
+      }
+
+    } catch (error) {
+      console.error('Lỗi API:', error);
+      tbody.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-danger">Lỗi kết nối CSDL.</td></tr>';
+    }
+  }
+
+  window.onload = loadKho;
+</script>
+</body>
+</html>
