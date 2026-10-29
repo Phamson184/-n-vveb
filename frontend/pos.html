@@ -136,7 +136,7 @@ button{font:inherit}
     <div class="search-wrap">
       <i class="fa-solid fa-magnifying-glass ic"></i>
       <input type="text" id="searchInput" placeholder="Quét mã vạch hoặc gõ tên thuốc, hoạt chất" autocomplete="off" autofocus>
-      <kbd>F2</kbd>
+      <kbd>F1</kbd>
       <div id="results" class="card-x"></div>
     </div>
 
@@ -145,7 +145,7 @@ button{font:inherit}
     <div class="card-x cart">
       <div class="cart-head">
         <h2>Giỏ hàng <span id="cartCount" class="tag">0 sản phẩm</span></h2>
-        <button class="link-btn" id="clearBtn"><i class="fa-regular fa-trash-can"></i> Xóa tất cả</button>
+        <button class="link-btn" id="clearBtn"><i class="fa-regular fa-trash-can"></i> Hủy đơn <small>F4</small></button>
       </div>
       <div class="cart-body">
         <table class="tbl">
@@ -195,7 +195,7 @@ button{font:inherit}
       </div>
 
       <div class="actions">
-        <button class="btn-pay" id="payBtn" disabled>Thanh toán <small>F8</small></button>
+        <button class="btn-pay" id="payBtn" disabled>Thanh toán <small>F3</small></button>
         <button class="btn-ghost" id="saveBtn">Lưu tạm đơn hàng</button>
       </div>
     </div>
@@ -205,7 +205,7 @@ button{font:inherit}
 <div class="toast-x" id="toast"></div>
 
 <script>
-const API = 'http://localhost:3000/api/thuoc';
+const API = 'http://localhost:3000/api/thuoc/danhsach';
 // Giả định: API trả về TenThuoc, HoatChat, QuyCach; nếu có GiaBan / DonViTinh thì dùng, không thì lấy giá trị mặc định bên dưới.
 const FALLBACK_PRICE = 25000, FALLBACK_UNIT = 'Hộp';
 
@@ -304,7 +304,7 @@ $('cartItems').addEventListener('click', e => {
 $('cartItems').addEventListener('change', e => {
   if (e.target.dataset.a === 'set') { cart[+e.target.dataset.i].qty = Math.max(1, parseInt(e.target.value) || 1); render(); }
 });
-$('clearBtn').onclick = () => { if (cart.length && confirm('Xóa toàn bộ giỏ hàng?')) { cart = []; render(); } };
+$('clearBtn').onclick = () => { if (cart.length && confirm('Hủy đơn hàng hiện tại?')) { cart = []; render(); } };
 
 /* ---- Tính tiền ---- */
 let grand = 0;
@@ -351,10 +351,11 @@ $('saveBtn').onclick = () => {
   localStorage.setItem('pos_draft', JSON.stringify(cart)); toast('Đã lưu tạm đơn hàng'); reset();
 };
 
-/* ---- Phím tắt & đồng hồ ---- */
+/* ---- Phím tắt (F1 tìm kiếm, F3 thanh toán, F4 hủy đơn) & đồng hồ ---- */
 document.addEventListener('keydown', e => {
-  if (e.key === 'F2') { e.preventDefault(); $('searchInput').focus(); $('searchInput').select(); }
-  if (e.key === 'F8') { e.preventDefault(); checkout(); }
+  if (e.key === 'F1') { e.preventDefault(); $('searchInput').focus(); $('searchInput').select(); }
+  if (e.key === 'F3') { e.preventDefault(); checkout(); }
+  if (e.key === 'F4') { e.preventDefault(); $('clearBtn').click(); }
 });
 setInterval(() => $('clock').textContent = new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }), 1000);
 $('clock').textContent = new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });

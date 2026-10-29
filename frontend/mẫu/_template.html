@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PharmaPro – TÊN TRANG</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="css/theme.css">
+<style>
+  /* CSS riêng của trang này viết ở đây (không sửa theme.css) */
+</style>
+</head>
+<body>
+
+<!-- KHUNG CHUNG: sidebar + thanh trên. Giữ nguyên, không sửa. -->
+<aside class="sidebar">
+  <div class="brand"><span class="brand-mark"><i class="fa-solid fa-staff-snake"></i></span>PharmaPro</div>
+
+  <div class="nav-group">Bán hàng</div>
+  <a href="index.html" class="nav-item"><i class="fa-solid fa-chart-pie"></i>Tổng quan</a>
+  <a href="pos.html" class="nav-item"><i class="fa-solid fa-desktop"></i>Bán hàng (POS)</a>
+  <a href="orders.html" class="nav-item"><i class="fa-solid fa-file-invoice-dollar"></i>Đơn hàng</a>
+
+  <div class="nav-group">Hàng hóa</div>
+  <a href="products.html" class="nav-item"><i class="fa-solid fa-pills"></i>Danh mục thuốc</a>
+  <a href="inventory.html" class="nav-item"><i class="fa-solid fa-boxes-stacked"></i>Quản lý kho</a>
+
+  <div class="nav-group">Quản lý</div>
+  <a href="customers.html" class="nav-item"><i class="fa-solid fa-users"></i>Khách hàng</a>
+  <a href="users.html" class="nav-item"><i class="fa-solid fa-user-doctor"></i>Nhân viên</a>
+
+  <div class="store-box"><b>Nhà thuốc GPP</b><span>Chi nhánh chính</span></div>
+</aside>
+
+<main class="main">
+  <header class="topbar">
+    <div class="search">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <input type="search" placeholder="Tìm thuốc, mã vạch, đơn hàng, khách hàng" aria-label="Tìm kiếm">
+    </div>
+    <a href="pos.html" class="btn-new ms-auto"><i class="fa-solid fa-plus"></i>Tạo đơn mới <small>F1</small></a>
+    <div class="user"><div class="avatar">DS</div><div><b>Dược sĩ</b><span>Đang đăng nhập</span></div></div>
+  </header>
+
+  <div class="page-title">
+    <h1>TÊN TRANG</h1>
+    <p>Mô tả ngắn một dòng</p>
+  </div>
+
+  <!-- ============ NỘI DUNG TRANG: làm việc ở đây ============ -->
+  <div class="panel">
+    <div class="panel-head"><h2>Danh sách</h2></div>
+    <div class="toolbar">
+      <div class="search"><i class="fa-solid fa-magnifying-glass"></i><input type="search" id="q" placeholder="Tìm kiếm"></div>
+      <button class="btn-brand" id="btnAdd"><i class="fa-solid fa-plus"></i>Thêm mới</button>
+    </div>
+    <div class="table-responsive">
+      <table class="tbl">
+        <thead><tr><th>Cột 1</th><th>Cột 2</th><th class="r">Cột 3</th></tr></thead>
+        <tbody id="rows"></tbody>
+      </table>
+      <div class="empty" id="empty" style="display:none"><i class="fa-regular fa-folder-open"></i><b>Chưa có dữ liệu</b></div>
+    </div>
+  </div>
+  <!-- ============ HẾT NỘI DUNG TRANG ============ -->
+</main>
+
+<div class="toast-x" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+/* ---------- Cấu hình và hàm dùng chung: giữ nguyên, copy sang mọi trang ---------- */
+const API = 'http://localhost:3000';
+const USE_MOCK = true;   // true = dùng dữ liệu giả bên dưới; đổi thành false khi API đã sẵn sàng
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const money = n => (Math.round(Number(n)) || 0).toLocaleString('vi-VN') + 'đ';
+const fmtDate = v => v ? new Date(v).toLocaleDateString('vi-VN') : '';
+const phoneOk = s => /^0\d{9}$/.test(String(s).trim());          // 10 số, bắt đầu bằng 0
+
+// Trạng thái lô thuốc theo hạn dùng: đỏ = hết hạn, vàng = còn <= 180 ngày (~6 tháng), xanh = an toàn
+function trangThaiLo(hanSuDung) {
+  const days = Math.floor((new Date(hanSuDung) - Date.now()) / 86400000);
+  if (days < 0)    return { key: 'danger', text: 'Hết hạn',      days };
+  if (days <= 180) return { key: 'warn',   text: 'Dưới 6 tháng', days };
+  return { key: 'ok', text: 'An toàn', days };
+}
+
+// Gọi API: tự thêm địa chỉ gốc, ném lỗi kèm câu thông báo tiếng Việt từ máy chủ
+async function api(path, options = {}) {
+  const res = await fetch(API + path, { headers: { 'Content-Type': 'application/json' }, ...options });
+  const data = await res.json().catch(() => null);
+  if (!res.ok) throw new Error((data && data.error) || 'Lỗi máy chủ (' + res.status + ')');
+  return data;
+}
+function toast(msg, isError = false) {
+  const t = $('toast'); t.textContent = msg; t.className = 'toast-x show' + (isError ? ' error' : '');
+  setTimeout(() => t.classList.remove('show'), 2400);
+}
+
+/* ---------- Mẫu "dữ liệu giả -> API thật": mỗi API một hàm như dưới ---------- */
+const MOCK_THUOC = [   // đúng tên trường và kiểu dữ liệu như trong AI_CONTEXT.md
+  { MaThuoc: 'T0001', TenThuoc: 'Paracetamol 500mg', HoatChat: 'Paracetamol', QuyCach: 'Hộp 10 vỉ x 10 viên', TenNhom: 'Giảm đau - hạ sốt', TongTonKho: 8,  GiaBan: 35000 },
+  { MaThuoc: 'T0005', TenThuoc: 'Amoxicillin 500mg', HoatChat: 'Amoxicillin trihydrat', QuyCach: 'Hộp 10 vỉ x 10 viên', TenNhom: 'Kháng sinh', TongTonKho: 150, GiaBan: 78000 }
+];
+async function layDanhSachThuoc() {
+  return USE_MOCK ? MOCK_THUOC : api('/api/thuoc/danhsach');
+}
+
+async function render() {
+  try {
+    const list = await layDanhSachThuoc();
+    $('rows').innerHTML = list.map(t => `<tr><td>${esc(t.TenThuoc)}</td><td>${esc(t.HoatChat)}</td><td class="r">${money(t.GiaBan)}</td></tr>`).join('');
+    $('empty').style.display = list.length ? 'none' : 'flex';
+  } catch (e) { toast(e.message, true); }
+}
+
+/* ---------- Menu đang chọn + phím tắt chung (F1 = mở POS) ---------- */
+const here = location.pathname.split('/').pop() || 'index.html';
+document.querySelectorAll('.sidebar .nav-item').forEach(a => a.classList.toggle('active', a.getAttribute('href') === here));
+document.addEventListener('keydown', e => { if (e.key === 'F1') { e.preventDefault(); location.href = 'pos.html'; } });
+
+render();
+</script>
+</body>
+</html>
