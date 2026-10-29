@@ -1,5 +1,24 @@
 ## Quy định làm việc
 
+Để bắt đầu làm việc, các bạn mở Terminal/PowerShell trên máy tính và copy-paste tuần tự các lệnh sau.
+Bước 1: Kéo mã nguồn từ GitHub
+PowerShell
+git clone https://github.com/Phamson184/-n-vveb.git
+cd -n-vveb
+
+Bước 2: Thiết lập môi trường
+PowerShell
+Copy-Item -Path .env.example -Destination .env
+(Nếu dùng macOS/Linux, thay bằng lệnh: cp .env.example .env)
+
+Bước 3: Chạy máy chủ ảo (Yêu cầu đã mở Docker Desktop)
+PowerShell
+docker-compose up -d --build
+
+Sau khi terminal chạy xong, mở trình duyệt:
+Giao diện Web: http://localhost:8080
+Test API: http://localhost:3000/api/thuoc/danhsach
+
 **Vai trò**
 
 | Người | Code | Ngoài code |
