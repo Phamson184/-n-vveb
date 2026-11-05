@@ -16,8 +16,9 @@ PowerShell
 docker-compose up -d --build
 
 Sau khi terminal chạy xong, mở trình duyệt:
-Giao diện Web: http://localhost:8080
-Test API: http://localhost:3000/api/thuoc/danhsach
+Giao diện Web / POS (Frontend): Truy cập tại địa chỉ http://localhost:8082
+API Backend (PHP Server): Truy cập tại địa chỉ http://localhost:3001 
+
 
 **Vai trò**
 
