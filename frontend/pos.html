@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
@@ -205,7 +205,7 @@ button{font:inherit}
 <div class="toast-x" id="toast"></div>
 
 <script>
-const API = 'http://localhost:3000/api/thuoc/danhsach';
+const API = 'http://localhost:3001/api/thuoc/danhsach';
 // Giả định: API trả về TenThuoc, HoatChat, QuyCach; nếu có GiaBan / DonViTinh thì dùng, không thì lấy giá trị mặc định bên dưới.
 const FALLBACK_PRICE = 25000, FALLBACK_UNIT = 'Hộp';
 
@@ -227,7 +227,7 @@ async function loadProducts() {
     $('quick').innerHTML = '<span>Hay bán:</span>' + products.slice(0, 6)
       .map(p => `<button data-id="${esc(p.id)}">${esc(p.name)}</button>`).join('');
   } catch (e) {
-    $('quick').innerHTML = '<span style="color:var(--danger)"><i class="fa-solid fa-plug-circle-xmark"></i> Không kết nối được máy chủ dữ liệu (localhost:3000)</span>';
+    $('quick').innerHTML = '<span style="color:var(--danger)"><i class="fa-solid fa-plug-circle-xmark"></i> Không kết nối được máy chủ dữ liệu (localhost:3001)</span>';
   }
 }
 $('quick').addEventListener('click', e => {
@@ -368,3 +368,4 @@ window.onload = () => {
 </script>
 </body>
 </html>
+

@@ -1,33 +1,58 @@
-﻿<?php
-// Tương đương server.js: khởi tạo app, cors, đọc JSON, khai báo route, xử lý lỗi.
-// Chạy (giữ nguyên cổng 3000 như Node nên frontend KHÔNG phải sửa URL):
-//     php -S localhost:3000 index.php
-require __DIR__ . '/config.php';
-require __DIR__ . '/handlers.php';
+<?php
+// 1. XƯỞNG CORS HEADERS BẮT BUỘC (Phải đặt ở dòng đầu tiên tuyệt đối)
+if (isset($_SERVER['HTTP_ORIGIN'])) {
+    header("Access-Control-Allow-Origin: {$_SERVER['HTTP_ORIGIN']}");
+    header('Access-Control-Allow-Credentials: true');
+    header('Access-Control-Max-Age: 86400');    // Cache trong 1 ngày
+}
 
-// app.use(cors())
-header('Access-Control-Allow-Origin: *');
-header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
-header('Access-Control-Allow-Headers: Content-Type, Authorization');
+// Xử lý các request dạng OPTIONS (Preflight) của trình duyệt
+if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
+    if (isset($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_METHOD']))
+        header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
+    if (isset($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS']))
+        header("Access-Control-Allow-Headers: {$_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS']}");
+    exit(0);
+}
+
+// Thiết lập định dạng trả về chung là JSON UTF-8
 header('Content-Type: application/json; charset=utf-8');
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') { http_response_code(204); exit; }
 
-// app.use(express.json())  ->  $body (dùng cho các route POST/PUT sau này)
+// 2. NẠP KẾT NỐI CSDL
+require_once __DIR__ . '/config.php';
+
+// 3. XỬ LÝ ROUTING VÀ CHUẨN HÓA ĐƯỜNG DẪN
 $body = json_decode(file_get_contents('php://input'), true) ?? [];
 
-// Bảng route: mỗi dòng = một app.get / app.post trong Node
+$path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+$path = rtrim(rtrim($path, '.'), '/');
+
+if (PHP_SAPI !== 'cli-server') {
+    $base = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/');
+    if ($base !== '' && str_starts_with($path, $base)) {
+        $path = substr($path, strlen($base));
+    }
+}
+
+$key = $_SERVER['REQUEST_METHOD'] . ' ' . $path;
+
+// 4. KHAI BÁO CÁC ROUTE API
 $routes = [
-    'GET /api/thuoc/danhsach' => 'getDanhSachThuoc',
-    'GET /api/kho/danhsach'   => 'getDanhSachKho',
+    'GET /api/thuoc/danhsach' => function() use ($conn) {
+        $sql = "SELECT * FROM THUOC";
+        $stmt = sqlsrv_query($conn, $sql);
+        if ($stmt === false) {
+            return ["error" => print_r(sqlsrv_errors(), true)];
+        }
+        $data = [];
+        while ($row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC)) {
+            $data[] = $row;
+        }
+        return $data;
+    }
 ];
 
-$path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-if (PHP_SAPI !== 'cli-server') { // chạy qua Apache/XAMPP trong thư mục con: cắt phần tiền tố thư mục
-    $base = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/');
-    if ($base !== '' && str_starts_with($path, $base)) $path = substr($path, strlen($base));
-}
-$key = $_SERVER['REQUEST_METHOD'] . ' ' . rtrim($path, '/');
-
+// 5. KIỂM TRA VÀ PHẢN HỒI API
 if (!isset($routes[$key])) {
     http_response_code(404);
     echo json_encode(['error' => 'Không tìm thấy API: ' . $key], JSON_UNESCAPED_UNICODE);
@@ -35,9 +60,9 @@ if (!isset($routes[$key])) {
 }
 
 try {
-    echo json_encode($routes[$key]($body), JSON_UNESCAPED_UNICODE); // res.json(...)
+    echo json_encode($routes[$key]($body), JSON_UNESCAPED_UNICODE);
 } catch (Throwable $e) {
-    http_response_code(500);                                         // res.status(500).json({error})
+    http_response_code(500);
     echo json_encode(['error' => $e->getMessage()], JSON_UNESCAPED_UNICODE);
 }
-
+?>

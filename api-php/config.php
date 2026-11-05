@@ -1,14 +1,31 @@
 ﻿<?php
-// Tự động lấy cấu hình từ môi trường Docker hoặc mặc định nếu chạy ngoài
-$serverName = getenv('DB_HOST') ?: "localhost";
-$database = getenv('DB_NAME') ?: "QuanLyNhaThuocDB";
-$uid = getenv('DB_USER') ?: "sa";
-$pwd = getenv('DB_PASS') ?: "P@ssw0rd123";
+$serverName = "db,1433";
+$connectionOptions = array(
+    "UID" => "sa",
+    "PWD" => "YourStrong@Passw0rd123",
+    "CharacterSet" => "UTF-8",
+    "TrustServerCertificate" => true
+);
 
-try {
-    $conn = new PDO("sqlsrv:server=$serverName;Database=$database;TrustServerCertificate=1", $uid, $pwd);
-    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-} catch (PDOException $e) {
-    die("Lỗi kết nối CSDL: " . $e->getMessage());
+// Kết nối master để tạo DB nếu chưa có
+$conn_master = sqlsrv_connect($serverName, $connectionOptions);
+if ($conn_master !== false) {
+    sqlsrv_query($conn_master, "IF NOT EXISTS (SELECT * FROM sys.databases WHERE name = 'QuanLyNhaThuocDB') CREATE DATABASE QuanLyNhaThuocDB;");
+    sqlsrv_close($conn_master);
 }
-?>
+
+// Kết nối chính thức vào CSDL QuanLyNhaThuocDB
+$connectionInfo = array(
+    "Database" => "QuanLyNhaThuocDB",
+    "UID" => "sa",
+    "PWD" => "YourStrong@Passw0rd123",
+    "CharacterSet" => "UTF-8",
+    "TrustServerCertificate" => true
+);
+
+$conn = sqlsrv_connect($serverName, $connectionInfo);
+if ($conn === false) {
+    http_response_code(500);
+    echo json_encode(["error" => "Lỗi kết nối CSDL: " . print_r(sqlsrv_errors(), true)], JSON_UNESCAPED_UNICODE);
+    exit;
+}

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
@@ -207,7 +207,7 @@ a{text-decoration:none}
     tbody.innerHTML = '<tr><td colspan="7" class="text-center py-4 text-muted">Đang tải dữ liệu...</td></tr>';
     
     try {
-      const response = await fetch('http://localhost:3000/api/thuoc/danhsach');
+      const response = await fetch('http://localhost:3001/api/thuoc/danhsach');
       const data = await response.json();
       
       tbody.innerHTML = data.map(thuoc => {

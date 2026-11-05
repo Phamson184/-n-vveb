@@ -135,7 +135,7 @@ a{text-decoration:none}
     let alertCount = 0;
     
     try {
-      const response = await fetch('http://localhost:3000/api/kho/danhsach');
+      const response = await fetch('http://localhost:3001/api/kho/danhsach');
       const data = await response.json();
       
       tbody.innerHTML = data.map(lo => {
@@ -196,3 +196,4 @@ a{text-decoration:none}
 </script>
 </body>
 </html>
+
