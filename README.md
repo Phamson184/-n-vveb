@@ -3,8 +3,8 @@
 Để bắt đầu làm việc, các bạn mở Terminal/PowerShell trên máy tính và copy-paste tuần tự các lệnh sau.
 Bước 1: Kéo mã nguồn từ GitHub
 PowerShell
-git clone https://github.com/Phamson184/-n-vveb.git
-cd -n-vveb
+ git clone https://github.com/Phamson184/-n-vveb.git
+cd -- -n-vveb
 
 Bước 2: Thiết lập môi trường
 PowerShell
