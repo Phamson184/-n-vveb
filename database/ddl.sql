@@ -14,7 +14,7 @@ END
 GO
 CREATE DATABASE QuanLyNhaThuocDB;
 GO
-USE QuanLyNhaThuocDB;
+USE QuanLyNhaThuocDBko;
 GO
 
 -- 1. BẢNG NHÓM THUỐC
