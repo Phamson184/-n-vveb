@@ -5,7 +5,7 @@
 1. Mở một cuộc trò chuyện **mới** với AI.
 2. **Đính kèm:** `docs/AI_CONTEXT.md`, `frontend/css/theme.css`, `frontend/_template.html`, và file trang của bạn nếu đã có.
 3. Dán lệnh của bạn ở mục 2. Làm theo thứ tự ở `AI_CONTEXT.md` mục 8: dữ liệu giả → chạy được → nối API.
-4. Mở trang trên http://localhost:8080 và thử bấm thật. Có lỗi thì dán nguyên thông báo trong Console (F12) cho AI, không tự đoán.
+4. Mở trang trên http://localhost:8082 và thử bấm thật. Có lỗi thì dán nguyên thông báo trong Console (F12) cho AI, không tự đoán.
 
 Các lệnh có nhãn **[Giai đoạn 3]** chỉ dùng sau khi phần lõi đã được trưởng nhóm nghiệm thu.
 
@@ -165,7 +165,7 @@ API DÙNG: 6.7
 
 ## 3. Danh sách tự kiểm tra trước khi tạo Pull Request
 
-- [ ] Trang mở được trên http://localhost:8080, Console (F12) không có lỗi đỏ.
+- [ ] Trang mở được trên http://localhost:8082, Console (F12) không có lỗi đỏ.
 - [ ] Chỉ sửa file được giao; sidebar và khối hàm dùng chung vẫn nguyên vẹn.
 - [ ] Không còn mã màu gõ tay trong CSS riêng; dùng biến `var(--...)`.
 - [ ] Dữ liệu chèn vào trang đều qua `esc()`.

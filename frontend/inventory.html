@@ -61,6 +61,64 @@ a{text-decoration:none}
 .drug-meta{font-size:12px; color:var(--muted)}
 .table-toolbar{display:flex; gap:12px; margin-bottom:16px}
 .filter-select{border:1px solid var(--line); padding:8px 12px; border-radius:8px; outline:none; font-size:13px; color:var(--ink); background:var(--surface)}
+
+/* Sửa lỗi Modal chạm trần màn hình */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    padding: 20px; /* Tạo khoảng cách an toàn với viền màn hình */
+}
+.modal-content {
+    background: #fff;
+    padding: 24px;
+    border-radius: 8px;
+    width: 100%;
+    max-width: 540px;
+    max-height: 85vh; /* Không bao giờ bị tràn trần */
+    overflow-y: auto;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    margin: auto;
+}
+
+/* CSS cho Ô chọn Tìm kiếm Thông minh (Combobox) */
+.combobox-container {
+    position: relative;
+    width: 100%;
+}
+.combobox-list {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0; right: 0;
+    max-height: 200px;
+    overflow-y: auto;
+    background: #ffffff;
+    border: 1px solid #0d6efd;
+    border-radius: 6px;
+    z-index: 1100;
+    display: none;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+}
+.combobox-item {
+    padding: 10px 12px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    border-bottom: 1px solid #f0f0f0;
+    display: flex;
+    justify-content: space-between;
+}
+.combobox-item:last-child { border-bottom: none; }
+.combobox-item:hover, .combobox-item.active {
+    background-color: #0d6efd;
+    color: #ffffff;
+}
+.combobox-item:hover .text-muted, .combobox-item.active .text-muted {
+    color: #e0e0e0 !important;
+}
 </style>
 </head>
 <body>
@@ -85,7 +143,8 @@ a{text-decoration:none}
   <header class="topbar">
     <div class="search">
       <i class="fa-solid fa-magnifying-glass"></i>
-      <input type="search" placeholder="Tìm theo số lô, mã thuốc..." aria-label="Tìm kiếm">
+      <input type="search" id="inpTimKiemKho" placeholder="Tìm theo số lô, mã thuốc, tên thuốc..." aria-label="Tìm kiếm" onkeyup="xuLyLocKho()">
+      <kbd>Ctrl K</kbd>
     </div>
     <div class="user">
       <div class="avatar">TS</div>
@@ -98,17 +157,17 @@ a{text-decoration:none}
         <h1>Quản lý Kho & Lô Thuốc</h1>
         <p>Theo dõi hạn sử dụng và số lượng tồn theo từng lô sản xuất</p>
     </div>
-    <button class="btn-new"><i class="fa-solid fa-truck-ramp-box"></i>Nhập hàng mới</button>
+    <button class="btn-new" onclick="hienThiModalNhapKho()"><i class="fa-solid fa-truck-ramp-box"></i>Nhập hàng mới</button>
   </div>
 
   <div class="panel">
     <div class="table-toolbar">
-        <select class="filter-select">
-            <option>Tất cả các lô</option>
-            <option>Sắp hết hạn (< 6 tháng)</option>
-            <option>Đã hết hạn</option>
-        </select>
-    </div>
+      <select class="filter-select" id="selLocDate" onchange="xuLyLocKho()">
+        <option value="ALL">Tất cả các lô</option>
+        <option value="SAP_HET_HAN">Sắp hết hạn (< 6 tháng)</option>
+        <option value="DA_HET_HAN">Đã hết hạn</option>
+      </select>
+  </div>
     <div class="table-responsive">
       <table class="tbl" id="inventoryTable">
         <thead>
@@ -127,19 +186,70 @@ a{text-decoration:none}
       </table>
     </div>
   </div>
+<!-- MODAL NHẬP LÔ HÀNG MỚI -->
+<!-- MODAL NHẬP LÔ HÀNG MỚI -->
+<div class="modal-overlay" id="modalNhapKho">
+    <div class="modal-content">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; border-bottom:1px solid #eee; padding-bottom:8px;">
+            <h3 style="margin:0; font-size:1.2rem;">Nhập Lô Thuốc Mới</h3>
+            <button type="button" onclick="dongModalNhapKho()" style="background:none; border:none; font-size:1.5rem; cursor:pointer;">&times;</button>
+        </div>
+        <form id="formNhapKho" onsubmit="submitNhapKho(event)">
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+                
+                <!-- Ô CHỌN THUỐC TÌM KIẾM THÔNG MINH -->
+                <div style="grid-column: span 2;">
+                    <label style="font-weight:500; font-size:0.9rem;">Chọn Thuốc Nhập Kho</label>
+                    <div class="combobox-container" style="margin-top:4px;">
+                        <!-- Input gõ tìm kiếm -->
+                        <input type="text" id="inpMaThuocSearch" placeholder="Gõ tên hoặc mã thuốc (Dùng phím ↑ ↓ Enter để chọn)..." autocomplete="off" required style="width:100%; padding:8px 12px; border:1px solid #ccc; border-radius:4px;">
+                        <!-- Input hidden lưu MaThuoc thực tế để gửi về DB -->
+                        <input type="hidden" id="inpMaThuocKho" required>
+                        <!-- Bảng danh sách kết quả xổ xuống -->
+                        <div class="combobox-list" id="listThuocSuggest"></div>
+                    </div>
+                </div>
+
+                <div>
+                    <label style="font-weight:500; font-size:0.9rem;">Số Lô (Bao bì)</label>
+                    <input type="text" id="inpSoLo" placeholder="VD: SL-2026-03" required style="width:100%; padding:8px 12px; border:1px solid #ccc; border-radius:4px; margin-top:4px;">
+                </div>
+                <div>
+                    <label style="font-weight:500; font-size:0.9rem;">Số Lượng Nhập</label>
+                    <input type="number" id="inpSoLuongTon" placeholder="VD: 50" min="1" required style="width:100%; padding:8px 12px; border:1px solid #ccc; border-radius:4px; margin-top:4px;">
+                </div>
+                <div>
+                    <label style="font-weight:500; font-size:0.9rem;">Ngày Sản Xuất</label>
+                    <input type="date" id="inpNgaySanXuat" required style="width:100%; padding:8px 12px; border:1px solid #ccc; border-radius:4px; margin-top:4px;">
+                </div>
+                <div>
+                    <label style="font-weight:500; font-size:0.9rem;">Hạn Sử Dụng</label>
+                    <input type="date" id="inpHanSuDung" required style="width:100%; padding:8px 12px; border:1px solid #ccc; border-radius:4px; margin-top:4px;">
+                </div>
+            </div>
+            <div style="margin-top:20px; display:flex; gap:8px; justify-content:flex-end;">
+                <button type="button" onclick="dongModalNhapKho()" style="padding:8px 16px; background:#f1f1f1; border:1px solid #ccc; border-radius:4px; cursor:pointer;">Hủy</button>
+                <button type="submit" style="padding:8px 16px; background:#0d6efd; color:#fff; border:none; border-radius:4px; cursor:pointer;">Lưu Nhập Kho</button>
+            </div>
+        </form>
+    </div>
+</div>
 </main>
 
 <script>
-  async function loadKho() {
+  let danhSachKhoTam = [];
+
+  // 1. Render dữ liệu ra bảng
+  function renderBangKho(mangDuLieu) {
     const tbody = document.querySelector('#inventoryTable tbody');
     let alertCount = 0;
-    
-    try {
-      const response = await fetch('http://localhost:3001/api/kho/danhsach');
-      const data = await response.json();
-      
-      tbody.innerHTML = data.map(lo => {
-        // Tính toán số ngày còn lại đến hạn sử dụng
+
+    if (!mangDuLieu || mangDuLieu.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-muted">Không tìm thấy dữ liệu lô thuốc.</td></tr>';
+        return;
+    }
+
+    tbody.innerHTML = mangDuLieu.map(lo => {
         const hanSD = new Date(lo.HanSuDung);
         const homNay = new Date();
         const diffTime = hanSD - homNay;
@@ -156,42 +266,259 @@ a{text-decoration:none}
             dateClass = 'warn';
             dateText = `Còn ${diffDays} ngày`;
             alertCount++;
-        } else {
-            // Định dạng ngày tháng VN nếu còn xa
-            dateClass = 'ok';
-            dateText = 'An toàn';
         }
 
         const ngaySXFmt = new Date(lo.NgaySanXuat).toLocaleDateString('vi-VN');
+        const hanSDFmt = hanSD.toLocaleDateString('vi-VN');
 
         return `
         <tr>
           <td><b class="text-secondary">${lo.SoLo}</b></td>
           <td>
               <span class="drug-name">${lo.TenThuoc}</span>
-              <span class="drug-meta">Mã: ${lo.SoDangKy} | Q/C: ${lo.QuyCach}</span>
+              <span class="drug-meta">Mã: ${lo.MaThuoc} | ĐK: ${lo.SoDangKy || 'N/A'}</span>
           </td>
           <td>${ngaySXFmt}</td>
-          <td class="fw-bold">${hanSD.toLocaleDateString('vi-VN')}</td>
+          <td class="fw-bold">${hanSDFmt}</td>
           <td class="r fw-bold ${lo.SoLuongTon < 20 ? 'text-danger' : ''}">${lo.SoLuongTon}</td>
           <td><span class="chip ${dateClass}">${dateText}</span></td>
         </tr>
         `;
-      }).join('');
+    }).join('');
 
-      // Cập nhật số lượng cảnh báo trên Sidebar
-      if(alertCount > 0) {
-          document.getElementById('alertCount').innerText = alertCount;
-      } else {
-          document.getElementById('alertCount').style.display = 'none';
-      }
+    // Cập nhật Badge cảnh báo ở Sidebar (nếu có element)
+    const alertBadge = document.getElementById('alertCount');
+    if(alertBadge) {
+        if(alertCount > 0) {
+            alertBadge.innerText = alertCount;
+            alertBadge.style.display = 'inline-block';
+        } else {
+            alertBadge.style.display = 'none';
+        }
+    }
+  }
 
+  // 2. Tải danh sách lô từ Backend
+  async function loadKho() {
+    const tbody = document.querySelector('#inventoryTable tbody');
+    tbody.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-muted">Đang tải dữ liệu...</td></tr>';
+    
+    try {
+      const response = await fetch('http://localhost:3001/api/kho/danhsach');
+      danhSachKhoTam = await response.json();
+      renderBangKho(danhSachKhoTam);
     } catch (error) {
       console.error('Lỗi API:', error);
       tbody.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-danger">Lỗi kết nối CSDL.</td></tr>';
     }
   }
 
+  // 3. Lọc Real-time (Tìm kiếm & Dropdown Date)
+  function xuLyLocKho() {
+    const tuKhoa = (document.getElementById('inpTimKiemKho')?.value || '').toLowerCase().trim();
+    const locDate = document.getElementById('selLocDate')?.value || 'ALL';
+
+    const ketQua = danhSachKhoTam.filter(lo => {
+        const soLo = lo.SoLo ? lo.SoLo.toLowerCase() : '';
+        const tenThuoc = lo.TenThuoc ? lo.TenThuoc.toLowerCase() : '';
+        const maThuoc = lo.MaThuoc ? lo.MaThuoc.toLowerCase() : '';
+
+        const khopTuKhoa = soLo.includes(tuKhoa) || tenThuoc.includes(tuKhoa) || maThuoc.includes(tuKhoa);
+
+        const diffDays = Math.ceil((new Date(lo.HanSuDung) - new Date()) / (1000 * 60 * 60 * 24));
+        let khopDate = true;
+        
+        if (locDate === 'SAP_HET_HAN') khopDate = (diffDays > 0 && diffDays <= 180);
+        if (locDate === 'DA_HET_HAN') khopDate = (diffDays <= 0);
+
+        return khopTuKhoa && khopDate;
+    });
+
+    renderBangKho(ketQua);
+  }
+
+  // 4. Quản lý Modal Nhập Kho
+  function hienThiModalNhapKho() {
+    document.getElementById('modalNhapKho').style.display = 'flex';
+    loadSelectThuoc();
+  }
+  function dongModalNhapKho() {
+    document.getElementById('modalNhapKho').style.display = 'none';
+    document.getElementById('formNhapKho').reset();
+  }
+
+  async function submitNhapKho(e) {
+    e.preventDefault();
+    const duLieu = {
+        MaLo: 'LO' + Date.now(),
+        MaThuoc: document.getElementById('inpMaThuocKho').value.trim(),
+        SoLo: document.getElementById('inpSoLo').value.trim(),
+        SoLuongTon: parseInt(document.getElementById('inpSoLuongTon').value),
+        NgaySanXuat: document.getElementById('inpNgaySanXuat').value,
+        HanSuDung: document.getElementById('inpHanSuDung').value
+    };
+
+    try {
+        const res = await fetch('http://localhost:3001/api/kho/nhaplo', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(duLieu)
+        });
+        const result = await res.json();
+        
+        if (result.success) {
+            alert('Nhập lô mới thành công!');
+            dongModalNhapKho();
+            loadKho();
+        } else {
+            // In toàn bộ object lỗi chi tiết ra Console F12
+            console.error("LỖI SQL SERVER CHI TIẾT:", result);
+            
+            // Lấy thông điệp lỗi cụ thể từ SQL Server
+            let msg = result.error;
+            if (result.details && result.details[0]) {
+                msg += "\n" + result.details[0].message;
+            }
+            alert("Lỗi nhập kho:\n" + msg);
+        }
+    } catch(err) {
+        console.error('Lỗi kết nối API:', err);
+        alert('Không thể kết nối đến máy chủ.');
+    }
+  }
+  // Hàm tải danh sách thuốc đắp vào Dropdown Modal Nhập Kho
+  async function loadSelectThuoc() {
+      const select = document.getElementById('inpMaThuocKho');
+      try {
+          const res = await fetch('http://localhost:3001/api/thuoc/danhsach');
+          const listThuoc = await res.json();
+          
+          if(listThuoc.length === 0) {
+              select.innerHTML = '<option value="">Chưa có dữ liệu thuốc</option>';
+              return;
+          }
+
+          select.innerHTML = '<option value="">-- Chọn thuốc cần nhập --</option>' + 
+              listThuoc.map(t => `<option value="${t.MaThuoc}">${t.MaThuoc} - ${t.TenThuoc}</option>`).join('');
+      } catch (err) {
+          console.error("Lỗi load danh sách thuốc:", err);
+          select.innerHTML = '<option value="">Lỗi tải danh sách thuốc</option>';
+      }
+  }
+  let danhSachThuocFull = []; 
+  let currentFocusIndex = -1; // Vị trí item đang được chọn bằng phím phím mũi tên
+
+  // 1. Tải dữ liệu thuốc từ Backend
+  async function loadSelectThuoc() {
+      try {
+          const res = await fetch('http://localhost:3001/api/thuoc/danhsach');
+          danhSachThuocFull = await res.json();
+      } catch (err) {
+          console.error("Lỗi load danh sách thuốc:", err);
+      }
+  }
+
+  // 2. Hàm vẽ danh sách gợi ý xổ xuống
+  function renderComboboxList(filterText = '') {
+      const listContainer = document.getElementById('listThuocSuggest');
+      const keyword = filterText.toLowerCase().trim();
+      
+      const filtered = danhSachThuocFull.filter(t => 
+          (t.TenThuoc && t.TenThuoc.toLowerCase().includes(keyword)) ||
+          (t.MaThuoc && t.MaThuoc.toLowerCase().includes(keyword)) ||
+          (t.HoatChat && t.HoatChat.toLowerCase().includes(keyword))
+      );
+
+      if (filtered.length === 0) {
+          listContainer.innerHTML = '<div class="combobox-item text-muted">Không tìm thấy thuốc...</div>';
+          listContainer.style.display = 'block';
+          return;
+      }
+
+      listContainer.innerHTML = filtered.map((t, index) => `
+          <div class="combobox-item" data-index="${index}" onclick="chonThuocCombobox('${t.MaThuoc}', '${t.TenThuoc}')">
+              <span><b>${t.TenThuoc}</b></span>
+              <span class="text-muted" style="font-size:0.85rem;">[${t.MaThuoc}]</span>
+          </div>
+      `).join('');
+
+      listContainer.style.display = 'block';
+      currentFocusIndex = -1;
+  }
+
+  // 3. Xử lý sự kiện khi gõ phím & điều hướng phím mũi tên (↑ ↓ Enter Esc)
+  const inpSearch = document.getElementById('inpMaThuocSearch');
+  
+  if (inpSearch) {
+      // Khi gõ phím để tìm kiếm
+      inpSearch.addEventListener('input', function() {
+          document.getElementById('inpMaThuocKho').value = ''; // Reset mã hidden
+          renderComboboxList(this.value);
+      });
+
+      // Khi nhấp chuột vào ô input
+      inpSearch.addEventListener('focus', function() {
+          renderComboboxList(this.value);
+      });
+
+      // Bắt sự kiện phím điều hướng
+      inpSearch.addEventListener('keydown', function(e) {
+          const listContainer = document.getElementById('listThuocSuggest');
+          const items = listContainer.getElementsByClassName('combobox-item');
+          
+          if (!items || items.length === 0) return;
+
+          if (e.key === 'ArrowDown') { // Nút mũi tên xuống
+              currentFocusIndex++;
+              if (currentFocusIndex >= items.length) currentFocusIndex = 0;
+              addActiveCombobox(items);
+          } else if (e.key === 'ArrowUp') { // Nút mũi tên lên
+              currentFocusIndex--;
+              if (currentFocusIndex < 0) currentFocusIndex = items.length - 1;
+              addActiveCombobox(items);
+          } else if (e.key === 'Enter') { // Nút Enter để chọn
+              if (currentFocusIndex > -1 && items[currentFocusIndex]) {
+                  e.preventDefault(); // Ngăn submit form
+                  items[currentFocusIndex].click();
+              }
+          } else if (e.key === 'Escape') { // Nút Esc để đóng
+              listContainer.style.display = 'none';
+          }
+      });
+  }
+
+  // Highlight item khi dùng phím mũi tên
+  function addActiveCombobox(items) {
+      for (let item of items) item.classList.remove('active');
+      if (currentFocusIndex >= 0 && currentFocusIndex < items.length) {
+          items[currentFocusIndex].classList.add('active');
+          items[currentFocusIndex].scrollIntoView({ block: 'nearest' }); // Tự cuộn scroll theo phím
+      }
+  }
+
+  // 4. Chọn 1 thuốc từ danh sách
+  function chonThuocCombobox(maThuoc, tenThuoc) {
+      document.getElementById('inpMaThuocSearch').value = `${tenThuoc} (${maThuoc})`;
+      document.getElementById('inpMaThuocKho').value = maThuoc; // Lưu giá trị MaThuoc thực sự vào hidden input
+      document.getElementById('listThuocSuggest').style.display = 'none';
+  }
+
+  // Đóng danh sách khi click ra ngoài vùng Combobox
+  document.addEventListener('click', function(e) {
+      if (!e.target.closest('.combobox-container')) {
+          const listContainer = document.getElementById('listThuocSuggest');
+          if(listContainer) listContainer.style.display = 'none';
+      }
+  });
+
+  // Cập nhật hàm mở Modal Nhập Kho
+  function hienThiModalNhapKho() {
+      document.getElementById('modalNhapKho').style.display = 'flex';
+      document.getElementById('inpMaThuocSearch').value = '';
+      document.getElementById('inpMaThuocKho').value = '';
+      loadSelectThuoc();
+  }
+  
   window.onload = loadKho;
 </script>
 </body>

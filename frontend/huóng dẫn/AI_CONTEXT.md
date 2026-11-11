@@ -6,7 +6,7 @@
 ## 1. Dự án và công nghệ
 
 Web quản lý nhà thuốc bán lẻ theo chuẩn GPP (tên PharmaPro). Backend PHP + SQL Server do trưởng nhóm làm. Frontend dùng **HTML + CSS + JavaScript thuần**, Bootstrap 5 (CDN) và FontAwesome 6. **Không dùng** React, Vue, jQuery hay framework khác.
-Chạy bằng Docker: giao diện http://localhost:8080, API http://localhost:3000.
+Chạy bằng Docker: giao diện http://localhost:8082, API http://localhost:3001.
 
 ## 2. Thư mục và quyền chỉnh sửa
 

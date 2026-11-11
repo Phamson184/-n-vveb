@@ -80,6 +80,57 @@ a{text-decoration:none}
 .table-toolbar{display:flex; gap:12px; margin-bottom:16px}
 .filter-select{border:1px solid var(--line); padding:8px 12px; border-radius:8px; outline:none; font-size:13px; color:var(--ink); background:var(--surface)}
 .filter-select:focus{border-color:var(--brand)}
+
+/* CSS cho Modal Form */
+.modal-overlay {
+    display: none; /* Mặc định ẩn */
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+}
+.modal-content {
+    background: #fff;
+    padding: 24px;
+    border-radius: 8px;
+    width: 100%;
+    max-width: 600px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 12px;
+    margin-bottom: 20px;
+}
+.modal-header h3 { margin: 0; font-size: 1.2rem; }
+.btn-close { background: none; border: none; font-size: 1.5rem; cursor: pointer; }
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+.form-group { display: flex; flex-direction: column; }
+.form-group label { font-weight: 500; margin-bottom: 6px; font-size: 0.9rem; }
+.form-group input, .form-group select {
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 0.9rem;
+}
+.form-group.full-width { grid-column: span 2; }
+.modal-footer {
+    margin-top: 24px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+}
+.btn-cancel { padding: 8px 16px; background: #f1f1f1; border: 1px solid #ccc; border-radius: 4px; cursor: pointer; }
+.btn-save { padding: 8px 16px; background: #0d6efd; color: white; border: none; border-radius: 4px; cursor: pointer; }
 </style>
 </head>
 <body>
@@ -108,7 +159,8 @@ a{text-decoration:none}
   <header class="topbar">
     <div class="search">
       <i class="fa-solid fa-magnifying-glass"></i>
-      <input type="search" placeholder="Tìm thuốc, mã vạch, thành phần..." aria-label="Tìm kiếm">
+      <!-- Đã thêm ID và onkeyup vào thẻ input bên dưới -->
+      <input type="search" id="inpTimKiem" placeholder="Tìm thuốc, mã vạch, thành phần..." aria-label="Tìm kiếm" onkeyup="xuLyLocDuLieu()">
       <kbd>Ctrl K</kbd>
     </div>
     <div class="user ms-auto">
@@ -122,25 +174,25 @@ a{text-decoration:none}
         <h1>Danh mục thuốc</h1>
         <p>Quản lý toàn bộ danh sách dược phẩm và vật tư y tế</p>
     </div>
-    <button class="btn-new"><i class="fa-solid fa-plus"></i>Thêm thuốc mới</button>
+    <button class="btn-new" onclick="hienThiFormThem()"><i class="fa-solid fa-plus"></i>Thêm thuốc mới</button>
   </div>
 
   <!-- PANEL CHỨA BẢNG DỮ LIỆU -->
-  <div class="panel">
-    <!-- Bộ lọc -->
+  <!-- Bộ lọc -->
     <div class="table-toolbar">
-        <select class="filter-select">
-            <option>Tất cả danh mục</option>
-            <option>Thuốc kê đơn</option>
-            <option>Thực phẩm chức năng</option>
-            <option>Vật tư y tế</option>
+        <select class="filter-select" id="selDanhHien" onchange="xuLyLocDuLieu()">
+            <option value="ALL">Tất cả loại thuốc</option>
+            <option value="KEDON">Thuốc kê đơn</option>
+            <option value="KHONGKEDON">Không kê đơn</option>
         </select>
-        <select class="filter-select">
-            <option>Trạng thái tồn kho</option>
-            <option>Sắp hết hàng</option>
-            <option>Đã hết hàng</option>
+        
+        <select class="filter-select" id="selTonKho" onchange="xuLyLocDuLieu()">
+            <option value="ALL">Tất cả trạng thái tồn</option>
+            <option value="SAP_HET">Sắp hết hàng (<= 30)</option>
+            <option value="HET_HANG">Đã hết hàng (0)</option>
         </select>
-        <button class="btn btn-light btn-sm border ms-auto"><i class="fa-solid fa-file-export"></i> Xuất Excel</button>
+        
+        <button class="btn btn-light btn-sm border ms-auto" onclick="xuatExcel()"><i class="fa-solid fa-file-export"></i> Xuất Excel</button>
     </div>
 
     <!-- Bảng Dữ liệu -->
@@ -196,51 +248,263 @@ a{text-decoration:none}
 </main>
 
 <script>
-  // Kích hoạt phím tắt tìm kiếm đồng bộ
-  document.addEventListener('keydown', e => {
-    if (e.ctrlKey && e.key.toLowerCase() === 'k') { e.preventDefault(); document.querySelector('.search input').focus(); }
-  });
+// 1. Phím tắt tìm kiếm (Ctrl+K)
+document.addEventListener('keydown', e => {
+    if (e.ctrlKey && e.key.toLowerCase() === 'k') { 
+        e.preventDefault(); 
+        document.getElementById('inpTimKiem').focus(); 
+    }
+});
 
-  // Gọi API và đổ dữ liệu vào bảng
-  async function loadDanhSachThuoc() {
+// Biến toàn cục
+let danhSachThuocTam = []; 
+let cheDoForm = 'THEM'; 
+
+// 2. HÀM RENDER (Tách riêng việc vẽ bảng HTML để dùng lại nhiều lần)
+function renderBangThuoc(mangDuLieu) {
     const tbody = document.querySelector('#productTable tbody');
-    tbody.innerHTML = '<tr><td colspan="7" class="text-center py-4 text-muted">Đang tải dữ liệu...</td></tr>';
     
-    try {
-      const response = await fetch('http://localhost:3001/api/thuoc/danhsach');
-      const data = await response.json();
-      
-      tbody.innerHTML = data.map(thuoc => {
-        // Logic tính toán trạng thái tồn kho
-        let tonKho = thuoc.TongTonKho;
+    if(mangDuLieu.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted py-4">Không tìm thấy dữ liệu phù hợp.</td></tr>';
+        return;
+    }
+
+    tbody.innerHTML = mangDuLieu.map(thuoc => {
+        let tonKho = thuoc.TongTonKho || 0;
         let trangThaiClass = tonKho > 30 ? 'ok' : (tonKho > 0 ? 'warn' : 'danger');
         let trangThaiText = tonKho > 30 ? `Còn ${tonKho}` : (tonKho > 0 ? `Sắp hết (${tonKho})` : 'Hết hàng');
 
         return `
         <tr>
-          <td><b class="text-secondary">${thuoc.SoDangKy || thuoc.MaThuoc}</b></td>
+          <td><b class="text-secondary">${thuoc.MaThuoc}</b></td>
           <td>
               <span class="drug-name">${thuoc.TenThuoc}</span>
-              <span class="drug-meta">Hoạt chất: ${thuoc.HoatChat}</span>
+              <span class="drug-meta">Hoạt chất: ${thuoc.HoatChat || 'N/A'}</span>
           </td>
-          <td>${thuoc.TenNhom || 'Chưa phân loại'}</td>
-          <td>${thuoc.QuyCach}</td>
-          <td class="r fw-bold text-success">Liên hệ</td>
+          <td>${thuoc.MaNhom}</td>
+          <td>${thuoc.QuyCach || '-'}</td>
+          <td class="r fw-bold text-success">${parseInt(thuoc.GiaBan).toLocaleString('vi-VN')}đ</td>
           <td><span class="chip ${trangThaiClass}">${trangThaiText}</span></td>
           <td class="r">
-              <button class="action-btn" title="Chỉnh sửa"><i class="fa-solid fa-pen"></i></button>
-              <button class="action-btn" title="Xóa"><i class="fa-solid fa-trash"></i></button>
+              <button class="action-btn" title="Chỉnh sửa" onclick="moFormSua('${thuoc.MaThuoc}')"><i class="fa-solid fa-pen"></i></button>
+              <button class="action-btn" title="Xóa" onclick="xoaThuoc('${thuoc.MaThuoc}')"><i class="fa-solid fa-trash"></i></button>
           </td>
         </tr>
         `;
-      }).join('');
-    } catch (error) {
-      console.error('Lỗi API:', error);
-      tbody.innerHTML = '<tr><td colspan="7" class="text-center py-4 text-danger">Không thể kết nối đến máy chủ.</td></tr>';
-    }
-  }
+    }).join('');
+}
 
-  window.onload = loadDanhSachThuoc;
+// 3. TẢI DỮ LIỆU TỪ DB (Chỉ gọi 1 lần khi mở trang)
+async function loadDanhSachThuoc() {
+    const tbody = document.querySelector('#productTable tbody');
+    tbody.innerHTML = '<tr><td colspan="7" class="text-center py-4 text-muted">Đang tải dữ liệu...</td></tr>';
+    try {
+        const response = await fetch('http://localhost:3001/api/thuoc/danhsach');
+        danhSachThuocTam = await response.json(); 
+        renderBangThuoc(danhSachThuocTam); 
+    } catch (error) {
+        tbody.innerHTML = '<tr><td colspan="7" class="text-center text-danger">Lỗi kết nối Backend.</td></tr>';
+    }
+}
+
+// 4. BỘ LỌC TÌM KIẾM TRỰC TIẾP TRÊN GIAO DIỆN
+function xuLyLocDuLieu() {
+    const tuKhoa = document.getElementById('inpTimKiem').value.toLowerCase().trim();
+    const loaiThuoc = document.getElementById('selDanhHien').value;
+    const tonKho = document.getElementById('selTonKho').value;
+
+    const ketQua = danhSachThuocTam.filter(thuoc => {
+        const ten = thuoc.TenThuoc ? thuoc.TenThuoc.toLowerCase() : '';
+        const ma = thuoc.MaThuoc ? thuoc.MaThuoc.toLowerCase() : '';
+        const khopTuKhoa = ten.includes(tuKhoa) || ma.includes(tuKhoa);
+
+        let khopLoai = true;
+        if(loaiThuoc === 'KEDON') khopLoai = (thuoc.LoaiThuoc == 1);
+        if(loaiThuoc === 'KHONGKEDON') khopLoai = (thuoc.LoaiThuoc == 0);
+
+        let soLuong = thuoc.TongTonKho || 0;
+        let khopTonKho = true;
+        if(tonKho === 'SAP_HET') khopTonKho = (soLuong > 0 && soLuong <= 30);
+        if(tonKho === 'HET_HANG') khopTonKho = (soLuong <= 0);
+
+        return khopTuKhoa && khopLoai && khopTonKho;
+    });
+    renderBangThuoc(ketQua);
+}
+
+// 5. CÁC HÀM XÓA, SỬA, THÊM (Đã hoàn thiện ở bước trước)
+async function xoaThuoc(maThuoc) {
+    if(!confirm(`Bạn có chắc muốn xóa thuốc [${maThuoc}]?`)) return;
+    try {
+        const response = await fetch('http://localhost:3001/api/thuoc/xoa', {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ MaThuoc: maThuoc })
+        });
+        const result = await response.json();
+        if(result.success) loadDanhSachThuoc();
+        else alert("Lỗi khi xóa: " + JSON.stringify(result.error));
+    } catch(err) { console.error(err); }
+}
+
+function moFormSua(maThuoc) {
+    cheDoForm = 'SUA';
+    document.querySelector('.modal-header h3').innerText = "Cập Nhật Thông Tin";
+    const thuoc = danhSachThuocTam.find(t => t.MaThuoc === maThuoc);
+    if(!thuoc) return;
+
+    document.getElementById('inpMaThuoc').value = thuoc.MaThuoc;
+    document.getElementById('inpMaThuoc').readOnly = true; 
+    document.getElementById('inpTenThuoc').value = thuoc.TenThuoc;
+    document.getElementById('inpMaNhom').value = thuoc.MaNhom;
+    document.getElementById('inpMaNCC').value = thuoc.MaNCC;
+    document.getElementById('inpSoDangKy').value = thuoc.SoDangKy;
+    document.getElementById('inpHoatChat').value = thuoc.HoatChat;
+    document.getElementById('inpQuyCach').value = thuoc.QuyCach;
+    document.getElementById('inpLoaiThuoc').value = thuoc.LoaiThuoc;
+    document.getElementById('inpGiaBan').value = thuoc.GiaBan;
+    document.getElementById('modalThemThuoc').style.display = 'flex';
+}
+
+function hienThiFormThem() {
+    cheDoForm = 'THEM';
+    document.querySelector('.modal-header h3').innerText = "Thêm Thuốc Mới";
+    document.getElementById('formThemThuoc').reset();
+    document.getElementById('inpMaThuoc').readOnly = false;
+    document.getElementById('modalThemThuoc').style.display = 'flex';
+}
+
+function dongFormThem() { document.getElementById('modalThemThuoc').style.display = 'none'; }
+
+async function submitThemThuoc(event) {
+    event.preventDefault();
+    const duLieu = {
+        MaThuoc: document.getElementById('inpMaThuoc').value,
+        TenThuoc: document.getElementById('inpTenThuoc').value,
+        MaNhom: document.getElementById('inpMaNhom').value,
+        MaNCC: document.getElementById('inpMaNCC').value,
+        SoDangKy: document.getElementById('inpSoDangKy').value,
+        HoatChat: document.getElementById('inpHoatChat').value,
+        QuyCach: document.getElementById('inpQuyCach').value,
+        LoaiThuoc: parseInt(document.getElementById('inpLoaiThuoc').value),
+        GiaBan: parseInt(document.getElementById('inpGiaBan').value)
+    };
+
+    const url = cheDoForm === 'THEM' ? '/api/thuoc/them' : '/api/thuoc/sua';
+    const method = cheDoForm === 'THEM' ? 'POST' : 'PUT';
+
+    try {
+        const response = await fetch(`http://localhost:3001${url}`, {
+            method: method,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(duLieu)
+        });
+        const result = await response.json();
+        if(result.success) { dongFormThem(); loadDanhSachThuoc(); }
+        else alert("Lỗi: " + JSON.stringify(result.error));
+    } catch(err) { console.error(err); }
+}
+// 6. TÍNH NĂNG XUẤT EXCEL (CSV)
+function xuatExcel() {
+    if (danhSachThuocTam.length === 0) {
+        alert("Không có dữ liệu để xuất!");
+        return;
+    }
+
+    // Thêm chuỗi "\uFEFF" (BOM) vào đầu file để Excel hiểu đúng font Tiếng Việt có dấu
+    let noiDungCSV = "\uFEFF"; 
+    
+    // Tạo dòng Tiêu đề
+    noiDungCSV += "Mã Thuốc,Tên Sản Phẩm,Hoạt Chất,Danh Mục,Quy Cách,Giá Bán (VNĐ),Tồn Kho\n";
+
+    // Duyệt qua mảng dữ liệu và tạo từng dòng
+    danhSachThuocTam.forEach(thuoc => {
+        let tonKho = thuoc.TongTonKho || 0;
+        
+        // Đặt các chuỗi văn bản vào trong dấu ngoặc kép "..." để tránh lỗi nếu tên thuốc có chứa dấu phẩy
+        let dong = [
+            thuoc.MaThuoc,
+            `"${thuoc.TenThuoc || ''}"`,
+            `"${thuoc.HoatChat || ''}"`,
+            `"${thuoc.MaNhom || ''}"`,
+            `"${thuoc.QuyCach || ''}"`,
+            thuoc.GiaBan,
+            tonKho
+        ];
+        noiDungCSV += dong.join(",") + "\n";
+    });
+
+    // Tạo một đối tượng Blob (file ảo trong bộ nhớ trình duyệt)
+    const blob = new Blob([noiDungCSV], { type: 'text/csv;charset=utf-8;' });
+    
+    // Tạo một thẻ <a> ẩn để kích hoạt tải xuống
+    const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+    link.setAttribute("href", url);
+    link.setAttribute("download", "Danh_Muc_Thuoc.csv"); // Tên file tải về
+    
+    document.body.appendChild(link);
+    link.click(); // Giả lập hành động click để tải file
+    document.body.removeChild(link); // Dọn dẹp thẻ ẩn
+}
+
+window.onload = loadDanhSachThuoc;
 </script>
+<!-- KHỐI MODAL THÊM THUỐC -->
+<div class="modal-overlay" id="modalThemThuoc">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Thêm Thuốc Mới</h3>
+            <button class="btn-close" onclick="dongFormThem()">&times;</button>
+        </div>
+        <form id="formThemThuoc" onsubmit="submitThemThuoc(event)">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Mã Thuốc (SKU)</label>
+                    <input type="text" id="inpMaThuoc" placeholder="VD: T0100" required>
+                </div>
+                <div class="form-group">
+                    <label>Số Đăng Ký</label>
+                    <input type="text" id="inpSoDangKy" placeholder="VD: VD-12345-19">
+                </div>
+                <div class="form-group full-width">
+                    <label>Tên Thuốc</label>
+                    <input type="text" id="inpTenThuoc" placeholder="Nhập tên thuốc..." required>
+                </div>
+                <div class="form-group">
+                    <label>Hoạt Chất</label>
+                    <input type="text" id="inpHoatChat" placeholder="Thành phần chính">
+                </div>
+                <div class="form-group">
+                    <label>Quy Cách</label>
+                    <input type="text" id="inpQuyCach" placeholder="VD: Hộp 10 vỉ x 10 viên">
+                </div>
+                <div class="form-group">
+                    <label>Danh Mục (Mã Nhóm)</label>
+                    <input type="text" id="inpMaNhom" value="NT001" required>
+                </div>
+                <div class="form-group">
+                    <label>Nhà Cung Cấp</label>
+                    <input type="text" id="inpMaNCC" value="NCC001" required>
+                </div>
+                <div class="form-group">
+                    <label>Loại Thuốc</label>
+                    <select id="inpLoaiThuoc">
+                        <option value="0">Không kê đơn</option>
+                        <option value="1">Thuốc kê đơn</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Giá Bán Lẻ (VNĐ)</label>
+                    <input type="number" id="inpGiaBan" placeholder="VD: 35000" required>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-cancel" onclick="dongFormThem()">Hủy</button>
+                <button type="submit" class="btn-save">Lưu Thông Tin</button>
+            </div>
+        </form>
+    </div>
+</div>
 </body>
 </html>
