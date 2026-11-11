@@ -1,0 +1,775 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PharmaPro – Quản lý đơn hàng</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="css/theme.css">
+
+  <style>
+    .order-stats {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 17px;
+    }
+
+    .stat-card .stat-label {
+      color: var(--muted);
+      font-size: 12px;
+      margin-bottom: 9px;
+    }
+
+    .stat-card .stat-value {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--ink);
+    }
+
+    .stat-card .stat-icon {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      display: grid;
+      place-items: center;
+      background: var(--brand-soft);
+      color: var(--brand);
+      margin-bottom: 12px;
+    }
+
+    .order-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      padding: 16px 20px;
+    }
+
+    .order-toolbar .search {
+      flex: 1;
+      min-width: 220px;
+    }
+
+    .filter-select {
+      min-width: 170px;
+      height: 40px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      padding: 0 12px;
+      color: var(--ink);
+      background: var(--surface);
+      font: inherit;
+      font-size: 13px;
+      outline: none;
+    }
+
+    .filter-select:focus {
+      border-color: var(--brand);
+    }
+
+    .order-code {
+      font-weight: 700;
+      color: var(--brand-dark);
+      white-space: nowrap;
+    }
+
+    .order-customer {
+      font-weight: 600;
+      color: var(--ink);
+    }
+
+    .order-sub {
+      display: block;
+      color: var(--muted);
+      font-size: 11px;
+      margin-top: 3px;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border-radius: 20px;
+      padding: 5px 10px;
+      font-size: 11px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .status-completed {
+      color: var(--ok);
+      background: var(--ok-soft);
+    }
+
+    .status-pending {
+      color: #946200;
+      background: var(--warn-soft);
+    }
+
+    .status-cancelled {
+      color: var(--danger);
+      background: var(--danger-soft);
+    }
+
+    .action-btn {
+      width: 32px;
+      height: 32px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--surface);
+      color: var(--muted);
+      display: inline-grid;
+      place-items: center;
+    }
+
+    .action-btn:hover {
+      color: var(--brand);
+      border-color: var(--brand);
+    }
+
+    .detail-section {
+      margin-bottom: 20px;
+    }
+
+    .detail-section h6 {
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+
+    .detail-info {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      background: var(--bg);
+      border-radius: 10px;
+      padding: 14px;
+    }
+
+    .detail-info small {
+      display: block;
+      color: var(--muted);
+      font-size: 11px;
+      margin-bottom: 4px;
+    }
+
+    .detail-info strong {
+      font-size: 13px;
+      color: var(--ink);
+    }
+
+    .detail-table {
+      width: 100%;
+      font-size: 12px;
+    }
+
+    .detail-table th {
+      color: var(--muted);
+      font-weight: 600;
+      padding: 10px 8px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .detail-table td {
+      padding: 11px 8px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .detail-total {
+      display: flex;
+      justify-content: space-between;
+      padding: 7px 0;
+      font-size: 13px;
+    }
+
+    .detail-total.final {
+      border-top: 1px solid var(--line);
+      margin-top: 6px;
+      padding-top: 13px;
+      font-weight: 700;
+      font-size: 16px;
+    }
+
+    .detail-note {
+      color: var(--muted);
+      font-size: 12px;
+      background: var(--bg);
+      padding: 12px;
+      border-radius: 8px;
+    }
+
+    .panel-head p {
+      color: var(--muted);
+      font-size: 12px;
+      margin: 4px 0 0;
+    }
+
+    @media (max-width: 900px) {
+      .order-stats {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 576px) {
+      .order-stats {
+        gap: 9px;
+      }
+
+      .stat-card {
+        padding: 12px;
+      }
+
+      .stat-card .stat-value {
+        font-size: 18px;
+      }
+
+      .order-toolbar {
+        padding: 13px;
+      }
+
+      .order-toolbar .search,
+      .filter-select {
+        width: 100%;
+      }
+
+      .detail-info {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="brand">
+      <span class="brand-mark"><i class="fa-solid fa-staff-snake"></i></span>
+      PharmaPro
+    </div>
+
+    <div class="nav-group">Bán hàng</div>
+    <a href="index.html" class="nav-item"><i class="fa-solid fa-chart-pie"></i>Tổng quan</a>
+    <a href="pos.html" class="nav-item"><i class="fa-solid fa-desktop"></i>Bán hàng (POS)</a>
+    <a href="orders.html" class="nav-item"><i class="fa-solid fa-file-invoice-dollar"></i>Đơn hàng</a>
+
+    <div class="nav-group">Hàng hóa</div>
+    <a href="products.html" class="nav-item"><i class="fa-solid fa-pills"></i>Danh mục thuốc</a>
+    <a href="inventory.html" class="nav-item"><i class="fa-solid fa-boxes-stacked"></i>Quản lý kho</a>
+
+    <div class="nav-group">Quản lý</div>
+    <a href="customers.html" class="nav-item"><i class="fa-solid fa-users"></i>Khách hàng</a>
+    <a href="users.html" class="nav-item"><i class="fa-solid fa-user-doctor"></i>Nhân viên</a>
+
+    <div class="store-box">
+      <b>Nhà thuốc GPP</b>
+      <span>Chi nhánh chính</span>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <div class="search">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="search" placeholder="Tìm thuốc, mã vạch, đơn hàng, khách hàng" aria-label="Tìm kiếm">
+      </div>
+
+      <a href="pos.html" class="btn-new ms-auto">
+        <i class="fa-solid fa-plus"></i>
+        Tạo đơn mới
+        <small>F1</small>
+      </a>
+
+      <div class="user">
+        <div class="avatar">DS</div>
+        <div>
+          <b>Dược sĩ</b>
+          <span>Đang đăng nhập</span>
+        </div>
+      </div>
+    </header>
+
+    <div class="page-title">
+      <h1>Quản lý đơn hàng</h1>
+      <p>Theo dõi, tra cứu và xem chi tiết các đơn bán hàng.</p>
+    </div>
+
+    <!-- Thống kê -->
+    <div class="order-stats">
+      <div class="stat-card">
+        <div class="stat-icon"><i class="fa-solid fa-file-invoice"></i></div>
+        <div class="stat-label">Tổng số đơn hàng</div>
+        <div class="stat-value" id="totalOrders">0</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon"><i class="fa-solid fa-circle-check"></i></div>
+        <div class="stat-label">Đã hoàn thành</div>
+        <div class="stat-value" id="completedOrders">0</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon"><i class="fa-solid fa-clock"></i></div>
+        <div class="stat-label">Chờ xử lý</div>
+        <div class="stat-value" id="pendingOrders">0</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon"><i class="fa-solid fa-wallet"></i></div>
+        <div class="stat-label">Doanh thu đơn hoàn thành</div>
+        <div class="stat-value" id="totalRevenue">0đ</div>
+      </div>
+    </div>
+
+    <!-- Danh sách đơn hàng -->
+    <div class="panel">
+      <div class="panel-head">
+        <div>
+          <h2>Danh sách đơn hàng</h2>
+          <p id="resultCount">Đang tải dữ liệu...</p>
+        </div>
+      </div>
+
+      <div class="order-toolbar">
+        <div class="search">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input type="search" id="q" placeholder="Tìm theo mã đơn hoặc tên khách hàng...">
+        </div>
+
+        <select id="statusFilter" class="filter-select" aria-label="Lọc trạng thái">
+          <option value="">Tất cả trạng thái</option>
+          <option value="Hoàn thành">Hoàn thành</option>
+          <option value="Chờ xử lý">Chờ xử lý</option>
+          <option value="Đã hủy">Đã hủy</option>
+        </select>
+
+        <button class="btn-ghost" id="btnReset" type="button">
+          <i class="fa-solid fa-rotate-left"></i>
+          Đặt lại
+        </button>
+      </div>
+
+      <div class="table-responsive">
+        <table class="tbl">
+          <thead>
+            <tr>
+              <th>Mã đơn</th>
+              <th>Thời gian</th>
+              <th>Khách hàng</th>
+              <th>Nhân viên</th>
+              <th class="r">Tổng tiền</th>
+              <th>Trạng thái</th>
+              <th class="r">Chi tiết</th>
+            </tr>
+          </thead>
+          <tbody id="rows"></tbody>
+        </table>
+
+        <div class="empty" id="empty" style="display:none">
+          <i class="fa-regular fa-folder-open"></i>
+          <b>Không tìm thấy đơn hàng</b>
+          <span>Thử thay đổi từ khóa hoặc bộ lọc.</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Modal chi tiết đơn hàng -->
+  <div class="modal fade" id="detailModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <div>
+            <h5 class="modal-title fw-bold">Chi tiết đơn hàng</h5>
+            <div class="text-muted small" id="detailOrderCode"></div>
+          </div>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+        </div>
+
+        <div class="modal-body">
+          <div class="detail-section">
+            <h6>Thông tin đơn hàng</h6>
+            <div class="detail-info" id="detailInfo"></div>
+          </div>
+
+          <div class="detail-section">
+            <h6>Sản phẩm trong đơn</h6>
+            <div class="table-responsive">
+              <table class="detail-table">
+                <thead>
+                  <tr>
+                    <th>Tên thuốc</th>
+                    <th class="text-center">SL</th>
+                    <th class="text-end">Đơn giá</th>
+                    <th class="text-end">Thành tiền</th>
+                  </tr>
+                </thead>
+                <tbody id="detailItems"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="detail-section">
+            <h6>Thanh toán</h6>
+            <div id="detailPayment"></div>
+          </div>
+
+          <div class="detail-note" id="detailNote"></div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-ghost" data-bs-dismiss="modal">Đóng</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast-x" id="toast"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    /* Cấu hình và hàm dùng chung */
+    const API = 'http://localhost:3001';
+    const USE_MOCK = true;
+
+    const $ = id => document.getElementById(id);
+
+    const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#39;'
+    })[c]);
+
+    const money = n =>
+      (Math.round(Number(n)) || 0).toLocaleString('vi-VN') + 'đ';
+
+    const fmtDate = v => {
+      if (!v) return '';
+      const d = new Date(v);
+      return Number.isNaN(d.getTime()) ? '' : d.toLocaleDateString('vi-VN');
+    };
+
+    async function api(path, options = {}) {
+      const res = await fetch(API + path, {
+        headers: { 'Content-Type': 'application/json' },
+        ...options
+      });
+
+      const data = await res.json().catch(() => null);
+
+      if (!res.ok) {
+        throw new Error((data && data.error) || 'Lỗi máy chủ (' + res.status + ')');
+      }
+
+      return data;
+    }
+
+    function toast(msg, isError = false) {
+      const t = $('toast');
+      t.textContent = msg;
+      t.className = 'toast-x show' + (isError ? ' error' : '');
+      setTimeout(() => t.classList.remove('show'), 2400);
+    }
+
+    /* Dữ liệu MOCK đơn hàng */
+    const MOCK_ORDERS = [
+      {
+        MaDonHang: 'DH001',
+        NgayTao: '2026-11-07T08:30:00',
+        TenKhachHang: 'Nguyễn Thị Lan',
+        SoDienThoai: '0900000001',
+        TenNhanVien: 'Trần Văn Minh',
+        TongTien: 113000,
+        GiamGia: 0,
+        ThanhToan: 'Tiền mặt',
+        TrangThai: 'Hoàn thành',
+        GhiChu: 'Khách mua trực tiếp tại quầy.',
+        ChiTiet: [
+          { TenThuoc: 'Paracetamol 500mg', SoLuong: 2, DonGia: 35000 },
+          { TenThuoc: 'Vitamin C 500mg', SoLuong: 1, DonGia: 43000 }
+        ]
+      },
+      {
+        MaDonHang: 'DH002',
+        NgayTao: '2026-11-07T09:15:00',
+        TenKhachHang: 'Trần Văn Hùng',
+        SoDienThoai: '0900000002',
+        TenNhanVien: 'Lê Thị Hoa',
+        TongTien: 156000,
+        GiamGia: 0,
+        ThanhToan: 'Chuyển khoản',
+        TrangThai: 'Hoàn thành',
+        GhiChu: 'Đã thanh toán đầy đủ.',
+        ChiTiet: [
+          { TenThuoc: 'Amoxicillin 500mg', SoLuong: 2, DonGia: 78000 }
+        ]
+      },
+      {
+        MaDonHang: 'DH003',
+        NgayTao: '2026-11-06T14:20:00',
+        TenKhachHang: 'Phạm Thị Mai',
+        SoDienThoai: '0900000003',
+        TenNhanVien: 'Trần Văn Minh',
+        TongTien: 70000,
+        GiamGia: 0,
+        ThanhToan: 'Tiền mặt',
+        TrangThai: 'Chờ xử lý',
+        GhiChu: 'Đơn hàng đang chờ xác nhận.',
+        ChiTiet: [
+          { TenThuoc: 'Paracetamol 500mg', SoLuong: 2, DonGia: 35000 }
+        ]
+      },
+      {
+        MaDonHang: 'DH004',
+        NgayTao: '2026-11-06T10:45:00',
+        TenKhachHang: 'Khách lẻ',
+        SoDienThoai: '',
+        TenNhanVien: 'Lê Thị Hoa',
+        TongTien: 78000,
+        GiamGia: 0,
+        ThanhToan: 'Tiền mặt',
+        TrangThai: 'Đã hủy',
+        GhiChu: 'Đơn hàng đã bị hủy.',
+        ChiTiet: [
+          { TenThuoc: 'Amoxicillin 500mg', SoLuong: 1, DonGia: 78000 }
+        ]
+      },
+      {
+        MaDonHang: 'DH005',
+        NgayTao: '2026-11-05T16:10:00',
+        TenKhachHang: 'Nguyễn Hoàng Nam',
+        SoDienThoai: '0900000005',
+        TenNhanVien: 'Trần Văn Minh',
+        TongTien: 70000,
+        GiamGia: 5000,
+        ThanhToan: 'Tiền mặt',
+        TrangThai: 'Hoàn thành',
+        GhiChu: 'Khách sử dụng ưu đãi.',
+        ChiTiet: [
+          { TenThuoc: 'Paracetamol 500mg', SoLuong: 2, DonGia: 35000 },
+          { TenThuoc: 'Vitamin C 500mg', SoLuong: 1, DonGia: 5000 }
+        ]
+      }
+    ];
+
+    let orders = [];
+
+    const detailModal = new bootstrap.Modal($('detailModal'));
+
+    /* Lấy danh sách đơn hàng */
+    async function layDanhSachDonHang() {
+      if (USE_MOCK) {
+        return MOCK_ORDERS;
+      }
+
+      // Cần API danh sách đơn hàng do trưởng nhóm backend cung cấp.
+      throw new Error('Chưa cấu hình API danh sách đơn hàng.');
+    }
+
+    /* Hiển thị thống kê */
+    function renderStats(list) {
+      const completed = list.filter(o => o.TrangThai === 'Hoàn thành');
+      const pending = list.filter(o => o.TrangThai === 'Chờ xử lý');
+      const revenue = completed.reduce((sum, o) => sum + Number(o.TongTien || 0), 0);
+
+      $('totalOrders').textContent = list.length;
+      $('completedOrders').textContent = completed.length;
+      $('pendingOrders').textContent = pending.length;
+      $('totalRevenue').textContent = money(revenue);
+    }
+
+    /* Hiển thị trạng thái */
+    function statusClass(status) {
+      if (status === 'Hoàn thành') return 'status-completed';
+      if (status === 'Chờ xử lý') return 'status-pending';
+      return 'status-cancelled';
+    }
+
+    /* Tìm kiếm và lọc */
+    function getFilteredOrders() {
+      const keyword = $('q').value.trim().toLowerCase();
+      const status = $('statusFilter').value;
+
+      return orders.filter(order => {
+        const matchKeyword =
+          String(order.MaDonHang || '').toLowerCase().includes(keyword) ||
+          String(order.TenKhachHang || '').toLowerCase().includes(keyword) ||
+          String(order.SoDienThoai || '').toLowerCase().includes(keyword);
+
+        const matchStatus = !status || order.TrangThai === status;
+
+        return matchKeyword && matchStatus;
+      });
+    }
+
+    /* Hiển thị danh sách */
+    function render() {
+      const list = getFilteredOrders();
+
+      $('rows').innerHTML = list.map(order => `
+        <tr>
+          <td>
+            <span class="order-code">${esc(order.MaDonHang)}</span>
+          </td>
+          <td>${esc(new Date(order.NgayTao).toLocaleString('vi-VN'))}</td>
+          <td>
+            <span class="order-customer">${esc(order.TenKhachHang)}</span>
+            <span class="order-sub">${esc(order.SoDienThoai || 'Không có SĐT')}</span>
+          </td>
+          <td>${esc(order.TenNhanVien)}</td>
+          <td class="r"><strong>${money(order.TongTien)}</strong></td>
+          <td>
+            <span class="status-badge ${statusClass(order.TrangThai)}">
+              ${esc(order.TrangThai)}
+            </span>
+          </td>
+          <td class="r">
+            <button class="action-btn" type="button"
+              data-detail="${esc(order.MaDonHang)}"
+              title="Xem chi tiết" aria-label="Xem chi tiết đơn hàng">
+              <i class="fa-solid fa-eye"></i>
+            </button>
+          </td>
+        </tr>
+      `).join('');
+
+      $('empty').style.display = list.length ? 'none' : 'flex';
+      $('resultCount').textContent = `Hiển thị ${list.length} / ${orders.length} đơn hàng`;
+    }
+
+    /* Hiển thị chi tiết đơn hàng */
+    function xemChiTiet(maDonHang) {
+      const order = orders.find(o => o.MaDonHang === maDonHang);
+
+      if (!order) {
+        toast('Không tìm thấy đơn hàng.', true);
+        return;
+      }
+
+      $('detailOrderCode').textContent = order.MaDonHang;
+
+      $('detailInfo').innerHTML = `
+        <div>
+          <small>Khách hàng</small>
+          <strong>${esc(order.TenKhachHang)}</strong>
+        </div>
+        <div>
+          <small>Số điện thoại</small>
+          <strong>${esc(order.SoDienThoai || 'Không có')}</strong>
+        </div>
+        <div>
+          <small>Nhân viên</small>
+          <strong>${esc(order.TenNhanVien)}</strong>
+        </div>
+        <div>
+          <small>Ngày tạo</small>
+          <strong>${esc(new Date(order.NgayTao).toLocaleString('vi-VN'))}</strong>
+        </div>
+        <div>
+          <small>Trạng thái</small>
+          <span class="status-badge ${statusClass(order.TrangThai)}">${esc(order.TrangThai)}</span>
+        </div>
+        <div>
+          <small>Phương thức thanh toán</small>
+          <strong>${esc(order.ThanhToan)}</strong>
+        </div>
+      `;
+
+      $('detailItems').innerHTML = (order.ChiTiet || []).map(item => `
+        <tr>
+          <td>${esc(item.TenThuoc)}</td>
+          <td class="text-center">${Number(item.SoLuong) || 0}</td>
+          <td class="text-end">${money(item.DonGia)}</td>
+          <td class="text-end">${money(Number(item.SoLuong) * Number(item.DonGia))}</td>
+        </tr>
+      `).join('');
+
+      const subtotal = (order.ChiTiet || []).reduce(
+        (sum, item) => sum + Number(item.SoLuong) * Number(item.DonGia),
+        0
+      );
+
+      $('detailPayment').innerHTML = `
+        <div class="detail-total">
+          <span>Tạm tính</span>
+          <span>${money(subtotal)}</span>
+        </div>
+        <div class="detail-total">
+          <span>Giảm giá</span>
+          <span>${money(order.GiamGia || 0)}</span>
+        </div>
+        <div class="detail-total final">
+          <span>Tổng thanh toán</span>
+          <strong>${money(order.TongTien)}</strong>
+        </div>
+      `;
+
+      $('detailNote').innerHTML =
+        `<strong>Ghi chú:</strong> ${esc(order.GhiChu || 'Không có ghi chú.')}`;
+
+      detailModal.show();
+    }
+
+    /* Sự kiện tìm kiếm và lọc */
+    $('q').addEventListener('input', render);
+    $('statusFilter').addEventListener('change', render);
+
+    $('btnReset').addEventListener('click', () => {
+      $('q').value = '';
+      $('statusFilter').value = '';
+      render();
+    });
+
+    /* Sự kiện xem chi tiết */
+    $('rows').addEventListener('click', event => {
+      const button = event.target.closest('[data-detail]');
+      if (button) {
+        xemChiTiet(button.dataset.detail);
+      }
+    });
+
+    /* Menu đang chọn và phím tắt F1 */
+    const here = location.pathname.split('/').pop() || 'index.html';
+
+    document.querySelectorAll('.sidebar .nav-item').forEach(a => {
+      a.classList.toggle('active', a.getAttribute('href') === here);
+    });
+
+    document.addEventListener('keydown', e => {
+      if (e.key === 'F1') {
+        e.preventDefault();
+        location.href = 'pos.html';
+      }
+    });
+
+    /* Khởi tạo trang */
+    async function init() {
+      try {
+        orders = await layDanhSachDonHang();
+        renderStats(orders);
+        render();
+      } catch (e) {
+        toast(e.message, true);
+        $('resultCount').textContent = 'Không thể tải danh sách đơn hàng.';
+      }
+    }
+
+    init();
+  </script>
+  <script src="chatbot.js"></script>
+</body>
+</html>

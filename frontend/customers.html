@@ -1,0 +1,779 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PharmaPro – Quản lý khách hàng</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="css/theme.css">
+
+  <style>
+    .customer-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .customer-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--brand-soft);
+      color: var(--brand-dark);
+      display: grid;
+      place-items: center;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .customer-name {
+      font-weight: 600;
+    }
+
+    .customer-code {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .points {
+      font-weight: 600;
+      color: var(--brand);
+    }
+
+    .table-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-top: 14px;
+      color: var(--muted);
+      font-size: 13px;
+      flex-wrap: wrap;
+    }
+
+    .modal-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      background: var(--brand-soft);
+      color: var(--brand);
+      display: grid;
+      place-items: center;
+      margin-right: 10px;
+    }
+
+    @media (max-width: 575px) {
+      .panel {
+        padding: 14px;
+      }
+
+      .toolbar .search {
+        min-width: 100%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="brand">
+    <span class="brand-mark">
+      <i class="fa-solid fa-staff-snake"></i>
+    </span>
+    PharmaPro
+  </div>
+
+  <div class="nav-group">Bán hàng</div>
+  <a href="index.html" class="nav-item">
+    <i class="fa-solid fa-chart-pie"></i>Tổng quan
+  </a>
+  <a href="pos.html" class="nav-item">
+    <i class="fa-solid fa-desktop"></i>Bán hàng (POS)
+  </a>
+  <a href="orders.html" class="nav-item">
+    <i class="fa-solid fa-file-invoice-dollar"></i>Đơn hàng
+  </a>
+
+  <div class="nav-group">Hàng hóa</div>
+  <a href="products.html" class="nav-item">
+    <i class="fa-solid fa-pills"></i>Danh mục thuốc
+  </a>
+  <a href="inventory.html" class="nav-item">
+    <i class="fa-solid fa-boxes-stacked"></i>Quản lý kho
+  </a>
+
+  <div class="nav-group">Quản lý</div>
+  <a href="customers.html" class="nav-item">
+    <i class="fa-solid fa-users"></i>Khách hàng
+  </a>
+  <a href="users.html" class="nav-item">
+    <i class="fa-solid fa-user-doctor"></i>Nhân viên
+  </a>
+
+  <div class="store-box">
+    <b>Nhà thuốc GPP</b>
+    <span>Chi nhánh chính</span>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+
+  <header class="topbar">
+    <div class="search">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <input
+        type="search"
+        placeholder="Tìm thuốc, mã vạch, đơn hàng, khách hàng"
+        aria-label="Tìm kiếm"
+      >
+    </div>
+
+    <a href="pos.html" class="btn-new ms-auto">
+      <i class="fa-solid fa-plus"></i>
+      Tạo đơn mới
+      <small>F1</small>
+    </a>
+
+    <div class="user">
+      <div class="avatar">DS</div>
+      <div>
+        <b>Dược sĩ</b>
+        <span>Đang đăng nhập</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="page-title">
+    <h1>Quản lý khách hàng</h1>
+    <p>Quản lý thông tin và điểm tích lũy của khách hàng nhà thuốc.</p>
+  </div>
+
+  <!-- NỘI DUNG -->
+  <div class="panel">
+
+    <div class="panel-head">
+      <h2>
+        <i class="fa-solid fa-users me-2" style="color:var(--brand)"></i>
+        Danh sách khách hàng
+      </h2>
+      <span class="chip gray" id="totalBadge">0 khách hàng</span>
+    </div>
+
+    <div class="toolbar">
+      <div class="search">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input
+          type="search"
+          id="q"
+          placeholder="Tìm theo tên, mã hoặc số điện thoại..."
+          aria-label="Tìm khách hàng"
+        >
+      </div>
+
+      <button class="btn-brand" id="btnAdd">
+        <i class="fa-solid fa-plus"></i>
+        Thêm khách hàng
+      </button>
+    </div>
+
+    <div class="table-responsive">
+      <table class="tbl">
+        <thead>
+          <tr>
+            <th>Khách hàng</th>
+            <th>Số điện thoại</th>
+            <th class="r">Điểm tích lũy</th>
+            <th class="text-end">Thao tác</th>
+          </tr>
+        </thead>
+        <tbody id="rows"></tbody>
+      </table>
+
+      <div class="empty" id="empty" style="display:none">
+        <i class="fa-regular fa-folder-open"></i>
+        <b>Không tìm thấy khách hàng</b>
+        <span>Thử tìm kiếm bằng tên hoặc số điện thoại khác.</span>
+      </div>
+    </div>
+
+    <div class="table-footer">
+      <span id="resultText">Đang tải dữ liệu...</span>
+      <span>Dữ liệu khách hàng PharmaPro</span>
+    </div>
+
+  </div>
+</main>
+
+<!-- MODAL THÊM / SỬA -->
+<div class="modal fade" id="customerModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <div class="d-flex align-items-center">
+          <div class="modal-icon">
+            <i class="fa-solid fa-user-plus" id="modalIcon"></i>
+          </div>
+          <div>
+            <h5 class="modal-title" id="modalTitle">Thêm khách hàng</h5>
+            <small class="text-muted">Nhập thông tin khách hàng</small>
+          </div>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+      </div>
+
+      <form id="customerForm" novalidate>
+        <div class="modal-body">
+
+          <input type="hidden" id="customerId">
+
+          <div class="form-grid">
+
+            <div class="full">
+              <label class="lbl" for="customerName">
+                Họ và tên <span style="color:var(--danger)">*</span>
+              </label>
+              <input
+                type="text"
+                class="inp"
+                id="customerName"
+                placeholder="Ví dụ: Nguyễn Thị Lan"
+                maxlength="100"
+                required
+              >
+              <div class="field-error" id="nameError"></div>
+            </div>
+
+            <div class="full">
+              <label class="lbl" for="customerPhone">
+                Số điện thoại <span style="color:var(--danger)">*</span>
+              </label>
+              <input
+                type="tel"
+                class="inp"
+                id="customerPhone"
+                placeholder="Ví dụ: 0900000001"
+                maxlength="10"
+                inputmode="numeric"
+                required
+              >
+              <div class="field-error" id="phoneError"></div>
+              <small class="text-muted">
+                Số điện thoại gồm 10 chữ số và bắt đầu bằng số 0.
+              </small>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-ghost" data-bs-dismiss="modal">
+            Hủy
+          </button>
+          <button type="submit" class="btn-brand" id="btnSave">
+            <i class="fa-solid fa-floppy-disk"></i>
+            Lưu thông tin
+          </button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast-x" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="js/chatbot.js"></script>
+
+<script>
+/* =====================================================
+   1. CẤU HÌNH VÀ HÀM DÙNG CHUNG
+===================================================== */
+
+const API = 'http://localhost:3000';
+const USE_MOCK = true;
+
+const $ = id => document.getElementById(id);
+
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({
+  '&': '&amp;',
+  '<': '&lt;',
+  '>': '&gt;',
+  '"': '&quot;',
+  "'": '&#39;'
+})[c]);
+
+const phoneOk = s => /^0\d{9}$/.test(String(s).trim());
+
+async function api(path, options = {}) {
+  const res = await fetch(API + path, {
+    headers: { 'Content-Type': 'application/json' },
+    ...options
+  });
+
+  const data = await res.json().catch(() => null);
+
+  if (!res.ok) {
+    throw new Error(
+      (data && data.error) || 'Lỗi máy chủ (' + res.status + ')'
+    );
+  }
+
+  return data;
+}
+
+function toast(msg, isError = false) {
+  const t = $('toast');
+  t.textContent = msg;
+  t.className = 'toast-x show' + (isError ? ' error' : '');
+
+  setTimeout(() => t.classList.remove('show'), 2400);
+}
+
+/* =====================================================
+   2. DỮ LIỆU GIẢ MOCK
+===================================================== */
+
+let MOCK_KHACHHANG = [
+  {
+    MaKhachHang: 'KH001',
+    HoTen: 'Nguyễn Thị Lan',
+    SoDienThoai: '0900000001',
+    DiemTichLuy: 120
+  },
+  {
+    MaKhachHang: 'KH002',
+    HoTen: 'Trần Văn Minh',
+    SoDienThoai: '0912345678',
+    DiemTichLuy: 85
+  },
+  {
+    MaKhachHang: 'KH003',
+    HoTen: 'Lê Thị Hồng',
+    SoDienThoai: '0987654321',
+    DiemTichLuy: 250
+  },
+  {
+    MaKhachHang: 'KH004',
+    HoTen: 'Phạm Quốc Bảo',
+    SoDienThoai: '0934567890',
+    DiemTichLuy: 45
+  },
+  {
+    MaKhachHang: 'KH005',
+    HoTen: 'Hoàng Ngọc Anh',
+    SoDienThoai: '0976543210',
+    DiemTichLuy: 310
+  }
+];
+
+/* =====================================================
+   3. CÁC HÀM GỌI API
+===================================================== */
+
+// Lấy danh sách khách hàng
+async function layDanhSachKhachHang() {
+  return USE_MOCK
+    ? MOCK_KHACHHANG
+    : api('/api/khachhang/danhsach');
+}
+
+// Thêm khách hàng
+async function themKhachHang(data) {
+  if (USE_MOCK) {
+    const maxId = MOCK_KHACHHANG.length + 1;
+    const maMoi = 'KH' + String(maxId).padStart(3, '0');
+
+    MOCK_KHACHHANG.push({
+      MaKhachHang: maMoi,
+      HoTen: data.HoTen,
+      SoDienThoai: data.SoDienThoai,
+      DiemTichLuy: 0
+    });
+
+    return { MaKhachHang: maMoi };
+  }
+
+  return api('/api/khachhang/them', {
+    method: 'POST',
+    body: JSON.stringify(data)
+  });
+}
+
+// Sửa khách hàng
+async function suaKhachHang(data) {
+  if (USE_MOCK) {
+    const index = MOCK_KHACHHANG.findIndex(
+      c => c.MaKhachHang === data.MaKhachHang
+    );
+
+    if (index === -1) {
+      throw new Error('Không tìm thấy khách hàng.');
+    }
+
+    MOCK_KHACHHANG[index] = {
+      ...MOCK_KHACHHANG[index],
+      HoTen: data.HoTen,
+      SoDienThoai: data.SoDienThoai
+    };
+
+    return { ok: true };
+  }
+
+  return api('/api/khachhang/sua', {
+    method: 'POST',
+    body: JSON.stringify(data)
+  });
+}
+
+// Xóa khách hàng
+async function xoaKhachHang(maKhachHang) {
+  if (USE_MOCK) {
+    MOCK_KHACHHANG = MOCK_KHACHHANG.filter(
+      c => c.MaKhachHang !== maKhachHang
+    );
+
+    return { ok: true };
+  }
+
+  return api('/api/khachhang/xoa', {
+    method: 'POST',
+    body: JSON.stringify({
+      MaKhachHang: maKhachHang
+    })
+  });
+}
+
+/* =====================================================
+   4. HIỂN THỊ DANH SÁCH
+===================================================== */
+
+let danhSachKhachHang = [];
+
+async function render() {
+  try {
+    danhSachKhachHang = await layDanhSachKhachHang();
+    hienThiDanhSach();
+  } catch (e) {
+    toast(e.message, true);
+  }
+}
+
+function hienThiDanhSach() {
+  const keyword = $('q').value.trim().toLowerCase();
+
+  const filtered = danhSachKhachHang.filter(c => {
+    return (
+      String(c.MaKhachHang || '').toLowerCase().includes(keyword) ||
+      String(c.HoTen || '').toLowerCase().includes(keyword) ||
+      String(c.SoDienThoai || '').includes(keyword)
+    );
+  });
+
+  $('rows').innerHTML = filtered.map(c => `
+    <tr>
+      <td>
+        <div class="customer-info">
+          <div class="customer-avatar">
+            ${esc(String(c.HoTen || '?').trim().charAt(0).toUpperCase())}
+          </div>
+          <div>
+            <div class="customer-name">${esc(c.HoTen)}</div>
+            <div class="customer-code">${esc(c.MaKhachHang)}</div>
+          </div>
+        </div>
+      </td>
+
+      <td>
+        <i class="fa-solid fa-phone me-2" style="color:var(--muted)"></i>
+        ${esc(c.SoDienThoai)}
+      </td>
+
+      <td class="r">
+        <span class="points">
+          ${Number(c.DiemTichLuy) || 0}
+          <i class="fa-solid fa-star"></i>
+        </span>
+      </td>
+
+      <td>
+        <div class="actions">
+          <button
+            type="button"
+            title="Chỉnh sửa"
+            aria-label="Chỉnh sửa khách hàng"
+            data-action="edit"
+            data-id="${esc(c.MaKhachHang)}"
+          >
+            <i class="fa-solid fa-pen"></i>
+          </button>
+
+          <button
+            type="button"
+            class="del"
+            title="Xóa khách hàng"
+            aria-label="Xóa khách hàng"
+            data-action="delete"
+            data-id="${esc(c.MaKhachHang)}"
+          >
+            <i class="fa-solid fa-trash"></i>
+          </button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+
+  $('empty').style.display = filtered.length ? 'none' : 'flex';
+
+  $('totalBadge').textContent =
+    danhSachKhachHang.length + ' khách hàng';
+
+  $('resultText').textContent =
+    `Hiển thị ${filtered.length} / ${danhSachKhachHang.length} khách hàng`;
+}
+
+/* =====================================================
+   5. MODAL THÊM VÀ CHỈNH SỬA
+===================================================== */
+
+const customerModal = new bootstrap.Modal($('customerModal'));
+
+function moModalThem() {
+  $('customerForm').reset();
+  $('customerId').value = '';
+
+  xoaLoi();
+
+  $('modalTitle').textContent = 'Thêm khách hàng';
+  $('modalIcon').className = 'fa-solid fa-user-plus';
+
+  customerModal.show();
+  setTimeout(() => $('customerName').focus(), 300);
+}
+
+function moModalSua(maKhachHang) {
+  const customer = danhSachKhachHang.find(
+    c => c.MaKhachHang === maKhachHang
+  );
+
+  if (!customer) {
+    toast('Không tìm thấy khách hàng.', true);
+    return;
+  }
+
+  $('customerForm').reset();
+  xoaLoi();
+
+  $('customerId').value = customer.MaKhachHang;
+  $('customerName').value = customer.HoTen;
+  $('customerPhone').value = customer.SoDienThoai;
+
+  $('modalTitle').textContent = 'Chỉnh sửa khách hàng';
+  $('modalIcon').className = 'fa-solid fa-user-pen';
+
+  customerModal.show();
+}
+
+function xoaLoi() {
+  $('nameError').textContent = '';
+  $('phoneError').textContent = '';
+
+  $('customerName').classList.remove('is-invalid');
+  $('customerPhone').classList.remove('is-invalid');
+}
+
+/* =====================================================
+   6. KIỂM TRA BIỂU MẪU
+===================================================== */
+
+function kiemTraForm() {
+  xoaLoi();
+
+  const hoTen = $('customerName').value.trim();
+  const soDienThoai = $('customerPhone').value.trim();
+
+  let hopLe = true;
+
+  if (!hoTen) {
+    $('nameError').textContent = 'Vui lòng nhập họ và tên.';
+    $('customerName').classList.add('is-invalid');
+    hopLe = false;
+  }
+
+  if (!soDienThoai) {
+    $('phoneError').textContent = 'Vui lòng nhập số điện thoại.';
+    $('customerPhone').classList.add('is-invalid');
+    hopLe = false;
+  } else if (!phoneOk(soDienThoai)) {
+    $('phoneError').textContent =
+      'Số điện thoại phải gồm 10 số và bắt đầu bằng số 0.';
+    $('customerPhone').classList.add('is-invalid');
+    hopLe = false;
+  }
+
+  // Kiểm tra số điện thoại trùng
+  const maHienTai = $('customerId').value;
+
+  const trungSDT = danhSachKhachHang.some(c =>
+    c.SoDienThoai === soDienThoai &&
+    c.MaKhachHang !== maHienTai
+  );
+
+  if (soDienThoai && phoneOk(soDienThoai) && trungSDT) {
+    $('phoneError').textContent = 'Số điện thoại đã tồn tại.';
+    $('customerPhone').classList.add('is-invalid');
+    hopLe = false;
+  }
+
+  return hopLe;
+}
+
+/* =====================================================
+   7. LƯU THÔNG TIN KHÁCH HÀNG
+===================================================== */
+
+$('customerForm').addEventListener('submit', async e => {
+  e.preventDefault();
+
+  if (!kiemTraForm()) return;
+
+  const maKhachHang = $('customerId').value;
+
+  const data = {
+    HoTen: $('customerName').value.trim(),
+    SoDienThoai: $('customerPhone').value.trim()
+  };
+
+  const btn = $('btnSave');
+
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Đang lưu...';
+
+  try {
+    if (maKhachHang) {
+      await suaKhachHang({
+        MaKhachHang: maKhachHang,
+        ...data
+      });
+
+      toast('Cập nhật khách hàng thành công.');
+    } else {
+      await themKhachHang(data);
+
+      toast('Thêm khách hàng thành công.');
+    }
+
+    customerModal.hide();
+    await render();
+
+  } catch (e) {
+    toast(e.message, true);
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Lưu thông tin';
+  }
+});
+
+/* =====================================================
+   8. XÓA KHÁCH HÀNG
+===================================================== */
+
+async function xuLyXoa(maKhachHang) {
+  const customer = danhSachKhachHang.find(
+    c => c.MaKhachHang === maKhachHang
+  );
+
+  if (!customer) return;
+
+  const dongY = confirm(
+    `Bạn có chắc muốn xóa khách hàng "${customer.HoTen}" không?`
+  );
+
+  if (!dongY) return;
+
+  try {
+    await xoaKhachHang(maKhachHang);
+
+    toast('Xóa khách hàng thành công.');
+    await render();
+
+  } catch (e) {
+    toast(e.message, true);
+  }
+}
+
+/* =====================================================
+   9. SỰ KIỆN GIAO DIỆN
+===================================================== */
+
+// Mở modal thêm
+$('btnAdd').addEventListener('click', moModalThem);
+
+// Tìm kiếm
+$('q').addEventListener('input', hienThiDanhSach);
+
+// Sự kiện nút sửa / xóa trong bảng
+$('rows').addEventListener('click', e => {
+  const button = e.target.closest('button[data-action]');
+
+  if (!button) return;
+
+  const maKhachHang = button.dataset.id;
+
+  if (button.dataset.action === 'edit') {
+    moModalSua(maKhachHang);
+  }
+
+  if (button.dataset.action === 'delete') {
+    xuLyXoa(maKhachHang);
+  }
+});
+
+// Xóa trạng thái lỗi khi người dùng nhập lại
+$('customerName').addEventListener('input', () => {
+  $('customerName').classList.remove('is-invalid');
+  $('nameError').textContent = '';
+});
+
+$('customerPhone').addEventListener('input', () => {
+  $('customerPhone').classList.remove('is-invalid');
+  $('phoneError').textContent = '';
+});
+
+/* =====================================================
+   10. MENU VÀ PHÍM TẮT CHUNG
+===================================================== */
+
+const here = location.pathname.split('/').pop() || 'index.html';
+
+document.querySelectorAll('.sidebar .nav-item').forEach(a => {
+  a.classList.toggle('active', a.getAttribute('href') === here);
+});
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'F1') {
+    e.preventDefault();
+    location.href = 'pos.html';
+  }
+});
+
+/* =====================================================
+   11. KHỞI CHẠY
+===================================================== */
+
+render();
+
+</script>
+<script src="chatbot.js"></script>
+</body>
+</html>

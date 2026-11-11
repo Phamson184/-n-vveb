@@ -3,8 +3,8 @@
 Để bắt đầu làm việc, các bạn mở Terminal/PowerShell trên máy tính và copy-paste tuần tự các lệnh sau.
 Bước 1: Kéo mã nguồn từ GitHub
 PowerShell
-git clone https://github.com/Phamson184/-n-vveb.git
-cd -n-vveb
+ git clone https://github.com/Phamson184/-n-vveb.git
+cd -- -n-vveb
 
 Bước 2: Thiết lập môi trường
 PowerShell
@@ -16,8 +16,9 @@ PowerShell
 docker-compose up -d --build
 
 Sau khi terminal chạy xong, mở trình duyệt:
-Giao diện Web: http://localhost:8080
-Test API: http://localhost:3000/api/thuoc/danhsach
+Giao diện Web / POS (Frontend): Truy cập tại địa chỉ http://localhost:8082
+API Backend (PHP Server): Truy cập tại địa chỉ http://localhost:3001 
+
 
 **Vai trò**
 
