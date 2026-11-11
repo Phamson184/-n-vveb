@@ -1,0 +1,1149 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PharmaPro – Tổng quan</title>
+<script src="js/chatbot.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="css/theme.css">
+
+<style>
+:root {
+  --bg: #f5f7f6;
+  --surface: #fff;
+  --line: #e6ebe8;
+  --ink: #16221d;
+  --muted: #6b7a73;
+  --brand: #0f766e;
+  --brand-dark: #0b5a54;
+  --brand-soft: #e3f3f0;
+  --warn: #b45309;
+  --warn-soft: #fef3e2;
+  --danger: #b42318;
+  --danger-soft: #fdeceb;
+  --ok: #15803d;
+  --ok-soft: #e5f5ea;
+  --radius: 12px;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'Be Vietnam Pro', 'Segoe UI', sans-serif;
+  font-size: 14px;
+  overflow-x: hidden;
+}
+
+a { text-decoration: none; }
+
+:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+
+/* Sidebar */
+.sidebar {
+  position: fixed;
+  inset: 0 auto 0 0;
+  width: 248px;
+  background: var(--surface);
+  border-right: 1px solid var(--line);
+  padding: 20px 14px;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  z-index: 20;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 4px 10px 22px;
+  font-weight: 700;
+  font-size: 1.15rem;
+  color: var(--ink);
+}
+
+.brand-mark {
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  background: var(--brand);
+  color: #fff;
+  display: grid;
+  place-items: center;
+}
+
+.nav-group {
+  font-size: 12px;
+  color: var(--muted);
+  padding: 16px 12px 6px;
+  font-weight: 500;
+}
+
+.sidebar .nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  margin-bottom: 2px;
+  border-radius: 9px;
+  color: #43524b;
+  font-weight: 500;
+  transition: background .15s, color .15s;
+}
+
+.sidebar .nav-item i {
+  width: 18px;
+  text-align: center;
+  color: #8a9a92;
+}
+
+.sidebar .nav-item:hover {
+  background: #f0f4f2;
+  color: var(--ink);
+}
+
+.sidebar .nav-item.active {
+  background: var(--brand-soft);
+  color: var(--brand-dark);
+}
+
+.sidebar .nav-item.active i { color: var(--brand); }
+
+.badge-count {
+  margin-left: auto;
+  background: var(--danger);
+  color: #fff;
+  border-radius: 20px;
+  font-size: 11px;
+  padding: 1px 7px;
+  font-weight: 600;
+}
+
+.store-box {
+  margin-top: auto;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 12px;
+  background: #fafcfb;
+}
+
+.store-box b {
+  display: block;
+  font-size: 13px;
+}
+
+.store-box span {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+/* Main */
+.main {
+  margin-left: 248px;
+  padding: 0 32px 40px;
+}
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: rgba(245,247,246,.92);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 0;
+}
+
+.search {
+  flex: 1;
+  max-width: 460px;
+  position: relative;
+}
+
+.search i {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #8a9a92;
+}
+
+.search input {
+  width: 100%;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  border-radius: 10px;
+  padding: 10px 14px 10px 40px;
+  font: inherit;
+}
+
+.search input:focus {
+  border-color: var(--brand);
+  outline: none;
+  box-shadow: 0 0 0 3px var(--brand-soft);
+}
+
+.search kbd {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: #eef2f0;
+  color: var(--muted);
+  border-radius: 6px;
+  font-size: 11px;
+  padding: 2px 6px;
+}
+
+.btn-new {
+  background: var(--brand);
+  color: #fff;
+  font-weight: 600;
+  border-radius: 10px;
+  padding: 10px 18px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 0;
+  transition: background .15s;
+  white-space: nowrap;
+}
+
+.btn-new:hover {
+  background: var(--brand-dark);
+  color: #fff;
+}
+
+.btn-new small {
+  opacity: .75;
+  font-weight: 500;
+}
+
+.user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: 8px;
+}
+
+.avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--brand-soft);
+  color: var(--brand-dark);
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.user b {
+  display: block;
+  font-size: 13px;
+  line-height: 1.2;
+}
+
+.user span {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.page-title { margin: 10px 0 20px; }
+
+.page-title h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.page-title p {
+  margin: 4px 0 0;
+  color: var(--muted);
+}
+
+/* Panel */
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 20px;
+  height: 100%;
+}
+
+.panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.panel-head h2 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.panel-head a {
+  font-size: 13px;
+  color: var(--brand);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+/* Hero */
+.hero {
+  background: var(--brand);
+  color: #fff;
+  border: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 100%;
+}
+
+.hero .label {
+  opacity: .8;
+  font-size: 13px;
+}
+
+.hero .big {
+  font-size: 2.3rem;
+  font-weight: 700;
+  letter-spacing: -.5px;
+  line-height: 1.2;
+  margin: 6px 0;
+}
+
+.hero .delta {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  background: rgba(255,255,255,.16);
+  border-radius: 20px;
+  padding: 3px 10px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.hero-stats {
+  display: flex;
+  gap: 25px;
+  margin-top: 22px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255,255,255,.2);
+  flex-wrap: wrap;
+}
+
+.hero-stats b {
+  display: block;
+  font-size: 1.15rem;
+}
+
+.hero-stats span {
+  font-size: 12px;
+  opacity: .8;
+}
+
+/* Chart */
+.bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 14px;
+  height: 170px;
+  padding-top: 10px;
+}
+
+.bar {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  height: 100%;
+  justify-content: flex-end;
+  font-size: 12px;
+  color: var(--muted);
+  min-width: 0;
+}
+
+.bar i {
+  display: block;
+  width: 100%;
+  max-width: 38px;
+  border-radius: 7px 7px 3px 3px;
+  background: #c9e4e0;
+  font-style: normal;
+  min-height: 3px;
+}
+
+.bar.today i { background: var(--brand); }
+.bar.today { color: var(--ink); font-weight: 600; }
+
+/* Alert */
+.alert-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 0;
+  border-top: 1px solid var(--line);
+}
+
+.alert-row:first-of-type { border-top: 0; }
+
+.alert-ico {
+  width: 36px;
+  height: 36px;
+  border-radius: 9px;
+  display: grid;
+  place-items: center;
+  flex: none;
+}
+
+.alert-ico.warn {
+  background: var(--warn-soft);
+  color: var(--warn);
+}
+
+.alert-ico.danger {
+  background: var(--danger-soft);
+  color: var(--danger);
+}
+
+.alert-row .name {
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.alert-row .meta {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.chip {
+  margin-left: auto;
+  white-space: nowrap;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 20px;
+  padding: 3px 10px;
+}
+
+.chip.warn {
+  background: var(--warn-soft);
+  color: var(--warn);
+}
+
+.chip.danger {
+  background: var(--danger-soft);
+  color: var(--danger);
+}
+
+.chip.ok {
+  background: var(--ok-soft);
+  color: var(--ok);
+}
+
+.chip.gray {
+  background: #eef2f0;
+  color: #43524b;
+}
+
+/* Table */
+.tbl {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.tbl th {
+  font-weight: 500;
+  color: var(--muted);
+  font-size: 12px;
+  text-align: left;
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--line);
+  white-space: nowrap;
+}
+
+.tbl td {
+  padding: 12px 10px;
+  border-bottom: 1px solid var(--line);
+  white-space: nowrap;
+}
+
+.tbl tr:last-child td { border-bottom: 0; }
+.tbl tbody tr:hover { background: #f8fbfa; }
+.tbl .r { text-align: right; }
+
+.order-code {
+  font-weight: 700;
+  color: var(--brand-dark);
+}
+
+.order-customer { font-weight: 600; }
+
+.order-sub {
+  display: block;
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 3px;
+}
+
+/* Top products */
+.rank {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+}
+
+.rank .bar-bg {
+  flex: 1;
+  height: 6px;
+  background: #eef2f0;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.rank .bar-bg span {
+  display: block;
+  height: 100%;
+  background: var(--brand);
+  border-radius: 6px;
+}
+
+.rank .nm {
+  width: 130px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rank .qty {
+  width: 44px;
+  text-align: right;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.empty-message {
+  padding: 24px;
+  text-align: center;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+#searchEmpty { display: none; }
+
+@media (max-width: 991px) {
+  .sidebar { transform: translateX(-100%); }
+  .main { margin-left: 0; padding: 0 16px 30px; }
+  .btn-new small { display: none; }
+}
+
+@media (max-width: 576px) {
+  .main { padding-left: 12px; padding-right: 12px; }
+  .topbar { gap: 8px; }
+  .topbar .search { max-width: none; }
+  .topbar .search kbd { display: none; }
+  .user { margin-left: 0; }
+  .user > div:last-child { display: none; }
+  .hero .big { font-size: 1.8rem; }
+  .hero-stats { gap: 15px; }
+  .panel { padding: 14px; }
+  .rank .nm { width: 105px; }
+  .bars { gap: 7px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; }
+}
+</style>
+</head>
+
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="brand">
+    <span class="brand-mark"><i class="fa-solid fa-staff-snake"></i></span>
+    PharmaPro
+  </div>
+
+  <div class="nav-group">Bán hàng</div>
+  <a href="index.html" class="nav-item active">
+    <i class="fa-solid fa-chart-pie"></i>Tổng quan
+  </a>
+  <a href="pos.html" class="nav-item">
+    <i class="fa-solid fa-desktop"></i>Bán hàng (POS)
+  </a>
+  <a href="orders.html" class="nav-item">
+    <i class="fa-solid fa-file-invoice-dollar"></i>Đơn hàng
+  </a>
+
+  <div class="nav-group">Hàng hóa</div>
+  <a href="products.html" class="nav-item">
+    <i class="fa-solid fa-pills"></i>Danh mục thuốc
+  </a>
+  <a href="inventory.html" class="nav-item">
+    <i class="fa-solid fa-boxes-stacked"></i>Quản lý kho
+    <span class="badge-count" id="inventoryBadge">0</span>
+  </a>
+
+  <div class="nav-group">Quản lý</div>
+  <a href="customers.html" class="nav-item">
+    <i class="fa-solid fa-users"></i>Khách hàng
+  </a>
+  <a href="users.html" class="nav-item">
+    <i class="fa-solid fa-user-doctor"></i>Nhân viên
+  </a>
+
+  <div class="store-box">
+    <b>Nhà thuốc GPP</b>
+    <span>Chi nhánh chính</span>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+
+  <header class="topbar">
+    <div class="search">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <input type="search" id="globalSearch"
+        placeholder="Tìm mã đơn hoặc khách hàng..."
+        aria-label="Tìm kiếm đơn hàng">
+      <kbd>Ctrl K</kbd>
+    </div>
+
+    <a href="pos.html" class="btn-new ms-auto">
+      <i class="fa-solid fa-plus"></i>
+      Tạo đơn mới
+      <small>F1</small>
+    </a>
+
+    <div class="user">
+      <div class="avatar">DS</div>
+      <div>
+        <b>Dược sĩ</b>
+        <span>Đang đăng nhập</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="page-title">
+    <h1>Tổng quan</h1>
+    <p id="currentDate">Tình hình hoạt động nhà thuốc</p>
+  </div>
+
+  <!-- HÀNG 1: DOANH THU VÀ BIỂU ĐỒ -->
+  <div class="row g-3 mb-3">
+
+    <div class="col-xl-4 col-md-6">
+      <div class="panel hero">
+        <div>
+          <div class="label">Doanh thu hôm nay</div>
+          <div class="big" id="todayRevenue">0đ</div>
+          <span class="delta" id="revenueCompare">
+            <i class="fa-solid fa-chart-line"></i>
+            Dữ liệu mô phỏng
+          </span>
+        </div>
+
+        <div class="hero-stats">
+          <div>
+            <b id="todayOrders">0</b>
+            <span>Đơn hàng</span>
+          </div>
+          <div>
+            <b id="grossProfit">0đ</b>
+            <span>Lợi nhuận gộp</span>
+          </div>
+          <div>
+            <b id="newCustomers">0</b>
+            <span>Khách mới</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-xl-8 col-md-6">
+      <div class="panel">
+        <div class="panel-head">
+          <h2>Doanh thu 7 ngày gần nhất</h2>
+          <span class="text-muted small">Đơn vị: triệu đồng</span>
+        </div>
+        <div class="bars" id="revenueChart"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- HÀNG 2: CẢNH BÁO VÀ THUỐC BÁN CHẠY -->
+  <div class="row g-3 mb-3">
+
+    <div class="col-xl-7">
+      <div class="panel">
+        <div class="panel-head">
+          <h2>Cần xử lý trong kho</h2>
+          <a href="inventory.html">Mở kho <i class="fa-solid fa-arrow-right"></i></a>
+        </div>
+        <div id="inventoryAlerts"></div>
+      </div>
+    </div>
+
+    <div class="col-xl-5">
+      <div class="panel">
+        <div class="panel-head">
+          <h2>Bán chạy hôm nay</h2>
+          <a href="products.html">Danh mục thuốc <i class="fa-solid fa-arrow-right"></i></a>
+        </div>
+        <div id="topProducts"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- HÀNG 3: ĐƠN HÀNG GẦN ĐÂY -->
+  <div class="panel" id="recentOrdersPanel">
+    <div class="panel-head">
+      <div>
+        <h2>Đơn hàng gần đây</h2>
+        <div class="text-muted small mt-1" id="orderCount">Danh sách đơn hàng</div>
+      </div>
+      <a href="orders.html">Xem tất cả <i class="fa-solid fa-arrow-right"></i></a>
+    </div>
+
+    <div class="table-responsive">
+      <table class="tbl">
+        <thead>
+          <tr>
+            <th>Mã đơn</th>
+            <th>Khách hàng</th>
+            <th>Thời gian</th>
+            <th>Thanh toán</th>
+            <th>Trạng thái</th>
+            <th class="r">Tổng tiền</th>
+          </tr>
+        </thead>
+        <tbody id="recentOrders"></tbody>
+      </table>
+      <div class="empty-message" id="searchEmpty">
+        Không tìm thấy đơn hàng phù hợp.
+      </div>
+    </div>
+  </div>
+
+  <div class="text-muted small mt-3 text-end">
+    PharmaPro · Dữ liệu đang ở chế độ mô phỏng
+  </div>
+
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+/* =====================================================
+   CẤU HÌNH
+===================================================== */
+
+const API = 'http://localhost:3001';
+const USE_MOCK = true;
+
+const $ = id => document.getElementById(id);
+
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({
+  '&': '&amp;',
+  '<': '&lt;',
+  '>': '&gt;',
+  '"': '&quot;',
+  "'": '&#39;'
+})[c]);
+
+const money = n =>
+  (Math.round(Number(n)) || 0).toLocaleString('vi-VN') + 'đ';
+
+/* =====================================================
+   DỮ LIỆU MOCK
+   Các số liệu dưới đây chỉ phục vụ kiểm thử giao diện.
+===================================================== */
+
+const MOCK_DASHBOARD = {
+  doanhThuHomNay: 8450000,
+  loiNhuanGop: 3200000,
+  khachMoi: 18,
+  doanhThuHomQua: 7500000,
+
+  doanhThu7Ngay: [
+    { ngay: 'T2', doanhThu: 5200000 },
+    { ngay: 'T3', doanhThu: 6800000 },
+    { ngay: 'T4', doanhThu: 4700000 },
+    { ngay: 'T5', doanhThu: 7900000 },
+    { ngay: 'T6', doanhThu: 9200000 },
+    { ngay: 'T7', doanhThu: 6100000 },
+    { ngay: 'Nay', doanhThu: 8450000 }
+  ],
+
+  canhBaoKho: [
+    {
+      ten: 'Amoxicillin 500mg',
+      moTa: 'Lô A2408 · Hết hạn 15/11/2026 · Còn 36 hộp',
+      loai: 'danger',
+      bieuTuong: 'fa-triangle-exclamation',
+      nhan: 'Sắp hết hạn'
+    },
+    {
+      ten: 'Vitamin C 500mg',
+      moTa: 'Lô C1107 · Hết hạn 20/12/2026 · Còn 120 vỉ',
+      loai: 'warn',
+      bieuTuong: 'fa-clock',
+      nhan: 'Gần hết hạn'
+    },
+    {
+      ten: 'Paracetamol 500mg',
+      moTa: 'Tồn 8 hộp · Mức tối thiểu 30 hộp',
+      loai: 'danger',
+      bieuTuong: 'fa-box-open',
+      nhan: 'Sắp hết hàng'
+    },
+    {
+      ten: 'Berberin 100mg',
+      moTa: 'Tồn 15 lọ · Mức tối thiểu 20 lọ',
+      loai: 'warn',
+      bieuTuong: 'fa-box-open',
+      nhan: 'Sắp hết hàng'
+    }
+  ],
+
+  thuocBanChay: [
+    { ten: 'Paracetamol 500mg', soLuong: 64 },
+    { ten: 'Vitamin C 500mg', soLuong: 50 },
+    { ten: 'Khẩu trang y tế', soLuong: 40 },
+    { ten: 'Oresol', soLuong: 29 },
+    { ten: 'Berberin 100mg', soLuong: 19 }
+  ],
+
+  donHang: [
+    {
+      ma: 'DH0142',
+      khachHang: 'Khách lẻ',
+      thoiGian: '14:32',
+      ngay: '2026-11-08',
+      thanhToan: 'Tiền mặt',
+      trangThai: 'Hoàn thành',
+      tongTien: 185000
+    },
+    {
+      ma: 'DH0141',
+      khachHang: 'Nguyễn Thị Lan',
+      thoiGian: '14:10',
+      ngay: '2026-11-08',
+      thanhToan: 'Chuyển khoản',
+      trangThai: 'Hoàn thành',
+      tongTien: 420000
+    },
+    {
+      ma: 'DH0140',
+      khachHang: 'Trần Văn Minh',
+      thoiGian: '13:45',
+      ngay: '2026-11-08',
+      thanhToan: 'Ghi nợ',
+      trangThai: 'Chờ xử lý',
+      tongTien: 1250000
+    },
+    {
+      ma: 'DH0139',
+      khachHang: 'Khách lẻ',
+      thoiGian: '13:20',
+      ngay: '2026-11-08',
+      thanhToan: 'Tiền mặt',
+      trangThai: 'Đã hủy',
+      tongTien: 96000
+    },
+    {
+      ma: 'DH0138',
+      khachHang: 'Phạm Thị Mai',
+      thoiGian: '11:25',
+      ngay: '2026-11-08',
+      thanhToan: 'Chuyển khoản',
+      trangThai: 'Hoàn thành',
+      tongTien: 350000
+    }
+  ]
+};
+
+/* =====================================================
+   HÀM LẤY DỮ LIỆU
+===================================================== */
+
+async function layDuLieuTongQuan() {
+  if (USE_MOCK) {
+    return MOCK_DASHBOARD;
+  }
+
+  // Chờ trưởng nhóm cung cấp API thống kê tổng quan.
+  throw new Error('Chưa cấu hình API thống kê tổng quan.');
+}
+
+/* =====================================================
+   NGÀY HIỆN TẠI
+===================================================== */
+
+function renderDate() {
+  const today = new Date();
+
+  $('currentDate').textContent = today.toLocaleDateString('vi-VN', {
+    weekday: 'long',
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric'
+  });
+}
+
+/* =====================================================
+   THỐNG KÊ DOANH THU
+===================================================== */
+
+function renderRevenue(data) {
+  const totalOrders = data.donHang.filter(
+    order => order.trangThai === 'Hoàn thành'
+  ).length;
+
+  $('todayRevenue').textContent = money(data.doanhThuHomNay);
+  $('todayOrders').textContent = totalOrders;
+  $('grossProfit').textContent = money(data.loiNhuanGop);
+  $('newCustomers').textContent = data.khachMoi;
+
+  const yesterday = Number(data.doanhThuHomQua || 0);
+  const today = Number(data.doanhThuHomNay || 0);
+
+  let percent = 0;
+
+  if (yesterday > 0) {
+    percent = ((today - yesterday) / yesterday) * 100;
+  }
+
+  const icon = percent >= 0
+    ? 'fa-arrow-trend-up'
+    : 'fa-arrow-trend-down';
+
+  const text = yesterday > 0
+    ? `${percent >= 0 ? '+' : ''}${percent.toFixed(1)}% so với hôm qua`
+    : 'Chưa có dữ liệu hôm qua';
+
+  $('revenueCompare').innerHTML =
+    `<i class="fa-solid ${icon}"></i>${esc(text)}`;
+}
+
+/* =====================================================
+   BIỂU ĐỒ DOANH THU 7 NGÀY
+===================================================== */
+
+function renderRevenueChart(data) {
+  const max = Math.max(...data.map(item => Number(item.doanhThu)), 1);
+
+  $('revenueChart').innerHTML = data.map((item, index) => {
+    const percent = Math.max(4, (Number(item.doanhThu) / max) * 100);
+    const todayClass = index === data.length - 1 ? 'today' : '';
+
+    return `
+      <div class="bar ${todayClass}" title="${money(item.doanhThu)}">
+        <i style="height:${percent}%"></i>
+        <span>${esc(item.ngay)}</span>
+      </div>
+    `;
+  }).join('');
+}
+
+/* =====================================================
+   CẢNH BÁO KHO
+===================================================== */
+
+function renderInventoryAlerts(list) {
+  $('inventoryBadge').textContent = list.length;
+
+  if (!list.length) {
+    $('inventoryAlerts').innerHTML =
+      '<div class="empty-message">Không có cảnh báo tồn kho.</div>';
+    return;
+  }
+
+  $('inventoryAlerts').innerHTML = list.map(item => `
+    <div class="alert-row">
+      <div class="alert-ico ${esc(item.loai)}">
+        <i class="fa-solid ${esc(item.bieuTuong)}"></i>
+      </div>
+
+      <div class="flex-grow-1">
+        <div class="name">${esc(item.ten)}</div>
+        <div class="meta">${esc(item.moTa)}</div>
+      </div>
+
+      <span class="chip ${esc(item.loai)}">${esc(item.nhan)}</span>
+    </div>
+  `).join('');
+}
+
+/* =====================================================
+   THUỐC BÁN CHẠY
+===================================================== */
+
+function renderTopProducts(list) {
+  if (!list.length) {
+    $('topProducts').innerHTML =
+      '<div class="empty-message">Chưa có dữ liệu bán hàng.</div>';
+    return;
+  }
+
+  const max = Math.max(...list.map(item => Number(item.soLuong)), 1);
+
+  $('topProducts').innerHTML = list.map(item => {
+    const percent = (Number(item.soLuong) / max) * 100;
+
+    return `
+      <div class="rank">
+        <span class="nm" title="${esc(item.ten)}">${esc(item.ten)}</span>
+        <div class="bar-bg">
+          <span style="width:${percent}%"></span>
+        </div>
+        <span class="qty">${Number(item.soLuong) || 0}</span>
+      </div>
+    `;
+  }).join('');
+}
+
+/* =====================================================
+   ĐƠN HÀNG GẦN ĐÂY
+===================================================== */
+
+function statusClass(status) {
+  if (status === 'Hoàn thành') return 'ok';
+  if (status === 'Chờ xử lý') return 'warn';
+  return 'gray';
+}
+
+function renderRecentOrders(list) {
+  $('orderCount').textContent = `Có ${list.length} đơn hàng gần đây`;
+
+  if (!list.length) {
+    $('recentOrders').innerHTML = '';
+    $('searchEmpty').style.display = 'block';
+    return;
+  }
+
+  $('searchEmpty').style.display = 'none';
+
+  $('recentOrders').innerHTML = list.map(order => `
+    <tr>
+      <td>
+        <a class="order-code" href="orders.html">${esc(order.ma)}</a>
+      </td>
+      <td>
+        <span class="order-customer">${esc(order.khachHang)}</span>
+      </td>
+      <td>${esc(order.thoiGian)} · ${esc(order.ngay)}</td>
+      <td>${esc(order.thanhToan)}</td>
+      <td>
+        <span class="chip ${statusClass(order.trangThai)}" style="margin:0">
+          ${esc(order.trangThai)}
+        </span>
+      </td>
+      <td class="r"><b>${money(order.tongTien)}</b></td>
+    </tr>
+  `).join('');
+}
+
+/* =====================================================
+   TÌM KIẾM ĐƠN HÀNG
+===================================================== */
+
+let allOrders = [];
+
+function searchOrders() {
+  const keyword = $('globalSearch').value.trim().toLowerCase();
+
+  const filtered = allOrders.filter(order => {
+    return String(order.ma).toLowerCase().includes(keyword) ||
+      String(order.khachHang).toLowerCase().includes(keyword) ||
+      String(order.thanhToan).toLowerCase().includes(keyword);
+  });
+
+  renderRecentOrders(filtered);
+}
+
+$('globalSearch').addEventListener('input', searchOrders);
+
+/* =====================================================
+   KHỞI TẠO TRANG
+===================================================== */
+
+async function initDashboard() {
+  try {
+    renderDate();
+
+    const data = await layDuLieuTongQuan();
+
+    allOrders = data.donHang || [];
+
+    renderRevenue(data);
+    renderRevenueChart(data.doanhThu7Ngay || []);
+    renderInventoryAlerts(data.canhBaoKho || []);
+    renderTopProducts(data.thuocBanChay || []);
+    renderRecentOrders(allOrders);
+
+  } catch (error) {
+    console.error(error);
+
+    $('recentOrders').innerHTML = `
+      <tr>
+        <td colspan="6" class="text-center text-danger">
+          Không thể tải dữ liệu tổng quan.
+        </td>
+      </tr>
+    `;
+  }
+}
+
+/* =====================================================
+   MENU VÀ PHÍM TẮT
+===================================================== */
+
+const here = location.pathname.split('/').pop() || 'index.html';
+
+document.querySelectorAll('.sidebar .nav-item').forEach(link => {
+  link.classList.toggle(
+    'active',
+    link.getAttribute('href') === here
+  );
+});
+
+document.addEventListener('keydown', event => {
+  if (event.key === 'F1') {
+    event.preventDefault();
+    location.href = 'pos.html';
+  }
+
+  if (event.ctrlKey && event.key.toLowerCase() === 'k') {
+    event.preventDefault();
+    $('globalSearch').focus();
+  }
+});
+
+initDashboard();
+</script>
+<script src="chatbot.js"></script>
+</body>
+</html>

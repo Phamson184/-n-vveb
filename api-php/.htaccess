@@ -1,0 +1,4 @@
+# Chỉ cần khi chạy bằng Apache (XAMPP/Laragon); chạy "php -S" thì không dùng file này
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^ index.php [QSA,L]
