@@ -10,7 +10,12 @@
   <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<<<<<<< HEAD
   <link rel="stylesheet" href="theme.css">
+=======
+  <!-- Đường dẫn CSS chuẩn theo cấu trúc frontend/mẫu/theme.css -->
+  <link rel="stylesheet" href="mẫu/theme.css">
+>>>>>>> a4e1b90 (feat(v2-core): setup PharmaPro_v2 temporal schema and HMVC JWT/RBAC middleware)
 
   <style>
     .customer-info {
@@ -127,16 +132,7 @@
 <main class="main">
 
   <header class="topbar">
-    <div class="search">
-      <i class="fa-solid fa-magnifying-glass"></i>
-      <input
-        type="search"
-        placeholder="Tìm thuốc, mã vạch, đơn hàng, khách hàng"
-        aria-label="Tìm kiếm"
-      >
-    </div>
-
-    <a href="pos.html" class="btn-new ms-auto">
+      <a href="pos.html" class="btn-new ms-auto">
       <i class="fa-solid fa-plus"></i>
       Tạo đơn mới
       <small>F1</small>
@@ -293,24 +289,17 @@
 <div class="toast-x" id="toast"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script src="js/chatbot.js"></script>
-
 <script>
 /* =====================================================
    1. CẤU HÌNH VÀ HÀM DÙNG CHUNG
 ===================================================== */
-
-const API = 'http://localhost:3000';
-const USE_MOCK = true;
+const API = 'http://localhost:3001';
+const USE_MOCK = false;
 
 const $ = id => document.getElementById(id);
 
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({
-  '&': '&amp;',
-  '<': '&lt;',
-  '>': '&gt;',
-  '"': '&quot;',
-  "'": '&#39;'
+  '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
 })[c]);
 
 const phoneOk = s => /^0\d{9}$/.test(String(s).trim());
@@ -320,76 +309,37 @@ async function api(path, options = {}) {
     headers: { 'Content-Type': 'application/json' },
     ...options
   });
-
   const data = await res.json().catch(() => null);
-
   if (!res.ok) {
-    throw new Error(
-      (data && data.error) || 'Lỗi máy chủ (' + res.status + ')'
-    );
+    throw new Error((data && data.error) || 'Lỗi máy chủ (' + res.status + ')');
   }
-
   return data;
 }
 
 function toast(msg, isError = false) {
   const t = $('toast');
+  if (!t) return alert(msg);
   t.textContent = msg;
   t.className = 'toast-x show' + (isError ? ' error' : '');
-
   setTimeout(() => t.classList.remove('show'), 2400);
 }
 
 /* =====================================================
-   2. DỮ LIỆU GIẢ MOCK
+   2. GỌI API BACKEND (KHÁCH HÀNG)
 ===================================================== */
+let danhSachKhachHang = [];
 
-let MOCK_KHACHHANG = [
-  {
-    MaKhachHang: 'KH001',
-    HoTen: 'Nguyễn Thị Lan',
-    SoDienThoai: '0900000001',
-    DiemTichLuy: 120
-  },
-  {
-    MaKhachHang: 'KH002',
-    HoTen: 'Trần Văn Minh',
-    SoDienThoai: '0912345678',
-    DiemTichLuy: 85
-  },
-  {
-    MaKhachHang: 'KH003',
-    HoTen: 'Lê Thị Hồng',
-    SoDienThoai: '0987654321',
-    DiemTichLuy: 250
-  },
-  {
-    MaKhachHang: 'KH004',
-    HoTen: 'Phạm Quốc Bảo',
-    SoDienThoai: '0934567890',
-    DiemTichLuy: 45
-  },
-  {
-    MaKhachHang: 'KH005',
-    HoTen: 'Hoàng Ngọc Anh',
-    SoDienThoai: '0976543210',
-    DiemTichLuy: 310
-  }
-];
-
-/* =====================================================
-   3. CÁC HÀM GỌI API
-===================================================== */
-
-// Lấy danh sách khách hàng
 async function layDanhSachKhachHang() {
-  return USE_MOCK
-    ? MOCK_KHACHHANG
-    : api('/api/khachhang/danhsach');
+  const res = await api('/api/khachhang/danhsach');
+  if (!Array.isArray(res)) {
+    console.error("Lỗi API Khách hàng:", res);
+    throw new Error(res.error || 'Dữ liệu trả về từ máy chủ không hợp lệ.');
+  }
+  return res;
 }
 
-// Thêm khách hàng
 async function themKhachHang(data) {
+<<<<<<< HEAD
   if (USE_MOCK) {
    const maxId = MOCK_KHACHHANG.reduce((max, customer) => {
   const number = Number(
@@ -410,75 +360,48 @@ const maMoi = 'KH' + String(maxId + 1).padStart(3, '0');
     return { MaKhachHang: maMoi };
   }
 
+=======
+>>>>>>> a4e1b90 (feat(v2-core): setup PharmaPro_v2 temporal schema and HMVC JWT/RBAC middleware)
   return api('/api/khachhang/them', {
     method: 'POST',
     body: JSON.stringify(data)
   });
 }
 
-// Sửa khách hàng
 async function suaKhachHang(data) {
-  if (USE_MOCK) {
-    const index = MOCK_KHACHHANG.findIndex(
-      c => c.MaKhachHang === data.MaKhachHang
-    );
-
-    if (index === -1) {
-      throw new Error('Không tìm thấy khách hàng.');
-    }
-
-    MOCK_KHACHHANG[index] = {
-      ...MOCK_KHACHHANG[index],
-      HoTen: data.HoTen,
-      SoDienThoai: data.SoDienThoai
-    };
-
-    return { ok: true };
-  }
-
   return api('/api/khachhang/sua', {
     method: 'POST',
     body: JSON.stringify(data)
   });
 }
 
-// Xóa khách hàng
 async function xoaKhachHang(maKhachHang) {
-  if (USE_MOCK) {
-    MOCK_KHACHHANG = MOCK_KHACHHANG.filter(
-      c => c.MaKhachHang !== maKhachHang
-    );
-
-    return { ok: true };
-  }
-
   return api('/api/khachhang/xoa', {
     method: 'POST',
-    body: JSON.stringify({
-      MaKhachHang: maKhachHang
-    })
+    body: JSON.stringify({ MaKhachHang: maKhachHang })
   });
 }
 
 /* =====================================================
-   4. HIỂN THỊ DANH SÁCH
+   3. HIỂN THỊ VÀ LỌC DANH SÁCH (RENDER)
 ===================================================== */
-
-let danhSachKhachHang = [];
-
 async function render() {
   try {
     danhSachKhachHang = await layDanhSachKhachHang();
     hienThiDanhSach();
   } catch (e) {
+    console.error(e);
     toast(e.message, true);
+    danhSachKhachHang = [];
+    hienThiDanhSach();
   }
 }
 
 function hienThiDanhSach() {
-  const keyword = $('q').value.trim().toLowerCase();
+  const keyword = ($('q')?.value || '').trim().toLowerCase();
+  const list = Array.isArray(danhSachKhachHang) ? danhSachKhachHang : [];
 
-  const filtered = danhSachKhachHang.filter(c => {
+  const filtered = list.filter(c => {
     return (
       String(c.MaKhachHang || '').toLowerCase().includes(keyword) ||
       String(c.HoTen || '').toLowerCase().includes(keyword) ||
@@ -486,128 +409,96 @@ function hienThiDanhSach() {
     );
   });
 
-  $('rows').innerHTML = filtered.map(c => `
-    <tr>
-      <td>
-        <div class="customer-info">
-          <div class="customer-avatar">
-            ${esc(String(c.HoTen || '?').trim().charAt(0).toUpperCase())}
+  const tbody = $('rows');
+  if (!tbody) return;
+
+  if (filtered.length === 0) {
+    tbody.innerHTML = '';
+    if ($('empty')) $('empty').style.display = 'flex';
+  } else {
+    if ($('empty')) $('empty').style.display = 'none';
+    tbody.innerHTML = filtered.map(c => `
+      <tr>
+        <td>
+          <div class="customer-info">
+            <div class="customer-avatar">
+              ${esc(String(c.HoTen || '?').trim().charAt(0).toUpperCase())}
+            </div>
+            <div>
+              <div class="customer-name">${esc(c.HoTen)}</div>
+              <div class="customer-code">${esc(c.MaKhachHang)}</div>
+            </div>
           </div>
-          <div>
-            <div class="customer-name">${esc(c.HoTen)}</div>
-            <div class="customer-code">${esc(c.MaKhachHang)}</div>
+        </td>
+        <td>
+          <i class="fa-solid fa-phone me-2" style="color:var(--muted)"></i>
+          ${esc(c.SoDienThoai)}
+        </td>
+        <td class="r">
+          <span class="points">
+            ${Number(c.DiemTichLuy || 0)}
+            <i class="fa-solid fa-star"></i>
+          </span>
+        </td>
+        <td>
+          <div class="actions">
+            <button type="button" title="Chỉnh sửa" data-action="edit" data-id="${esc(c.MaKhachHang)}">
+              <i class="fa-solid fa-pen"></i>
+            </button>
+            <button type="button" class="del" title="Xóa khách hàng" data-action="delete" data-id="${esc(c.MaKhachHang)}">
+              <i class="fa-solid fa-trash"></i>
+            </button>
           </div>
-        </div>
-      </td>
+        </td>
+      </tr>
+    `).join('');
+  }
 
-      <td>
-        <i class="fa-solid fa-phone me-2" style="color:var(--muted)"></i>
-        ${esc(c.SoDienThoai)}
-      </td>
-
-      <td class="r">
-        <span class="points">
-          ${Number(c.DiemTichLuy) || 0}
-          <i class="fa-solid fa-star"></i>
-        </span>
-      </td>
-
-      <td>
-        <div class="actions">
-          <button
-            type="button"
-            title="Chỉnh sửa"
-            aria-label="Chỉnh sửa khách hàng"
-            data-action="edit"
-            data-id="${esc(c.MaKhachHang)}"
-          >
-            <i class="fa-solid fa-pen"></i>
-          </button>
-
-          <button
-            type="button"
-            class="del"
-            title="Xóa khách hàng"
-            aria-label="Xóa khách hàng"
-            data-action="delete"
-            data-id="${esc(c.MaKhachHang)}"
-          >
-            <i class="fa-solid fa-trash"></i>
-          </button>
-        </div>
-      </td>
-    </tr>
-  `).join('');
-
-  $('empty').style.display = filtered.length ? 'none' : 'flex';
-
-  $('totalBadge').textContent =
-    danhSachKhachHang.length + ' khách hàng';
-
-  $('resultText').textContent =
-    `Hiển thị ${filtered.length} / ${danhSachKhachHang.length} khách hàng`;
+  if ($('totalBadge')) $('totalBadge').textContent = list.length + ' khách hàng';
+  if ($('resultText')) $('resultText').textContent = `Hiển thị ${filtered.length} / ${list.length} khách hàng`;
 }
 
 /* =====================================================
-   5. MODAL THÊM VÀ CHỈNH SỬA
+   4. TƯƠNG TÁC MODAL (THÊM / SỬA)
 ===================================================== */
-
-const customerModal = new bootstrap.Modal($('customerModal'));
+const customerModalEl = $('customerModal');
+const customerModal = customerModalEl ? new bootstrap.Modal(customerModalEl) : null;
 
 function moModalThem() {
   $('customerForm').reset();
   $('customerId').value = '';
-
   xoaLoi();
-
   $('modalTitle').textContent = 'Thêm khách hàng';
   $('modalIcon').className = 'fa-solid fa-user-plus';
-
-  customerModal.show();
+  if (customerModal) customerModal.show();
   setTimeout(() => $('customerName').focus(), 300);
 }
 
 function moModalSua(maKhachHang) {
-  const customer = danhSachKhachHang.find(
-    c => c.MaKhachHang === maKhachHang
-  );
-
-  if (!customer) {
-    toast('Không tìm thấy khách hàng.', true);
-    return;
-  }
+  const customer = danhSachKhachHang.find(c => c.MaKhachHang === maKhachHang);
+  if (!customer) return toast('Không tìm thấy khách hàng.', true);
 
   $('customerForm').reset();
   xoaLoi();
-
   $('customerId').value = customer.MaKhachHang;
   $('customerName').value = customer.HoTen;
   $('customerPhone').value = customer.SoDienThoai;
-
   $('modalTitle').textContent = 'Chỉnh sửa khách hàng';
   $('modalIcon').className = 'fa-solid fa-user-pen';
-
-  customerModal.show();
+  if (customerModal) customerModal.show();
 }
 
 function xoaLoi() {
-  $('nameError').textContent = '';
-  $('phoneError').textContent = '';
-
-  $('customerName').classList.remove('is-invalid');
-  $('customerPhone').classList.remove('is-invalid');
+  if ($('nameError')) $('nameError').textContent = '';
+  if ($('phoneError')) $('phoneError').textContent = '';
+  if ($('customerName')) $('customerName').classList.remove('is-invalid');
+  if ($('customerPhone')) $('customerPhone').classList.remove('is-invalid');
 }
-
-/* =====================================================
-   6. KIỂM TRA BIỂU MẪU
-===================================================== */
 
 function kiemTraForm() {
   xoaLoi();
-
   const hoTen = $('customerName').value.trim();
   const soDienThoai = $('customerPhone').value.trim();
-
   let hopLe = true;
 
   if (!hoTen) {
@@ -621,22 +512,15 @@ function kiemTraForm() {
     $('customerPhone').classList.add('is-invalid');
     hopLe = false;
   } else if (!phoneOk(soDienThoai)) {
-    $('phoneError').textContent =
-      'Số điện thoại phải gồm 10 số và bắt đầu bằng số 0.';
+    $('phoneError').textContent = 'Số điện thoại phải gồm 10 số và bắt đầu bằng số 0.';
     $('customerPhone').classList.add('is-invalid');
     hopLe = false;
   }
 
-  // Kiểm tra số điện thoại trùng
   const maHienTai = $('customerId').value;
-
-  const trungSDT = danhSachKhachHang.some(c =>
-    c.SoDienThoai === soDienThoai &&
-    c.MaKhachHang !== maHienTai
-  );
-
+  const trungSDT = danhSachKhachHang.some(c => c.SoDienThoai === soDienThoai && c.MaKhachHang !== maHienTai);
   if (soDienThoai && phoneOk(soDienThoai) && trungSDT) {
-    $('phoneError').textContent = 'Số điện thoại đã tồn tại.';
+    $('phoneError').textContent = 'Số điện thoại này đã tồn tại trong hệ thống.';
     $('customerPhone').classList.add('is-invalid');
     hopLe = false;
   }
@@ -645,43 +529,32 @@ function kiemTraForm() {
 }
 
 /* =====================================================
-   7. LƯU THÔNG TIN KHÁCH HÀNG
+   5. XỬ LÝ SUBMIT FORM & XÓA
 ===================================================== */
-
 $('customerForm').addEventListener('submit', async e => {
   e.preventDefault();
-
   if (!kiemTraForm()) return;
 
   const maKhachHang = $('customerId').value;
-
   const data = {
     HoTen: $('customerName').value.trim(),
     SoDienThoai: $('customerPhone').value.trim()
   };
 
   const btn = $('btnSave');
-
   btn.disabled = true;
   btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Đang lưu...';
 
   try {
     if (maKhachHang) {
-      await suaKhachHang({
-        MaKhachHang: maKhachHang,
-        ...data
-      });
-
-      toast('Cập nhật khách hàng thành công.');
+      await suaKhachHang({ MaKhachHang: maKhachHang, ...data });
+      toast('Cập nhật thông tin khách hàng thành công!');
     } else {
       await themKhachHang(data);
-
-      toast('Thêm khách hàng thành công.');
+      toast('Thêm khách hàng mới thành công!');
     }
-
-    customerModal.hide();
+    if (customerModal) customerModal.hide();
     await render();
-
   } catch (e) {
     toast(e.message, true);
   } finally {
@@ -690,82 +563,57 @@ $('customerForm').addEventListener('submit', async e => {
   }
 });
 
-/* =====================================================
-   8. XÓA KHÁCH HÀNG
-===================================================== */
-
 async function xuLyXoa(maKhachHang) {
-  const customer = danhSachKhachHang.find(
-    c => c.MaKhachHang === maKhachHang
-  );
-
+  const customer = danhSachKhachHang.find(c => c.MaKhachHang === maKhachHang);
   if (!customer) return;
-
-  const dongY = confirm(
-    `Bạn có chắc muốn xóa khách hàng "${customer.HoTen}" không?`
-  );
-
-  if (!dongY) return;
+  if (!confirm(`Bạn có chắc chắn muốn xóa khách hàng "${customer.HoTen}"?`)) return;
 
   try {
     await xoaKhachHang(maKhachHang);
-
-    toast('Xóa khách hàng thành công.');
+    toast('Xóa khách hàng thành công!');
     await render();
-
   } catch (e) {
     toast(e.message, true);
   }
 }
 
 /* =====================================================
-   9. SỰ KIỆN GIAO DIỆN
+   6. BẮT SỰ KIỆN GIAO DIỆN & PHÍM TẮT
 ===================================================== */
+if ($('btnAdd')) $('btnAdd').addEventListener('click', moModalThem);
+if ($('q')) $('q').addEventListener('input', hienThiDanhSach);
 
-// Mở modal thêm
-$('btnAdd').addEventListener('click', moModalThem);
+if ($('rows')) {
+  $('rows').addEventListener('click', e => {
+    const button = e.target.closest('button[data-action]');
+    if (!button) return;
+    const maKhachHang = button.dataset.id;
+    if (button.dataset.action === 'edit') moModalSua(maKhachHang);
+    if (button.dataset.action === 'delete') xuLyXoa(maKhachHang);
+  });
+}
 
-// Tìm kiếm
-$('q').addEventListener('input', hienThiDanhSach);
+if ($('customerName')) {
+  $('customerName').addEventListener('input', () => {
+    $('customerName').classList.remove('is-invalid');
+    if ($('nameError')) $('nameError').textContent = '';
+  });
+}
 
-// Sự kiện nút sửa / xóa trong bảng
-$('rows').addEventListener('click', e => {
-  const button = e.target.closest('button[data-action]');
+if ($('customerPhone')) {
+  $('customerPhone').addEventListener('input', () => {
+    $('customerPhone').classList.remove('is-invalid');
+    if ($('phoneError')) $('phoneError').textContent = '';
+  });
+}
 
-  if (!button) return;
-
-  const maKhachHang = button.dataset.id;
-
-  if (button.dataset.action === 'edit') {
-    moModalSua(maKhachHang);
-  }
-
-  if (button.dataset.action === 'delete') {
-    xuLyXoa(maKhachHang);
-  }
+// Active Sidebar Item theo trang hiện tại
+const currentPath = location.pathname.split('/').pop() || 'index.html';
+document.querySelectorAll('.sidebar .nav-item').forEach(link => {
+  link.classList.toggle('active', link.getAttribute('href') === currentPath);
 });
 
-// Xóa trạng thái lỗi khi người dùng nhập lại
-$('customerName').addEventListener('input', () => {
-  $('customerName').classList.remove('is-invalid');
-  $('nameError').textContent = '';
-});
-
-$('customerPhone').addEventListener('input', () => {
-  $('customerPhone').classList.remove('is-invalid');
-  $('phoneError').textContent = '';
-});
-
-/* =====================================================
-   10. MENU VÀ PHÍM TẮT CHUNG
-===================================================== */
-
-const here = location.pathname.split('/').pop() || 'index.html';
-
-document.querySelectorAll('.sidebar .nav-item').forEach(a => {
-  a.classList.toggle('active', a.getAttribute('href') === here);
-});
-
+// Phím tắt bàn phím
 document.addEventListener('keydown', e => {
   if (e.key === 'F1') {
     e.preventDefault();
@@ -773,13 +621,8 @@ document.addEventListener('keydown', e => {
   }
 });
 
-/* =====================================================
-   11. KHỞI CHẠY
-===================================================== */
-
+// Khởi chạy ứng dụng
 render();
-
 </script>
-<script src="chatbot.js"></script>
 </body>
 </html>
