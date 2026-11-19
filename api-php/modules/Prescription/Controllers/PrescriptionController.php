@@ -24,6 +24,65 @@ class PrescriptionController {
         return $code;
     }
 
+    public function listPrescriptions(array $body, $user) {
+        $rxId = (int)($_GET['PrescriptionID'] ?? $body['PrescriptionID'] ?? 0);
+        if ($rxId > 0) {
+            $stmt = $this->pdo->prepare("
+                SELECT p.*, pt.PatientCode, pt.FullName AS PatientName, pt.Phone AS PatientPhone, pt.PatientType
+                FROM Prescriptions p
+                INNER JOIN Patients pt ON p.PatientID = pt.PatientID
+                WHERE p.PrescriptionID = ?
+            ");
+            $stmt->execute([$rxId]);
+            $rx = $stmt->fetch();
+            if (!$rx) {
+                http_response_code(404);
+                return ['error' => 'Không tìm thấy đơn thuốc.'];
+            }
+
+            $stmtItems = $this->pdo->prepare("
+                SELECT pi.*, d.DrugCode, d.DrugName, d.Concentration, d.IsControlled, d.CurrentPrice
+                FROM PrescriptionItems pi
+                INNER JOIN Drugs d ON pi.DrugID = d.DrugID
+                WHERE pi.PrescriptionID = ?
+            ");
+            $stmtItems->execute([$rxId]);
+            $items = $stmtItems->fetchAll();
+
+            $stmtBatch = $this->pdo->prepare("
+                SELECT dbd.DispenseID, dbd.BatchID, ib.BatchCode, ib.ExpiryDate, dbd.DispensedQty, dbd.UnitPrice, dbd.SubTotal, dbd.DispensedAt
+                FROM DispenseBatchDetails dbd
+                INNER JOIN InventoryBatches ib ON dbd.BatchID = ib.BatchID
+                WHERE dbd.ItemID = ?
+            ");
+            foreach ($items as &$item) {
+                $stmtBatch->execute([(int)$item['ItemID']]);
+                $item['dispensed_batches'] = $stmtBatch->fetchAll();
+            }
+            unset($item);
+
+            return ['success' => true, 'prescription' => $rx, 'items' => $items];
+        }
+
+        $status = trim($_GET['Status'] ?? $body['Status'] ?? '');
+        $sql = "
+            SELECT p.PrescriptionID, p.NationalCode, p.PatientID, pt.PatientCode, pt.FullName AS PatientName,
+                   p.Diagnosis, p.Status, p.IsChronic, p.ChronicDurationDays, p.TotalAmount, p.CreatedAt
+            FROM Prescriptions p
+            INNER JOIN Patients pt ON p.PatientID = pt.PatientID
+        ";
+        $params = [];
+        if ($status !== '') {
+            $sql .= " WHERE p.Status = ?";
+            $params[] = $status;
+        }
+        $sql .= " ORDER BY p.CreatedAt DESC";
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($params);
+        return ['success' => true, 'prescriptions' => $stmt->fetchAll()];
+    }
+
     public function createPrescription(array $body, $user) {
         $patientId = (int)($body['PatientID'] ?? 0);
         $items = $body['items'] ?? [];
@@ -176,6 +235,7 @@ class PrescriptionController {
 
     public function dispensePrescription(array $body, $user) {
         $rxId = (int)($body['PrescriptionID'] ?? 0);
+        $handoverCode = trim($body['HandoverReportCode'] ?? '');
         if ($rxId <= 0) {
             http_response_code(400);
             return ['error' => 'Thiếu PrescriptionID.'];
@@ -194,14 +254,39 @@ class PrescriptionController {
             return ['error' => "Chỉ được xuất kho đơn ở trạng thái Validated (Hiện tại: {$rx['Status']})."];
         }
 
-        $stmtItems = $this->pdo->prepare("SELECT * FROM PrescriptionItems WHERE PrescriptionID = ?");
+        $stmtItems = $this->pdo->prepare("
+            SELECT pi.*, d.IsControlled, d.DrugName
+            FROM PrescriptionItems pi
+            INNER JOIN Drugs d ON pi.DrugID = d.DrugID
+            WHERE pi.PrescriptionID = ?
+        ");
         $stmtItems->execute([$rxId]);
         $items = $stmtItems->fetchAll();
+
+        // Kiểm tra quy định Phụ lục IX TT 20/2017: Chặn xuất thuốc kiểm soát đặc biệt nếu chưa có Biên bản giao nhận
+        foreach ($items as $it) {
+            if ((int)$it['IsControlled'] === 1 && $handoverCode === '') {
+                http_response_code(422);
+                return [
+                    'success' => false,
+                    'blocked_by' => 'CONTROLLED_DRUG_PROTOCOL',
+                    'error' => "Đơn chứa thuốc kiểm soát đặc biệt [{$it['DrugName']}]. Bắt buộc lập Biên bản giao nhận Phụ lục IX (HandoverReportCode) trước khi xuất kho!"
+                ];
+            }
+        }
 
         try {
             $this->pdo->beginTransaction();
 
             $dispenseSummary = [];
+            $stmtCtrlLog = $this->pdo->prepare("
+                INSERT INTO ControlledDrugLogs (
+                    DrugID, BatchID, PrescriptionID, TransactionType, QuantityChange,
+                    CabinetPhysicalStock, SystemStock, HandoverReportCode, ModifiedByUserID
+                ) VALUES (?, ?, ?, 'DISPENSE', ?, ?, ?, ?, ?)
+            ");
+            $stmtCurStock = $this->pdo->prepare("SELECT CurrentStock FROM Drugs WHERE DrugID = ?");
+
             foreach ($items as $item) {
                 $fefoResult = $this->fefoService->dispenseFefo(
                     (int)$item['DrugID'],
@@ -210,6 +295,23 @@ class PrescriptionController {
                     (int)$item['ItemID']
                 );
                 $dispenseSummary[] = $fefoResult;
+
+                if ((int)$item['IsControlled'] === 1) {
+                    $stmtCurStock->execute([(int)$item['DrugID']]);
+                    $sysStockAfter = (int)$stmtCurStock->fetchColumn();
+                    foreach ($fefoResult['Batches'] as $b) {
+                        $stmtCtrlLog->execute([
+                            (int)$item['DrugID'],
+                            (int)$b['BatchID'],
+                            $rxId,
+                            -(int)$b['DispensedQty'],
+                            $sysStockAfter,
+                            $sysStockAfter,
+                            $handoverCode,
+                            (int)$user['UserID']
+                        ]);
+                    }
+                }
             }
 
             $updRx = $this->pdo->prepare("
@@ -229,6 +331,51 @@ class PrescriptionController {
             if ($this->pdo->inTransaction()) $this->pdo->rollBack();
             http_response_code(422);
             return ['error' => 'Xuất kho FEFO thất bại (đã rollback): ' . $e->getMessage()];
+        }
+    }
+
+    /**
+     * Hoàn tất đơn & cộng điểm tích lũy bệnh nhân (Dispensed -> Completed)
+     */
+    public function completePrescription(array $body, $user) {
+        $rxId = (int)($body['PrescriptionID'] ?? 0);
+        if ($rxId <= 0) {
+            http_response_code(400);
+            return ['error' => 'Thiếu PrescriptionID.'];
+        }
+
+        $stmtRx = $this->pdo->prepare("SELECT PrescriptionID, PatientID, TotalAmount, Status FROM Prescriptions WHERE PrescriptionID = ?");
+        $stmtRx->execute([$rxId]);
+        $rx = $stmtRx->fetch();
+
+        if (!$rx || $rx['Status'] !== 'Dispensed') {
+            http_response_code(409);
+            return ['error' => 'Chỉ có thể hoàn tất (Completed) đơn đang ở trạng thái Dispensed.'];
+        }
+
+        $earnedPoints = (int)floor((float)$rx['TotalAmount'] / 10000); // 1 điểm cho mỗi 10.000đ
+
+        $this->pdo->beginTransaction();
+        try {
+            $updRx = $this->pdo->prepare("UPDATE Prescriptions SET Status = 'Completed', ModifiedByUserID = ? WHERE PrescriptionID = ?");
+            $updRx->execute([$user['UserID'], $rxId]);
+
+            if ($earnedPoints > 0) {
+                $updPt = $this->pdo->prepare("UPDATE Patients SET LoyaltyPoints = LoyaltyPoints + ?, ModifiedByUserID = ? WHERE PatientID = ?");
+                $updPt->execute([$earnedPoints, $user['UserID'], (int)$rx['PatientID']]);
+            }
+
+            $this->pdo->commit();
+            return [
+                'success' => true,
+                'message' => "Đơn #{$rxId} đã hoàn tất (Completed). Cộng {$earnedPoints} điểm tích lũy cho bệnh nhân.",
+                'Status' => 'Completed',
+                'EarnedLoyaltyPoints' => $earnedPoints
+            ];
+        } catch (Throwable $e) {
+            if ($this->pdo->inTransaction()) $this->pdo->rollBack();
+            http_response_code(500);
+            return ['error' => 'Lỗi hoàn tất đơn: ' . $e->getMessage()];
         }
     }
 }
