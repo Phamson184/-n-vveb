@@ -16,6 +16,9 @@ require_once __DIR__ . '/core/Database.php';
 require_once __DIR__ . '/core/Middleware.php';
 require_once __DIR__ . '/core/Router.php';
 require_once __DIR__ . '/modules/Auth/Controllers/AuthController.php';
+require_once __DIR__ . '/modules/Inventory/Controllers/InventoryController.php';
+require_once __DIR__ . '/modules/Clinical/Controllers/ClinicalController.php';
+require_once __DIR__ . '/modules/Prescription/Controllers/PrescriptionController.php';
 
 try {
     $pdo = Database::getInstance($config['db']);
@@ -28,23 +31,31 @@ try {
 $middleware = new Middleware($config['jwt']['secret']);
 $router = new Router($middleware);
 
-// Khởi tạo Controllers
 $authController = new AuthController($pdo, $middleware);
+$inventoryController = new InventoryController($pdo);
+$clinicalController = new ClinicalController($pdo);
+$prescriptionController = new PrescriptionController($pdo);
 
-// --- ĐỊNH NGHĨA ROUTES ---
-// 1. Public Route (Không cần Token)
+// --- ROUTES: AUTH ---
 $router->add('POST', '/api/v2/auth/login', [$authController, 'login'], null);
+$router->add('GET',  '/api/v2/auth/me', fn($body, $u) => ['success' => true, 'profile' => $u], []);
 
-// 2. Protected Routes (Kiểm thử RBAC Middleware)
-$router->add('GET', '/api/v2/auth/me', function($body, $currentUser) {
-    return ['success' => true, 'profile' => $currentUser];
-}, []); // Mọi role đã đăng nhập đều xem được
+// --- ROUTES: INVENTORY ---
+$router->add('GET',  '/api/v2/inventory/drugs', [$inventoryController, 'listDrugs'], []);
+$router->add('POST', '/api/v2/inventory/drugs', [$inventoryController, 'createDrug'], ['ADMIN', 'WAREHOUSE']);
+$router->add('POST', '/api/v2/inventory/batches', [$inventoryController, 'importBatch'], ['ADMIN', 'WAREHOUSE']);
+$router->add('POST', '/api/v2/inventory/fefo-dispense-test', [$inventoryController, 'testFefoDispense'], ['ADMIN', 'PHARMACIST', 'WAREHOUSE']);
 
-$router->add('POST', '/api/v2/clinical/approve-test', function($body, $currentUser) {
-    return ['success' => true, 'message' => 'Đã duyệt đơn lâm sàng bởi: ' . $currentUser['FullName']];
-}, ['ADMIN', 'PHARMACIST']); // Chỉ ADMIN hoặc PHARMACIST được phép, CASHIER sẽ bị chặn 403
+// --- ROUTES: CLINICAL ---
+$router->add('POST', '/api/v2/clinical/patients', [$clinicalController, 'createPatient'], ['ADMIN', 'DOCTOR', 'PHARMACIST']);
+$router->add('POST', '/api/v2/clinical/allergies', [$clinicalController, 'addAllergy'], ['ADMIN', 'DOCTOR', 'PHARMACIST']);
+$router->add('GET',  '/api/v2/clinical/patients/360', [$clinicalController, 'getPatient360'], ['ADMIN', 'DOCTOR', 'PHARMACIST']);
 
-// Đọc JSON body (xử lý BOM UTF-8)
+// --- ROUTES: PRESCRIPTION ---
+$router->add('POST', '/api/v2/prescriptions', [$prescriptionController, 'createPrescription'], ['ADMIN', 'DOCTOR', 'PHARMACIST']);
+$router->add('POST', '/api/v2/prescriptions/validate', [$prescriptionController, 'validatePrescription'], ['ADMIN', 'PHARMACIST']);
+$router->add('POST', '/api/v2/prescriptions/dispense', [$prescriptionController, 'dispensePrescription'], ['ADMIN', 'PHARMACIST', 'CASHIER']);
+
 $rawInput = preg_replace('/^[\x{FEFF}\x{FFFE}]/u', '', file_get_contents('php://input'));
 $body = json_decode($rawInput, true) ?? [];
 
