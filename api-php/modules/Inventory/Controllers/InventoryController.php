@@ -109,30 +109,65 @@ class InventoryController {
 
     // Thêm biệt dược mới vào danh mục Drugs
     public function createDrug(array $body, $user) {
-        $sql = "
-            INSERT INTO Drugs (DrugCode, NationalDrugCode, DrugName, IngredientID, DosageFormID,
-                               Concentration, Manufacturer, DepartmentID, IsPrescriptionOnly,
-                               IsControlled, MinSafeCrCl, CurrentPrice, CurrentStock)
-            OUTPUT INSERTED.DrugID
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)
-        ";
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute([
-            $body['DrugCode'],
-            $body['NationalDrugCode'] ?? null,
-            $body['DrugName'],
-            $body['IngredientID'],
-            $body['DosageFormID'],
-            $body['Concentration'],
-            $body['Manufacturer'],
-            $body['DepartmentID'] ?? null,
-            $body['IsPrescriptionOnly'] ?? 0,
-            $body['IsControlled'] ?? 0,
-            $body['MinSafeCrCl'] ?? 30.00,
-            $body['CurrentPrice']
-        ]);
-        $newId = $stmt->fetchColumn();
-        return ['success' => true, 'message' => 'Thêm biệt dược thành công!', 'DrugID' => (int)$newId];
+        $code  = strtoupper(trim($body['DrugCode'] ?? ''));
+        $sdk   = trim($body['NationalDrugCode'] ?? '');
+        $name  = trim($body['DrugName'] ?? '');
+        $ingId = (int)($body['IngredientID'] ?? 0);
+        $formId= (int)($body['DosageFormID'] ?? 0);
+        $conc  = trim($body['Concentration'] ?? '');
+        $mfg   = trim($body['Manufacturer'] ?? '');
+        $deptId= !empty($body['DepartmentID']) ? (int)$body['DepartmentID'] : null;
+        $isRx  = !empty($body['IsPrescriptionOnly']) ? 1 : 0;
+        $isCtrl= !empty($body['IsControlled']) ? 1 : 0;
+        $crcl  = ($body['MinSafeCrCl'] !== '' && $body['MinSafeCrCl'] !== null) ? (float)$body['MinSafeCrCl'] : 30.00;
+        $price = (float)($body['CurrentPrice'] ?? -1);
+
+        if ($code === '' || $name === '' || $ingId <= 0 || $formId <= 0 || $conc === '' || $mfg === '' || $price < 0) {
+            http_response_code(422);
+            return ['error' => 'Vui lòng nhập đầy đủ thông tin bắt buộc và đơn giá hợp lệ.'];
+        }
+
+        $chk = $this->pdo->prepare("SELECT DrugID, DrugName FROM Drugs WHERE DrugCode = ?");
+        $chk->execute([$code]);
+        if ($dup = $chk->fetch()) {
+            http_response_code(422);
+            $exName = $dup['DrugName'] ?? '';
+            return ['error' => "Mã thuốc '$code' đã tồn tại ($exName).", 'field' => 'DrugCode'];
+        }
+
+        try {
+            $sql = "
+                INSERT INTO Drugs (DrugCode, NationalDrugCode, DrugName, IngredientID, DosageFormID,
+                                   Concentration, Manufacturer, DepartmentID, IsPrescriptionOnly,
+                                   IsControlled, MinSafeCrCl, CurrentPrice, CurrentStock)
+                OUTPUT INSERTED.DrugID
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)
+            ";
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute([
+                $code,
+                $sdk !== '' ? $sdk : null,
+                $name,
+                $ingId,
+                $formId,
+                $conc,
+                $mfg,
+                $deptId,
+                $isRx,
+                $isCtrl,
+                $crcl,
+                $price
+            ]);
+            $newId = $stmt->fetchColumn();
+            return ['success' => true, 'message' => 'Thêm biệt dược thành công!', 'DrugID' => (int)$newId];
+        } catch (PDOException $e) {
+            http_response_code(422);
+            if (stripos($e->getMessage(), 'DrugCode') !== false || stripos($e->getMessage(), 'UNIQUE') !== false) {
+                return ['error' => "Mã thuốc '$code' đã tồn tại trong hệ thống.", 'field' => 'DrugCode'];
+            }
+            http_response_code(500);
+            return ['error' => 'Không thể lưu biệt dược: ' . $e->getMessage()];
+        }
     }
 
     // Nhập lô hàng mới (Tự động đồng bộ CurrentStock, ghi sổ Phụ lục VIII nếu IsControlled = 1)

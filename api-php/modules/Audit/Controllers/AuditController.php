@@ -7,7 +7,7 @@ class AuditController {
     }
 
     public function queryAsOf(array $body, $user) {
-        $table = trim($_GET['table'] ?? $body['table'] ?? 'InventoryBatches');
+        $table = trim($_GET['table'] ?? $_GET['entity'] ?? $body['table'] ?? 'InventoryBatches');
         $asOf  = trim($_GET['as_of'] ?? $body['as_of'] ?? '');
         $allowedTables = ['InventoryBatches', 'Prescriptions', 'Patients', 'PatientAllergies', 'ControlledDrugLogs'];
 

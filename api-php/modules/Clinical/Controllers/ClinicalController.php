@@ -8,7 +8,7 @@ class ClinicalController {
         $this->safetyService = new ClinicalSafetyService($pdo);
     }
 
-    public function createPatient(array $body, $user) {
+        public function createPatient(array $body, $user) {
         $code   = trim($body['PatientCode'] ?? '');
         $name   = trim($body['FullName'] ?? '');
         $phone  = trim($body['Phone'] ?? '');
@@ -17,49 +17,92 @@ class ClinicalController {
         $weight = (float)($body['Weight_Kg'] ?? 0);
         $scr    = (float)($body['SerumCreatinine'] ?? 1.0);
         $pType  = trim($body['PatientType'] ?? 'Thường');
-        $cond   = trim($body['ChronicCondition'] ?? '');
+        $chronic = trim($body['ChronicCondition'] ?? 'Không');
+        $address = trim($body['Address'] ?? '');
 
-        if ($code === '' || $name === '' || $dob === '' || $weight <= 0 || $scr <= 0) {
-            http_response_code(400);
-            return ['error' => 'Thiếu thông tin bắt buộc hoặc cân nặng/Creatinine không hợp lệ.'];
+        if ($code === '' || $name === '' || $phone === '' || $dob === '' || $weight <= 0 || $scr <= 0) {
+            http_response_code(422);
+            return ['error' => 'Vui lòng nhập đầy đủ thông tin bắt buộc và chỉ số hợp lệ.'];
         }
 
-        $stmt = $this->pdo->prepare("
-            DECLARE @Out TABLE (PatientID INT);
-            INSERT INTO Patients (PatientCode, FullName, Phone, DateOfBirth, Gender, Weight_Kg, SerumCreatinine, PatientType, ChronicCondition, ModifiedByUserID)
-            OUTPUT INSERTED.PatientID INTO @Out
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
-            SELECT PatientID FROM @Out;
-        ");
-        $stmt->execute([$code, $name, $phone, $dob, $gender, $weight, $scr, $pType, $cond ?: null, $user['UserID'] ?? null]);
-        $row = $stmt->fetch();
+        $chkCode = $this->pdo->prepare("SELECT PatientID FROM Patients WHERE PatientCode = ?");
+        $chkCode->execute([$code]);
+        if ($chkCode->fetch()) {
+            http_response_code(422);
+            return ['error' => "Mã bệnh nhân '$code' đã tồn tại trong hệ thống.", 'field' => 'PatientCode'];
+        }
 
-        return [
-            'success'   => true,
-            'message'   => 'Tạo hồ sơ bệnh nhân thành công!',
-            'PatientID' => (int)$row['PatientID']
-        ];
+        $chkPhone = $this->pdo->prepare("SELECT PatientID, FullName FROM Patients WHERE Phone = ?");
+        $chkPhone->execute([$phone]);
+        if ($exPhone = $chkPhone->fetch()) {
+            http_response_code(422);
+            $owner = $exPhone['FullName'] ?? '';
+            return ['error' => "Số điện thoại '$phone' đã được đăng ký cho bệnh nhân ($owner).", 'field' => 'Phone'];
+        }
+
+        try {
+            $this->pdo->exec("
+                DECLARE @ck NVARCHAR(128);
+                SELECT @ck = name FROM sys.check_constraints WHERE parent_object_id = OBJECT_ID('Patients') AND definition LIKE '%PatientType%';
+                IF @ck IS NOT NULL EXEC('ALTER TABLE Patients DROP CONSTRAINT [' + @ck + ']');
+                DECLARE @df NVARCHAR(128);
+                SELECT @df = name FROM sys.default_constraints WHERE parent_object_id = OBJECT_ID('Patients') AND col_name(parent_object_id, parent_column_id) = 'PatientType';
+                IF @df IS NOT NULL EXEC('ALTER TABLE Patients DROP CONSTRAINT [' + @df + ']');
+                IF EXISTS (SELECT 1 FROM sys.columns WHERE object_id = OBJECT_ID('Patients') AND name = 'PatientType' AND system_type_id = 167)
+                BEGIN
+                    ALTER TABLE Patients ALTER COLUMN PatientType NVARCHAR(30) NOT NULL;
+                    ALTER TABLE Patients ADD CONSTRAINT DF_Patients_PatientType DEFAULT N'Thường' FOR PatientType;
+                    ALTER TABLE Patients ADD CONSTRAINT CK_Patients_PatientType CHECK (PatientType IN (N'Thường', N'VIP', N'Bệnh mạn tính'));
+                END
+            ");
+        } catch (Throwable $ignore) {}
+
+        $uid = (int)($user['UserID'] ?? 1);
+        $stmt = $this->pdo->prepare("
+            INSERT INTO Patients (PatientCode, FullName, Phone, DateOfBirth, Gender, Weight_Kg, SerumCreatinine, PatientType, ChronicCondition, Address, ModifiedByUserID)
+            OUTPUT INSERTED.PatientID
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ");
+        try {
+            $stmt->execute([$code, $name, $phone, $dob, $gender, $weight, $scr, $pType, $chronic, $address !== '' ? $address : null, $uid]);
+            $row = $stmt->fetch();
+            $newId = (int)($row['PatientID'] ?? 0);
+            return ['success' => true, 'PatientID' => $newId];
+        } catch (PDOException $e) {
+            $msg = $e->getMessage();
+            http_response_code(422);
+            if (stripos($msg, 'Phone') !== false || stripos($msg, 'UQ__Patients__5C7E359E') !== false) {
+                return ['error' => "Số điện thoại '$phone' đã tồn tại trong hệ thống.", 'field' => 'Phone'];
+            }
+            if (stripos($msg, 'PatientCode') !== false || stripos($msg, 'UNIQUE') !== false) {
+                return ['error' => "Mã bệnh nhân '$code' đã tồn tại trong hệ thống.", 'field' => 'PatientCode'];
+            }
+            http_response_code(500);
+            return ['error' => 'Không thể lưu bệnh nhân: ' . $msg];
+        }
     }
 
     public function addAllergy(array $body, $user) {
-        $patientId    = (int)($body['PatientID'] ?? 0);
-        $ingredientId = (int)($body['ActiveIngredientID'] ?? 0);
-        $severity     = trim($body['Severity'] ?? 'Hard Stop');
-        $note         = trim($body['ReactionNote'] ?? '');
+        $patientId = (int)($body['PatientID'] ?? 0);
+        $ingId     = (int)($body['ActiveIngredientID'] ?? 0);
+        $severity  = trim($body['Severity'] ?? 'Soft Stop');
+        $note      = trim($body['ReactionNote'] ?? '');
 
-        if ($patientId <= 0 || $ingredientId <= 0) {
-            http_response_code(400);
-            return ['error' => 'PatientID và ActiveIngredientID là bắt buộc.'];
+        if ($patientId <= 0 || $ingId <= 0) {
+            http_response_code(422);
+            return ['error' => 'Thiếu PatientID hoặc ActiveIngredientID.'];
         }
 
+        $uid = (int)($user['UserID'] ?? 1);
         $stmt = $this->pdo->prepare("
             INSERT INTO PatientAllergies (PatientID, ActiveIngredientID, Severity, ReactionNote, ModifiedByUserID)
             VALUES (?, ?, ?, ?, ?)
         ");
-        $stmt->execute([$patientId, $ingredientId, $severity, $note ?: null, $user['UserID'] ?? null]);
-
+        $stmt->execute([$patientId, $ingId, $severity, $note, $uid]);
         return ['success' => true, 'message' => 'Đã ghi nhận tiền sử dị ứng chuẩn hoạt chất INN.'];
     }
+
+
 
     public function getPatient360(array $body, $user) {
         $patientId = (int)($_GET['PatientID'] ?? $body['PatientID'] ?? 0);

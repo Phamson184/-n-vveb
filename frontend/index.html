@@ -13,37 +13,68 @@
   <link rel="stylesheet" href="css/theme.css">
   <style>
     .st-pending {
-      background: var(--warn-soft, #fef3e2);
-      color: var(--warn, #b45309);
+      background: var(--warn-soft);
+      color: var(--warn);
+      border: 1px solid var(--warn);
       font-size: 11px;
       font-weight: 700;
       padding: 3px 9px;
-      border-radius: 20px;
+      border-radius: var(--radius-sm);
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
     }
 
     .st-completed {
-      background: var(--ok-soft, #e5f5ea);
-      color: var(--ok, #15803d);
+      background: var(--ok-soft);
+      color: var(--ok);
+      border: 1px solid var(--ok);
       font-size: 11px;
       font-weight: 700;
       padding: 3px 9px;
-      border-radius: 20px;
+      border-radius: var(--radius-sm);
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .kpi-value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-top: 6px;
+    }
+
+    .kpi-value.ok {
+      color: var(--ok);
+    }
+
+    .kpi-value.warn {
+      color: var(--warn);
+    }
+
+    .kpi-value.danger {
+      color: var(--danger);
+    }
+
+    .kpi-value.brand {
+      color: var(--brand-dark);
     }
 
     .quick-card {
-      border: 1px solid var(--line, #e6ebe8);
-      border-radius: 12px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
       padding: 14px;
-      transition: all 0.15s ease;
+      transition: background-color 0.15s ease, border-color 0.15s ease;
       text-decoration: none;
-      color: inherit;
+      color: var(--ink);
       display: block;
-      background: var(--surface, #fff);
+      background: var(--surface);
     }
 
     .quick-card:hover {
-      border-color: var(--brand, #0d9488);
-      transform: translateY(-1px);
+      border-color: var(--brand);
+      background: var(--bg);
+      color: var(--ink);
     }
   </style>
 </head>
@@ -51,35 +82,29 @@
 <body>
   <div class="app-shell d-flex min-vh-100">
     <!-- SIDEBAR DÙNG CHUNG -->
-    <aside class="sidebar">
+    <aside class="sidebar" aria-label="Điều hướng chính">
       <div class="brand">
-        <span class="brand-mark"><i class="fa-solid fa-staff-snake"></i></span>
+        <span class="brand-mark"><i class="fa-solid fa-staff-snake" aria-hidden="true"></i></span>
         <span>PharmaPro <small class="text-muted">v2</small></span>
       </div>
 
-      <div class="nav-group">
-        <div class="nav-label">Điều hành</div>
-        <a class="nav-item" href="index.html"><i class="fa-solid fa-chart-pie"></i> Tổng quan</a>
-      </div>
+      <div class="nav-group">Điều hành</div>
+      <a class="nav-item" href="index.html"><i class="fa-solid fa-chart-pie" aria-hidden="true"></i> Tổng quan</a>
 
-      <div class="nav-group">
-        <div class="nav-label">Dược lâm sàng & Bán hàng</div>
-        <a class="nav-item" href="pos.html" data-roles="ADMIN,DOCTOR,PHARMACIST"><i
-            class="fa-solid fa-cash-register"></i> Kê đơn & POS</a>
-        <a class="nav-item" href="prescriptions.html" data-roles="ADMIN,DOCTOR,PHARMACIST,CASHIER"><i
-            class="fa-solid fa-file-prescription"></i> Đơn thuốc GPP</a>
-        <a class="nav-item" href="patients.html" data-roles="ADMIN,DOCTOR,PHARMACIST"><i
-            class="fa-solid fa-user-injured"></i> Hồ sơ Dược bạ 360°</a>
-      </div>
+      <div class="nav-group">Dược lâm sàng &amp; Bán hàng</div>
+      <a class="nav-item" href="pos.html" data-roles="ADMIN,DOCTOR,PHARMACIST"><i
+          class="fa-solid fa-cash-register" aria-hidden="true"></i> Kê đơn &amp; POS</a>
+      <a class="nav-item" href="prescriptions.html" data-roles="ADMIN,DOCTOR,PHARMACIST,CASHIER"><i
+          class="fa-solid fa-file-prescription" aria-hidden="true"></i> Đơn thuốc GPP</a>
+      <a class="nav-item" href="patients.html" data-roles="ADMIN,DOCTOR,PHARMACIST"><i
+          class="fa-solid fa-user-injured" aria-hidden="true"></i> Hồ sơ Dược bạ 360°</a>
 
-      <div class="nav-group">
-        <div class="nav-label">Kho dược & Pháp lý</div>
-        <a class="nav-item" href="products.html"><i class="fa-solid fa-pills"></i> Danh mục & DDI</a>
-        <a class="nav-item" href="inventory.html" data-roles="ADMIN,PHARMACIST,WAREHOUSE"><i
-            class="fa-solid fa-boxes-stacked"></i> Kho FEFO & TT 20/2017</a>
-        <a class="nav-item" href="audit.html" data-roles="ADMIN,PHARMACIST,WAREHOUSE"><i
-            class="fa-solid fa-clock-rotate-left"></i> Thanh tra Temporal</a>
-      </div>
+      <div class="nav-group">Kho dược &amp; Pháp lý</div>
+      <a class="nav-item" href="products.html"><i class="fa-solid fa-pills" aria-hidden="true"></i> Danh mục &amp; DDI</a>
+      <a class="nav-item" href="inventory.html" data-roles="ADMIN,PHARMACIST,WAREHOUSE"><i
+          class="fa-solid fa-boxes-stacked" aria-hidden="true"></i> Kho FEFO &amp; TT 20/2017</a>
+      <a class="nav-item" href="audit.html" data-roles="ADMIN,PHARMACIST,WAREHOUSE"><i
+          class="fa-solid fa-clock-rotate-left" aria-hidden="true"></i> Thanh tra Temporal</a>
 
       <div class="store-box mt-auto">
         <div class="fw-semibold">Nhà thuốc GPP #79001</div>
@@ -97,8 +122,8 @@
             <div class="small text-muted" id="userRoleBadge">ROLE</div>
           </div>
           <div class="avatar" id="userAvatar">PP</div>
-          <button class="btn-ghost btn-sm" id="btnLogout" title="Đăng xuất"><i
-              class="fa-solid fa-right-from-bracket"></i></button>
+          <button type="button" class="btn-ghost btn-sm" id="btnLogout" title="Đăng xuất" aria-label="Đăng xuất"><i
+              class="fa-solid fa-right-from-bracket" aria-hidden="true"></i></button>
         </div>
       </header>
 
@@ -107,26 +132,26 @@
         <div class="row g-3 mb-4">
           <div class="col-sm-6 col-xl-3">
             <div class="panel">
-              <div class="small text-muted">Doanh thu đơn hoàn tất</div>
-              <div class="fs-4 fw-bold mt-1 text-success" id="kpiRevenue">0đ</div>
+              <div class="small text-muted"><i class="fa-solid fa-coins me-1" aria-hidden="true"></i>Doanh thu đơn hoàn tất</div>
+              <div class="kpi-value ok" id="kpiRevenue">0đ</div>
             </div>
           </div>
           <div class="col-sm-6 col-xl-3">
             <div class="panel">
-              <div class="small text-muted">Đơn chờ cấp phát (Pending)</div>
-              <div class="fs-4 fw-bold mt-1 text-warning" id="kpiPendingRx">0</div>
+              <div class="small text-muted"><i class="fa-solid fa-clock me-1" aria-hidden="true"></i>Đơn chờ cấp phát (Pending)</div>
+              <div class="kpi-value warn" id="kpiPendingRx">0</div>
             </div>
           </div>
           <div class="col-sm-6 col-xl-3">
             <div class="panel">
-              <div class="small text-muted">Lô cận date (&le; 90 ngày)</div>
-              <div class="fs-4 fw-bold mt-1 text-danger" id="kpiNearExpiry">0</div>
+              <div class="small text-muted"><i class="fa-solid fa-hourglass-end me-1" aria-hidden="true"></i>Lô cận date (&le; 90 ngày)</div>
+              <div class="kpi-value danger" id="kpiNearExpiry">0</div>
             </div>
           </div>
           <div class="col-sm-6 col-xl-3">
             <div class="panel">
-              <div class="small text-muted">Thuốc kiểm soát đặc biệt</div>
-              <div class="fs-4 fw-bold mt-1 text-primary" id="kpiCtrlDrugs">0</div>
+              <div class="small text-muted"><i class="fa-solid fa-shield-halved me-1" aria-hidden="true"></i>Thuốc kiểm soát đặc biệt</div>
+              <div class="kpi-value brand" id="kpiCtrlDrugs">0</div>
             </div>
           </div>
         </div>
@@ -143,10 +168,10 @@
                 <table class="table table-sm align-middle mb-0">
                   <thead>
                     <tr>
-                      <th>Mã đơn</th>
-                      <th>Bệnh nhân</th>
-                      <th>Trạng thái</th>
-                      <th class="text-end">Tổng tiền</th>
+                      <th scope="col">Mã đơn</th>
+                      <th scope="col">Bệnh nhân</th>
+                      <th scope="col">Trạng thái</th>
+                      <th scope="col" class="text-end">Tổng tiền</th>
                     </tr>
                   </thead>
                   <tbody id="tblRecentRx">
@@ -165,22 +190,22 @@
               <h2 class="h6 fw-bold mb-3">Truy cập nhanh phân hệ</h2>
               <div class="d-flex flex-column gap-2">
                 <a href="pos.html" class="quick-card" data-roles="ADMIN,DOCTOR,PHARMACIST">
-                  <div class="fw-semibold"><i class="fa-solid fa-cash-register text-primary me-2"></i>Kê đơn & POS
+                  <div class="fw-semibold"><i class="fa-solid fa-cash-register me-2" aria-hidden="true"></i>Kê đơn &amp; POS
                     (F1/F3/F4)</div>
-                  <div class="small text-muted">Tìm thuốc, thuốc thay thế, kiểm tra CDSS & nhập OCR</div>
+                  <div class="small text-muted">Tìm thuốc, thuốc thay thế, kiểm tra CDSS &amp; nhập OCR</div>
                 </a>
                 <a href="patients.html" class="quick-card" data-roles="ADMIN,DOCTOR,PHARMACIST">
-                  <div class="fw-semibold"><i class="fa-solid fa-user-injured text-success me-2"></i>Hồ sơ Dược bạ 360°
+                  <div class="fw-semibold"><i class="fa-solid fa-user-injured me-2" aria-hidden="true"></i>Hồ sơ Dược bạ 360°
                   </div>
                   <div class="small text-muted">Tra cứu CrCl, dị ứng thuốc và lịch sử kê đơn</div>
                 </a>
                 <a href="inventory.html" class="quick-card" data-roles="ADMIN,PHARMACIST,WAREHOUSE">
-                  <div class="fw-semibold"><i class="fa-solid fa-boxes-stacked text-warning me-2"></i>Kho FEFO & Sổ TT
+                  <div class="fw-semibold"><i class="fa-solid fa-boxes-stacked me-2" aria-hidden="true"></i>Kho FEFO &amp; Sổ TT
                     20/2017</div>
-                  <div class="small text-muted">Ưu tiên lô hạn gần, nhập lô mới & kiểm soát đặc biệt</div>
+                  <div class="small text-muted">Ưu tiên lô hạn gần, nhập lô mới &amp; kiểm soát đặc biệt</div>
                 </a>
                 <a href="audit.html" class="quick-card" data-roles="ADMIN,PHARMACIST,WAREHOUSE">
-                  <div class="fw-semibold"><i class="fa-solid fa-clock-rotate-left text-danger me-2"></i>Thanh tra
+                  <div class="fw-semibold"><i class="fa-solid fa-clock-rotate-left me-2" aria-hidden="true"></i>Thanh tra
                     Temporal</div>
                   <div class="small text-muted">Đối chiếu lịch sử biến động dữ liệu theo thời gian</div>
                 </a>
@@ -193,7 +218,7 @@
   </div>
 
   <!-- TOAST THÔNG BÁO -->
-  <div class="toast-x" id="toastBox" style="display:none; position:fixed; bottom:20px; right:20px; z-index:9999;"></div>
+  <div class="toast-x" id="toastBox" role="status" aria-live="polite" style="display:none; position:fixed; bottom:20px; right:20px; z-index:9999;"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script>
@@ -225,11 +250,10 @@
       if (!box) return;
       box.textContent = msg;
       box.style.display = 'block';
-      box.style.background = isError ? 'var(--danger, #dc2626)' : 'var(--brand, #0d9488)';
-      box.style.color = '#fff';
+      box.style.background = isError ? 'var(--danger)' : 'var(--brand)';
+      box.style.color = 'var(--surface)';
       box.style.padding = '12px 18px';
       box.style.borderRadius = '10px';
-      box.style.boxShadow = '0 8px 24px rgba(0,0,0,0.15)';
       clearTimeout(window._toastTimer);
       window._toastTimer = setTimeout(() => { box.style.display = 'none'; }, 4000);
     }
@@ -303,11 +327,18 @@
         const pend = rxList.filter(x => String(x.Status).toLowerCase() === 'pending').length;
         const ctrl = drugList.filter(d => flag(d.IsControlled)).length;
 
-        document.getElementById('kpiRevenue').textContent = money(rev);
-        document.getElementById('kpiPendingRx').textContent = String(pend);
-        document.getElementById('kpiNearExpiry').textContent = nearRes.status === 'fulfilled' ? String(nearList.length) : '?';
-        document.getElementById('kpiCtrlDrugs').textContent = drugRes.status === 'fulfilled' ? String(ctrl) : '?';
+        const elRev = document.getElementById('kpiRevenue');
+        const elPend = document.getElementById('kpiPendingRx');
+        const elNear = document.getElementById('kpiNearExpiry');
+        const elCtrl = document.getElementById('kpiCtrlDrugs');
+
+        if (elRev) elRev.textContent = money(rev);
+        if (elPend) elPend.textContent = String(pend);
+        if (elNear) elNear.textContent = nearRes.status === 'fulfilled' ? String(nearList.length) : '?';
+        if (elCtrl) elCtrl.textContent = drugRes.status === 'fulfilled' ? String(ctrl) : '?';
+
         const tbody = document.getElementById('tblRecentRx');
+        if (!tbody) return;
         if (!rxList.length) {
           tbody.innerHTML = '<tr><td colspan="4" class="text-center text-muted py-3">Chưa có đơn thuốc.</td></tr>';
           return;
@@ -315,9 +346,10 @@
 
         tbody.innerHTML = rxList.map(rx => {
           const st = String(rx.Status || 'Pending');
-          const badge = st.toLowerCase() === 'completed'
-            ? `<span class="st-completed">${esc(st)}</span>`
-            : `<span class="st-pending">${esc(st)}</span>`;
+          const isCompleted = st.toLowerCase() === 'completed';
+          const badge = isCompleted
+            ? `<span class="st-completed"><i class="fa-solid fa-circle-check" aria-hidden="true"></i>${esc(st)}</span>`
+            : `<span class="st-pending"><i class="fa-solid fa-hourglass-half" aria-hidden="true"></i>${esc(st)}</span>`;
           return `
         <tr>
           <td><a href="prescriptions.html?id=${encodeURIComponent(rx.PrescriptionID || '')}"><code>${esc(rx.NationalCode)}</code></a></td>
@@ -334,13 +366,17 @@
 
     document.addEventListener('DOMContentLoaded', async () => {
       if (PP_USER) {
-        document.getElementById('userFullName').textContent = PP_USER.FullName || PP_USER.Username;
-        document.getElementById('userRoleBadge').textContent = PP_USER.RoleCode;
-        document.getElementById('userAvatar').textContent = (PP_USER.FullName || 'PP').trim().slice(0, 2).toUpperCase();
+        const elName = document.getElementById('userFullName');
+        const elRole = document.getElementById('userRoleBadge');
+        const elAvatar = document.getElementById('userAvatar');
+        if (elName) elName.textContent = PP_USER.FullName || PP_USER.Username || '';
+        if (elRole) elRole.textContent = PP_USER.RoleCode || '';
+        if (elAvatar) elAvatar.textContent = (PP_USER.FullName || 'PP').trim().slice(0, 2).toUpperCase();
       }
       const pageRoles = document.body.getAttribute('data-page-roles');
       if (pageRoles && !hasRole(pageRoles)) {
-        document.getElementById('mainContent').innerHTML = '<div class="panel p-4 text-danger fw-semibold">Bạn không có quyền truy cập trang này (403 Forbidden).</div>';
+        const mainEl = document.getElementById('mainContent');
+        if (mainEl) mainEl.innerHTML = '<div class="panel p-4 text-danger fw-semibold">Bạn không có quyền truy cập trang này (403 Forbidden).</div>';
         return;
       }
       applyRoles(document);
