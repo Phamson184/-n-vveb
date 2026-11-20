@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PharmaPro v2.0 – Hồ sơ Dược bạ 360°</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/theme.css">
+    <style>
+        .crcl-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .crcl-danger {
+            background: var(--danger-soft, #fdeceb);
+            color: var(--danger, #b42318);
+        }
+
+        .crcl-warn {
+            background: var(--warn-soft, #fef3e2);
+            color: var(--warn, #b45309);
+        }
+
+        .crcl-ok {
+            background: var(--ok-soft, #e5f5ea);
+            color: var(--ok, #15803d);
+        }
+
+        .allergy-hard {
+            background: var(--danger-soft, #fdeceb);
+            color: var(--danger, #b42318);
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .allergy-soft {
+            background: var(--warn-soft, #fef3e2);
+            color: var(--warn, #b45309);
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .field-invalid {
+            border-color: var(--danger, #dc2626) !important;
+        }
+
+        .field-err-msg {
+            color: var(--danger, #dc2626);
+            font-size: 12px;
+            margin-top: 4px;
+        }
+
+        .created-box {
+            background: var(--brand-soft, #e3f3f0);
+            border: 1px solid var(--brand, #0f766e);
+            border-radius: 10px;
+            padding: 12px 14px;
+            margin-bottom: 16px;
+        }
+    </style>
+</head>
+
+<body data-page-roles="ADMIN,DOCTOR,PHARMACIST">
+    <div class="app-shell d-flex min-vh-100">
+        <!-- SIDEBAR DÙNG CHUNG -->
+        <aside class="sidebar">
+            <div class="brand">
+                <span class="brand-mark"><i class="fa-solid fa-staff-snake"></i></span>
+                <span>PharmaPro <small class="text-muted">v2</small></span>
+            </div>
+
+            <div class="nav-group">
+                <div class="nav-label">Điều hành</div>
+                <a class="nav-item" href="index.html"><i class="fa-solid fa-chart-pie"></i> Tổng quan</a>
+            </div>
+
+            <div class="nav-group">
+                <div class="nav-label">Dược lâm sàng & Bán hàng</div>
+                <a class="nav-item" href="pos.html" data-roles="ADMIN,DOCTOR,PHARMACIST"><i
+                        class="fa-solid fa-cash-register"></i> Kê đơn & POS</a>
+                <a class="nav-item" href="prescriptions.html" data-roles="ADMIN,DOCTOR,PHARMACIST,CASHIER"><i
+                        class="fa-solid fa-file-prescription"></i> Đơn thuốc GPP</a>
+                <a class="nav-item" href="patients.html" data-roles="ADMIN,DOCTOR,PHARMACIST"><i
+                        class="fa-solid fa-user-injured"></i> Hồ sơ Dược bạ 360°</a>
+            </div>
+
+            <div class="nav-group">
+                <div class="nav-label">Kho dược & Pháp lý</div>
+                <a class="nav-item" href="products.html"><i class="fa-solid fa-pills"></i> Danh mục & DDI</a>
+                <a class="nav-item" href="inventory.html" data-roles="ADMIN,PHARMACIST,WAREHOUSE"><i
+                        class="fa-solid fa-boxes-stacked"></i> Kho FEFO & TT 20/2017</a>
+                <a class="nav-item" href="audit.html" data-roles="ADMIN,PHARMACIST,WAREHOUSE"><i
+                        class="fa-solid fa-clock-rotate-left"></i> Thanh tra Temporal</a>
+            </div>
+
+            <div class="store-box mt-auto">
+                <div class="fw-semibold">Nhà thuốc GPP #79001</div>
+                <div class="small text-muted">Chuẩn Thông tư 02/2018</div>
+            </div>
+        </aside>
+
+        <!-- KHU VỰC CHÍNH -->
+        <div class="main flex-grow-1 d-flex flex-column">
+            <header class="topbar d-flex align-items-center justify-content-between">
+                <div class="page-title" id="pageTitle">Hồ sơ Dược bạ 360°</div>
+                <div class="user d-flex align-items-center gap-3">
+                    <div class="text-end">
+                        <div class="fw-semibold" id="userFullName">Đang tải...</div>
+                        <div class="small text-muted" id="userRoleBadge">ROLE</div>
+                    </div>
+                    <div class="avatar" id="userAvatar">PP</div>
+                    <button class="btn-ghost btn-sm" id="btnLogout" title="Đăng xuất"><i
+                            class="fa-solid fa-right-from-bracket"></i></button>
+                </div>
+            </header>
+
+            <main class="content p-4" id="mainContent">
+                <!-- Th banner thông báo PatientID vừa tạo -->
+                <div class="created-box d-none" id="createdPatientBanner">
+                    <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
+                        <div>
+                            <i class="fa-solid fa-circle-check me-1"></i>
+                            Đã tạo bệnh nhân: <strong id="createdPatientName"></strong>
+                            — <strong>PatientID: <span id="createdPatientId" class="fs-6"></span></strong>
+                            (<span id="createdPatientCode"></span>)
+                        </div>
+                        <div class="d-flex gap-2">
+                            <button type="button" class="btn btn-sm btn-outline-secondary" id="btnViewCreated360">Xem hồ
+                                sơ 360°</button>
+                            <a href="#" class="btn btn-sm btn-primary" id="linkToPosWithPatient">Sang POS kê đơn</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Thanh tìm / chọn bệnh nhân xem 360° + Nút thêm bệnh nhân -->
+                <div class="panel mb-4">
+                    <div class="panel-head d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
+                        <h2 class="h6 mb-0 fw-bold">Tra cứu hồ sơ bệnh nhân 360°</h2>
+                        <button type="button" class="btn btn-primary btn-sm" id="btnOpenAddPatient"
+                            data-roles="ADMIN,DOCTOR,PHARMACIST">
+                            <i class="fa-solid fa-user-plus me-1"></i> Thêm bệnh nhân
+                        </button>
+                    </div>
+                    <form class="row g-2 align-items-end" id="frmLookupPatient">
+                        <div class="col-sm-5 col-md-4">
+                            <label class="form-label small fw-semibold" for="inpLookupPatientId">PatientID (số)</label>
+                            <input type="number" min="1" step="1" class="form-control" id="inpLookupPatientId"
+                                placeholder="Ví dụ: 7">
+                        </div>
+                        <div class="col-auto">
+                            <button type="submit" class="btn btn-outline-primary" id="btnLookupPatient">
+                                <i class="fa-solid fa-magnifying-glass me-1"></i> Xem hồ sơ 360°
+                            </button>
+                        </div>
+                        <div class="col-auto ms-auto" id="posShortcutWrap"></div>
+                    </form>
+                    <div class="mt-3 text-danger small d-none" id="profile360Error"></div>
+                </div>
+
+                <!-- Nội dung hồ sơ 360° -->
+                <div id="profile360Container" class="d-none">
+                    <div class="row g-4 mb-4">
+                        <!-- Thông tin bệnh nhân & CrCl -->
+                        <div class="col-lg-6">
+                            <div class="panel h-100">
+                                <div class="panel-head d-flex align-items-center justify-content-between mb-3">
+                                    <h3 class="h6 mb-0 fw-bold">Thông tin bệnh nhân & Chức năng thận</h3>
+                                    <span id="crclBadgeWrap"></span>
+                                </div>
+                                <div id="patientInfoBody" class="row g-2 small"></div>
+                            </div>
+                        </div>
+
+                        <!-- Form thêm dị ứng -->
+                        <div class="col-lg-6">
+                            <div class="panel h-100">
+                                <div class="panel-head mb-3">
+                                    <h3 class="h6 mb-0 fw-bold">Thêm dị ứng hoạt chất (INN)</h3>
+                                </div>
+                                <form id="frmAddAllergy" novalidate>
+                                    <div class="row g-2">
+                                        <div class="col-md-6">
+                                            <label class="form-label small fw-semibold" for="selActiveIngredient">Hoạt
+                                                chất <span class="text-danger">*</span></label>
+                                            <select class="form-select form-select-sm" id="selActiveIngredient"
+                                                required>
+                                                <option value="">-- Chọn hoạt chất --</option>
+                                            </select>
+                                            <div class="field-err-msg" id="errIngredient"></div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label small fw-semibold" for="selSeverity">Mức độ <span
+                                                    class="text-danger">*</span></label>
+                                            <select class="form-select form-select-sm" id="selSeverity" required>
+                                                <option value="Soft Stop">Soft Stop (Cảnh báo vàng)</option>
+                                                <option value="Hard Stop">Hard Stop (Cảnh báo đỏ)</option>
+                                            </select>
+                                            <div class="field-err-msg" id="errSeverity"></div>
+                                        </div>
+                                        <div class="col-12">
+                                            <label class="form-label small fw-semibold" for="inpReactionNote">Ghi chú
+                                                phản ứng</label>
+                                            <input type="text" class="form-control form-control-sm" id="inpReactionNote"
+                                                placeholder="Ví dụ: Nổi mề đay, khó thở...">
+                                        </div>
+                                        <div class="col-12 text-end mt-2">
+                                            <button type="submit" class="btn btn-sm btn-primary" id="btnSaveAllergy"
+                                                data-roles="ADMIN,DOCTOR,PHARMACIST">
+                                                <i class="fa-solid fa-plus me-1"></i> Lưu dị ứng
+                                            </button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bảng dị ứng INN -->
+                    <div class="panel mb-4">
+                        <div class="panel-head mb-3">
+                            <h3 class="h6 mb-0 fw-bold">Danh sách dị ứng (allergies_INN)</h3>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-sm align-middle mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Hoạt chất</th>
+                                        <th>Mức độ</th>
+                                        <th>Ghi chú phản ứng</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tblAllergiesBody">
+                                    <tr>
+                                        <td colspan="3" class="text-muted text-center py-3">Chưa có dữ liệu</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Bảng lịch sử đơn thuốc -->
+                    <div class="panel">
+                        <div class="panel-head mb-3">
+                            <h3 class="h6 mb-0 fw-bold">Lịch sử đơn thuốc (prescription_history)</h3>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-sm align-middle mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Mã đơn (14 ký tự)</th>
+                                        <th>Chẩn đoán</th>
+                                        <th>Trạng thái</th>
+                                        <th class="text-end">Tổng tiền</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tblHistoryBody">
+                                    <tr>
+                                        <td colspan="4" class="text-muted text-center py-3">Chưa có lịch sử đơn</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- MODAL THÊM BỆNH NHÂN -->
+    <div class="modal fade" id="modalAddPatient" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold">Thêm bệnh nhân mới</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+                </div>
+                <form id="frmAddPatient" novalidate>
+                    <div class="modal-body">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label small fw-semibold" for="inpPatientCode">Mã bệnh nhân
+                                    (PatientCode) <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="inpPatientCode"
+                                    placeholder="Ví dụ: BN202699" required>
+                                <div class="field-err-msg" id="errPatientCode"></div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-semibold" for="inpFullName">Họ và tên (FullName) <span
+                                        class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="inpFullName"
+                                    placeholder="Ví dụ: Nguyễn Văn An" required>
+                                <div class="field-err-msg" id="errFullName"></div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-semibold" for="inpPhone">Số điện thoại (Phone) <span
+                                        class="text-danger">*</span></label>
+                                <input type="tel" class="form-control" id="inpPhone" maxlength="10"
+                                    placeholder="0909123456" required>
+                                <div class="field-err-msg" id="errPhone"></div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-semibold" for="inpDateOfBirth">Ngày sinh (DateOfBirth)
+                                    <span class="text-danger">*</span></label>
+                                <input type="date" class="form-control" id="inpDateOfBirth" required>
+                                <div class="field-err-msg" id="errDateOfBirth"></div>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label small fw-semibold" for="selGender">Giới tính (Gender) <span
+                                        class="text-danger">*</span></label>
+                                <select class="form-select" id="selGender" required>
+                                    <option value="">-- Chọn --</option>
+                                    <option value="M">Nam (M)</option>
+                                    <option value="F">Nữ (F)</option>
+                                </select>
+                                <div class="field-err-msg" id="errGender"></div>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label small fw-semibold" for="inpWeightKg">Cân nặng Kg (Weight_Kg)
+                                    <span class="text-danger">*</span></label>
+                                <input type="number" step="0.1" min="0.1" class="form-control" id="inpWeightKg"
+                                    placeholder="62" required>
+                                <div class="field-err-msg" id="errWeightKg"></div>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label small fw-semibold" for="inpSerumCreatinine">Creatinin máu
+                                    (SerumCreatinine) <span class="text-danger">*</span></label>
+                                <input type="number" step="0.01" min="0.01" class="form-control" id="inpSerumCreatinine"
+                                    placeholder="1.2" required>
+                                <div class="field-err-msg" id="errSerumCreatinine"></div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-semibold" for="selPatientType">Loại bệnh nhân
+                                    (PatientType) <span class="text-danger">*</span></label>
+                                <select class="form-select" id="selPatientType" required>
+                                    <option value="Thường">Thường</option>
+                                    <option value="VIP">VIP</option>
+                                    <option value="Bệnh mạn tính">Bệnh mạn tính</option>
+                                </select>
+                                <div class="field-err-msg" id="errPatientType"></div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-semibold" for="inpChronicCondition">Bệnh mạn tính
+                                    (ChronicCondition) <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="inpChronicCondition"
+                                    placeholder="Ví dụ: Tăng huyết áp hoặc Không" required>
+                                <div class="field-err-msg" id="errChronicCondition"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Hủy</button>
+                        <button type="submit" class="btn btn-primary" id="btnSubmitPatient">
+                            <i class="fa-solid fa-floppy-disk me-1"></i> Lưu bệnh nhân
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST THÔNG BÁO -->
+    <div class="toast-x" id="toastBox" style="display:none; position:fixed; bottom:20px; right:20px; z-index:9999;">
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const API_BASE = 'http://localhost:3001/api/v2';
+        const USE_MOCK = true; // Đổi thành false khi chạy API thật
+
+        // 1. KIỂM TRA ĐĂNG NHẬP JWT
+        let PP_TOKEN = sessionStorage.getItem('pp_token');
+        let PP_USER = (() => {
+            try { return JSON.parse(sessionStorage.getItem('pp_user') || 'null'); } catch (e) { return null; }
+        })();
+
+        if (USE_MOCK && (!PP_TOKEN || !PP_USER)) {
+            PP_TOKEN = 'mock-jwt-token';
+            PP_USER = { UserID: '2', EmployeeCode: 'NV002', FullName: 'Trần Thị Thu Hà', RoleCode: 'PHARMACIST' };
+        }
+
+        if (!PP_TOKEN || !PP_USER) {
+            const cur = location.pathname.split('/').pop() || 'index.html';
+            location.replace('login.html?next=' + encodeURIComponent(cur));
+        }
+
+        // 2. CÁC HÀM TIỆN ÍCH CHUẨN BẮT BUỘC (AI_CONTEXT_V2)
+        const num = v => { const n = Number(v); return Number.isFinite(n) ? n : 0; };
+        const flag = v => Number(v) === 1;
+        const esc = s => String(s ?? '').replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
+        const money = v => Math.round(num(v)).toLocaleString('vi-VN') + 'đ';
+        const getParam = k => new URLSearchParams(location.search).get(k);
+
+        function fmtDate(iso) {
+            if (!iso) return '—';
+            const d = new Date(iso);
+            if (isNaN(d)) return esc(iso);
+            return String(d.getDate()).padStart(2, '0') + '/' + String(d.getMonth() + 1).padStart(2, '0') + '/' + d.getFullYear();
+        }
+
+        function fmtDateTime(iso) {
+            if (!iso) return '—';
+            const d = new Date(iso);
+            if (isNaN(d)) return esc(iso);
+            return fmtDate(iso) + ' ' + String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+        }
+
+        function toast(msg, isError = false) {
+            const box = document.getElementById('toastBox');
+            if (!box) return;
+            box.textContent = msg;
+            box.style.display = 'block';
+            box.style.background = isError ? 'var(--danger, #dc2626)' : 'var(--brand, #0d9488)';
+            box.style.color = '#fff';
+            box.style.padding = '12px 18px';
+            box.style.borderRadius = '10px';
+            box.style.boxShadow = '0 8px 24px rgba(0,0,0,0.15)';
+            clearTimeout(window._toastTimer);
+            window._toastTimer = setTimeout(() => { box.style.display = 'none'; }, 4000);
+        }
+
+        // 3. PHÂN QUYỀN GIAO DIỆN RBAC
+        function hasRole(rolesCsv) {
+            if (!rolesCsv) return true;
+            const allow = String(rolesCsv).split(',').map(s => s.trim().toUpperCase()).filter(Boolean);
+            return allow.length === 0 || allow.includes(String(PP_USER?.RoleCode || '').toUpperCase());
+        }
+
+        function applyRoles(root = document) {
+            root.querySelectorAll('[data-roles]').forEach(el => {
+                if (!hasRole(el.getAttribute('data-roles'))) el.style.display = 'none';
+            });
+        }
+
+        // 4. HÀM GỌI API TRUNG TÂM (TỰ GẮN JWT, BẮT 401/403/422)
+        async function api(method, path, body = null) {
+            const headers = { 'Authorization': 'Bearer ' + PP_TOKEN };
+            const opts = { method: method.toUpperCase(), headers };
+            if (body !== null && opts.method !== 'GET') {
+                headers['Content-Type'] = 'application/json';
+                opts.body = JSON.stringify(body);
+            }
+            const res = await fetch(API_BASE + path, opts);
+            let data = null;
+            try { data = await res.json(); } catch (e) { }
+
+            if (res.status === 401) {
+                sessionStorage.removeItem('pp_token');
+                sessionStorage.removeItem('pp_user');
+                location.replace('login.html?expired=1');
+                throw new Error('Phiên đăng nhập hết hạn.');
+            }
+
+            if (!res.ok) {
+                const errMsg = res.status === 403
+                    ? 'Bạn không có quyền thực hiện chức năng này!'
+                    : ((data && data.error) || ('Lỗi máy chủ (' + res.status + ')'));
+                const err = new Error(errMsg);
+                err.status = res.status;
+                err.data = data;
+                throw err;
+            }
+            return data;
+        }
+
+        /* =====================================================
+           DỮ LIỆU GIẢ CHUẨN KIỂU CHUỖI CHO V2 (KHI USE_MOCK = true)
+        ===================================================== */
+        const MOCK_CATALOGS = {
+            success: true,
+            active_ingredients: [
+                { ActiveIngredientID: '1', IngredientName: 'Paracetamol' },
+                { ActiveIngredientID: '2', IngredientName: 'Amoxicillin' },
+                { ActiveIngredientID: '3', IngredientName: 'Ibuprofen' },
+                { ActiveIngredientID: '4', IngredientName: 'Morphin' }
+            ]
+        };
+
+        const MOCK_PROFILES = {
+            '7': {
+                success: true,
+                patient: {
+                    PatientID: '7',
+                    PatientCode: 'BN202607',
+                    FullName: 'Nguyễn Thị Lan',
+                    Phone: '0900000001',
+                    DateOfBirth: '1970-03-15',
+                    Gender: 'F',
+                    Weight_Kg: '55.00',
+                    SerumCreatinine: '1.85',
+                    PatientType: 'Bệnh mạn tính',
+                    ChronicCondition: 'Suy thận mạn, Tăng huyết áp'
+                },
+                calculated_CrCl: '31.40',
+                allergies_INN: [
+                    { ActiveIngredientID: '2', IngredientName: 'Amoxicillin', Severity: 'Hard Stop', ReactionNote: 'Phát ban nặng / sốc phản vệ' }
+                ],
+                prescription_history: [
+                    { PrescriptionID: '101', NationalCode: '79001A1B2C3D-C', Diagnosis: 'Viêm họng cấp', Status: 'Completed', TotalAmount: '125000.00' }
+                ]
+            },
+            '8': {
+                success: true,
+                patient: {
+                    PatientID: '8',
+                    PatientCode: 'BN202608',
+                    FullName: 'Trần Văn Minh',
+                    Phone: '0912345678',
+                    DateOfBirth: '1958-08-20',
+                    Gender: 'M',
+                    Weight_Kg: '64.00',
+                    SerumCreatinine: '2.90',
+                    PatientType: 'VIP',
+                    ChronicCondition: 'Đái tháo đường type 2'
+                },
+                calculated_CrCl: '24.15',
+                allergies_INN: [
+                    { ActiveIngredientID: '3', IngredientName: 'Ibuprofen', Severity: 'Soft Stop', ReactionNote: 'Đau dạ dày nhẹ' }
+                ],
+                prescription_history: [
+                    { PrescriptionID: '102', NationalCode: '79001X9Y8Z7W-C', Diagnosis: 'Đau nhức cơ xương', Status: 'Validated', TotalAmount: '240000.00' }
+                ]
+            }
+        };
+
+        let activeIngredients = [];
+        let currentPatientId = null;
+        const addPatientModal = new bootstrap.Modal(document.getElementById('modalAddPatient'));
+
+        function clearValidationErrors(ids) {
+            ids.forEach(({ inputId, errId }) => {
+                const inp = document.getElementById(inputId);
+                const err = document.getElementById(errId);
+                if (inp) inp.classList.remove('field-invalid');
+                if (err) err.textContent = '';
+            });
+        }
+
+        function setFieldError(inputId, errId, msg) {
+            const inp = document.getElementById(inputId);
+            const err = document.getElementById(errId);
+            if (inp) inp.classList.add('field-invalid');
+            if (err) err.textContent = msg;
+        }
+
+        function renderCrClBadge(crclRaw) {
+            const crcl = num(crclRaw);
+            const wrap = document.getElementById('crclBadgeWrap');
+            if (crcl < 30) {
+                wrap.innerHTML = `<span class="crcl-badge crcl-danger"><i class="fa-solid fa-triangle-exclamation"></i> CrCl ${esc(crcl.toFixed(2))} mL/phút · Suy thận nặng - cần giảm liều</span>`;
+            } else if (crcl <= 60) {
+                wrap.innerHTML = `<span class="crcl-badge crcl-warn"><i class="fa-solid fa-circle-exclamation"></i> CrCl ${esc(crcl.toFixed(2))} mL/phút · Suy thận trung bình</span>`;
+            } else {
+                wrap.innerHTML = `<span class="crcl-badge crcl-ok"><i class="fa-solid fa-heart-pulse"></i> CrCl ${esc(crcl.toFixed(2))} mL/phút · Bình thường</span>`;
+            }
+        }
+
+        function renderProfile360(data) {
+            const p = data?.patient;
+            if (!p) {
+                document.getElementById('profile360Container').classList.add('d-none');
+                return;
+            }
+
+            const pid = String(p.PatientID ?? '');
+            currentPatientId = pid;
+            document.getElementById('inpLookupPatientId').value = pid;
+            document.getElementById('profile360Error').classList.add('d-none');
+            document.getElementById('profile360Container').classList.remove('d-none');
+
+            document.getElementById('posShortcutWrap').innerHTML =
+                `<a href="pos.html?patientId=${encodeURIComponent(pid)}" class="btn btn-sm btn-outline-success"><i class="fa-solid fa-notes-medical me-1"></i> Kê đơn cho BN #${esc(pid)}</a>`;
+
+            renderCrClBadge(data.calculated_CrCl);
+
+            document.getElementById('patientInfoBody').innerHTML = `
+    <div class="col-6"><span class="text-muted">PatientID:</span> <strong>${esc(p.PatientID)}</strong></div>
+    <div class="col-6"><span class="text-muted">Mã BN:</span> <strong>${esc(p.PatientCode)}</strong></div>
+    <div class="col-6"><span class="text-muted">Họ tên:</span> <strong>${esc(p.FullName)}</strong></div>
+    <div class="col-6"><span class="text-muted">SĐT:</span> <strong>${esc(p.Phone)}</strong></div>
+    <div class="col-6"><span class="text-muted">Ngày sinh:</span> <strong>${fmtDate(p.DateOfBirth)}</strong></div>
+    <div class="col-6"><span class="text-muted">Giới tính:</span> <strong>${esc(p.Gender)}</strong></div>
+    <div class="col-6"><span class="text-muted">Cân nặng:</span> <strong>${esc(p.Weight_Kg)} kg</strong></div>
+    <div class="col-6"><span class="text-muted">Creatinin:</span> <strong>${esc(p.SerumCreatinine)}</strong></div>
+    <div class="col-6"><span class="text-muted">Loại BN:</span> <strong>${esc(p.PatientType)}</strong></div>
+    <div class="col-6"><span class="text-muted">Bệnh mạn tính:</span> <strong>${esc(p.ChronicCondition)}</strong></div>
+  `;
+
+            const allergies = Array.isArray(data.allergies_INN) ? data.allergies_INN : [];
+            const allergyBody = document.getElementById('tblAllergiesBody');
+            if (!allergies.length) {
+                allergyBody.innerHTML = '<tr><td colspan="3" class="text-muted text-center py-3">Không ghi nhận dị ứng hoạt chất</td></tr>';
+            } else {
+                allergyBody.innerHTML = allergies.map(a => {
+                    const isHard = String(a.Severity || '').toLowerCase() === 'hard stop';
+                    const badgeClass = isHard ? 'allergy-hard' : 'allergy-soft';
+                    return `
+        <tr>
+          <td class="fw-semibold">${esc(a.IngredientName || a.ActiveIngredientID)}</td>
+          <td><span class="${badgeClass}">${esc(a.Severity)}</span></td>
+          <td>${esc(a.ReactionNote || '—')}</td>
+        </tr>
+      `;
+                }).join('');
+            }
+
+            const history = Array.isArray(data.prescription_history) ? data.prescription_history : [];
+            const historyBody = document.getElementById('tblHistoryBody');
+            if (!history.length) {
+                historyBody.innerHTML = '<tr><td colspan="4" class="text-muted text-center py-3">Chưa có lịch sử đơn thuốc</td></tr>';
+            } else {
+                historyBody.innerHTML = history.map(h => `
+      <tr>
+        <td>
+          <a href="prescriptions.html?id=${encodeURIComponent(h.PrescriptionID)}" class="fw-semibold text-decoration-underline">
+            ${esc(h.NationalCode || h.PrescriptionID)}
+          </a>
+        </td>
+        <td>${esc(h.Diagnosis || '—')}</td>
+        <td><span class="badge bg-light text-dark border">${esc(h.Status || '—')}</span></td>
+        <td class="text-end fw-semibold">${money(h.TotalAmount)}</td>
+      </tr>
+    `).join('');
+            }
+
+            applyRoles(document.getElementById('profile360Container'));
+        }
+
+        async function loadCatalogsInit() {
+            try {
+                const data = USE_MOCK ? MOCK_CATALOGS : await api('GET', '/catalogs/init');
+                activeIngredients = Array.isArray(data?.active_ingredients) ? data.active_ingredients : [];
+                const sel = document.getElementById('selActiveIngredient');
+                sel.innerHTML = '<option value="">-- Chọn hoạt chất --</option>' +
+                    activeIngredients.map(ing => `<option value="${esc(ing.ActiveIngredientID)}">${esc(ing.IngredientName)}</option>`).join('');
+            } catch (e) {
+                toast(e.message, true);
+            }
+        }
+
+        async function loadPatient360(patientIdRaw) {
+            const pid = String(patientIdRaw ?? '').trim();
+            const errBox = document.getElementById('profile360Error');
+            if (!/^\d+$/.test(pid) || Number(pid) <= 0) {
+                errBox.textContent = 'Vui lòng nhập PatientID là số nguyên dương.';
+                errBox.classList.remove('d-none');
+                return;
+            }
+
+            try {
+                let data;
+                if (USE_MOCK) {
+                    data = MOCK_PROFILES[pid];
+                    if (!data) {
+                        throw Object.assign(new Error('Không tìm thấy hồ sơ bệnh nhân #' + pid), { status: 404 });
+                    }
+                } else {
+                    data = await api('GET', '/clinical/patients/360?PatientID=' + encodeURIComponent(pid));
+                }
+                renderProfile360(data);
+            } catch (e) {
+                document.getElementById('profile360Container').classList.add('d-none');
+                errBox.textContent = e.status === 403 ? 'Không có quyền xem hồ sơ 360° (403).' : e.message;
+                errBox.classList.remove('d-none');
+                toast(e.message, true);
+            }
+        }
+
+        // Xử lý form thêm bệnh nhân
+        document.getElementById('btnOpenAddPatient').addEventListener('click', () => {
+            document.getElementById('frmAddPatient').reset();
+            clearValidationErrors([
+                { inputId: 'inpPatientCode', errId: 'errPatientCode' },
+                { inputId: 'inpFullName', errId: 'errFullName' },
+                { inputId: 'inpPhone', errId: 'errPhone' },
+                { inputId: 'inpDateOfBirth', errId: 'errDateOfBirth' },
+                { inputId: 'selGender', errId: 'errGender' },
+                { inputId: 'inpWeightKg', errId: 'errWeightKg' },
+                { inputId: 'inpSerumCreatinine', errId: 'errSerumCreatinine' },
+                { inputId: 'selPatientType', errId: 'errPatientType' },
+                { inputId: 'inpChronicCondition', errId: 'errChronicCondition' }
+            ]);
+            addPatientModal.show();
+        });
+
+        document.getElementById('frmAddPatient').addEventListener('submit', async e => {
+            e.preventDefault();
+            const fields = [
+                { inputId: 'inpPatientCode', errId: 'errPatientCode' },
+                { inputId: 'inpFullName', errId: 'errFullName' },
+                { inputId: 'inpPhone', errId: 'errPhone' },
+                { inputId: 'inpDateOfBirth', errId: 'errDateOfBirth' },
+                { inputId: 'selGender', errId: 'errGender' },
+                { inputId: 'inpWeightKg', errId: 'errWeightKg' },
+                { inputId: 'inpSerumCreatinine', errId: 'errSerumCreatinine' },
+                { inputId: 'selPatientType', errId: 'errPatientType' },
+                { inputId: 'inpChronicCondition', errId: 'errChronicCondition' }
+            ];
+            clearValidationErrors(fields);
+
+            const PatientCode = document.getElementById('inpPatientCode').value.trim();
+            const FullName = document.getElementById('inpFullName').value.trim();
+            const Phone = document.getElementById('inpPhone').value.trim();
+            const DateOfBirth = document.getElementById('inpDateOfBirth').value;
+            const Gender = document.getElementById('selGender').value;
+            const Weight_Kg = num(document.getElementById('inpWeightKg').value);
+            const SerumCreatinine = num(document.getElementById('inpSerumCreatinine').value);
+            const PatientType = document.getElementById('selPatientType').value;
+            const ChronicCondition = document.getElementById('inpChronicCondition').value.trim();
+
+            let valid = true;
+            if (!PatientCode) { setFieldError('inpPatientCode', 'errPatientCode', 'Bắt buộc nhập mã bệnh nhân.'); valid = false; }
+            if (!FullName) { setFieldError('inpFullName', 'errFullName', 'Bắt buộc nhập họ và tên.'); valid = false; }
+            if (!/^0\d{9}$/.test(Phone)) { setFieldError('inpPhone', 'errPhone', 'Số điện thoại gồm 10 số, bắt đầu bằng 0.'); valid = false; }
+            if (!DateOfBirth) { setFieldError('inpDateOfBirth', 'errDateOfBirth', 'Bắt buộc chọn ngày sinh.'); valid = false; }
+            if (!Gender) { setFieldError('selGender', 'errGender', 'Bắt buộc chọn giới tính.'); valid = false; }
+            if (Weight_Kg <= 0) { setFieldError('inpWeightKg', 'errWeightKg', 'Cân nặng phải lớn hơn 0.'); valid = false; }
+            if (SerumCreatinine <= 0) { setFieldError('inpSerumCreatinine', 'errSerumCreatinine', 'Creatinin máu phải lớn hơn 0.'); valid = false; }
+            if (!PatientType) { setFieldError('selPatientType', 'errPatientType', 'Bắt buộc chọn loại bệnh nhân.'); valid = false; }
+            if (!ChronicCondition) { setFieldError('inpChronicCondition', 'errChronicCondition', 'Bắt buộc nhập thông tin bệnh mạn tính.'); valid = false; }
+
+            if (!valid) return;
+
+            const payload = {
+                PatientCode,
+                FullName,
+                Phone,
+                DateOfBirth,
+                Gender,
+                Weight_Kg,
+                SerumCreatinine,
+                PatientType,
+                ChronicCondition
+            };
+
+            const btn = document.getElementById('btnSubmitPatient');
+            btn.disabled = true;
+            try {
+                let createdId;
+                if (USE_MOCK) {
+                    createdId = String(Math.max(10, ...Object.keys(MOCK_PROFILES).map(Number)) + 1);
+                    MOCK_PROFILES[createdId] = {
+                        success: true,
+                        patient: {
+                            PatientID: createdId,
+                            PatientCode,
+                            FullName,
+                            Phone,
+                            DateOfBirth,
+                            Gender,
+                            Weight_Kg: String(Weight_Kg),
+                            SerumCreatinine: String(SerumCreatinine),
+                            PatientType,
+                            ChronicCondition
+                        },
+                        calculated_CrCl: '68.50',
+                        allergies_INN: [],
+                        prescription_history: []
+                    };
+                } else {
+                    const res = await api('POST', '/clinical/patients', payload);
+                    createdId = String(res?.PatientID ?? res?.patient?.PatientID ?? '');
+                }
+
+                addPatientModal.hide();
+                toast('Tạo bệnh nhân thành công (PatientID: ' + createdId + ')');
+
+                document.getElementById('createdPatientBanner').classList.remove('d-none');
+                document.getElementById('createdPatientName').textContent = FullName;
+                document.getElementById('createdPatientId').textContent = createdId;
+                document.getElementById('createdPatientCode').textContent = PatientCode;
+                document.getElementById('linkToPosWithPatient').href = 'pos.html?patientId=' + encodeURIComponent(createdId);
+                document.getElementById('btnViewCreated360').onclick = () => loadPatient360(createdId);
+
+                if (createdId) {
+                    await loadPatient360(createdId);
+                }
+            } catch (err) {
+                toast(err.message, true);
+            } finally {
+                btn.disabled = false;
+            }
+        });
+
+        // Xử lý tra cứu PatientID
+        document.getElementById('frmLookupPatient').addEventListener('submit', e => {
+            e.preventDefault();
+            loadPatient360(document.getElementById('inpLookupPatientId').value);
+        });
+
+        // Xử lý thêm dị ứng
+        document.getElementById('frmAddAllergy').addEventListener('submit', async e => {
+            e.preventDefault();
+            if (!currentPatientId) {
+                toast('Vui lòng mở hồ sơ bệnh nhân trước khi thêm dị ứng.', true);
+                return;
+            }
+
+            clearValidationErrors([
+                { inputId: 'selActiveIngredient', errId: 'errIngredient' },
+                { inputId: 'selSeverity', errId: 'errSeverity' }
+            ]);
+
+            const ingId = document.getElementById('selActiveIngredient').value;
+            const Severity = document.getElementById('selSeverity').value;
+            const ReactionNote = document.getElementById('inpReactionNote').value.trim();
+
+            let valid = true;
+            if (!ingId) { setFieldError('selActiveIngredient', 'errIngredient', 'Vui lòng chọn hoạt chất.'); valid = false; }
+            if (!Severity) { setFieldError('selSeverity', 'errSeverity', 'Vui lòng chọn mức độ.'); valid = false; }
+            if (!valid) return;
+
+            const btn = document.getElementById('btnSaveAllergy');
+            btn.disabled = true;
+            try {
+                const payload = {
+                    PatientID: Number(currentPatientId),
+                    ActiveIngredientID: Number(ingId),
+                    Severity,
+                    ReactionNote
+                };
+
+                if (USE_MOCK) {
+                    const foundIng = activeIngredients.find(x => String(x.ActiveIngredientID) === String(ingId));
+                    const prof = MOCK_PROFILES[currentPatientId];
+                    if (prof) {
+                        prof.allergies_INN.push({
+                            ActiveIngredientID: String(ingId),
+                            IngredientName: foundIng ? foundIng.IngredientName : ('INN #' + ingId),
+                            Severity,
+                            ReactionNote
+                        });
+                    }
+                } else {
+                    await api('POST', '/clinical/allergies', payload);
+                }
+
+                toast('Đã lưu dị ứng hoạt chất.');
+                document.getElementById('inpReactionNote').value = '';
+                await loadPatient360(currentPatientId);
+            } catch (err) {
+                toast(err.message, true);
+            } finally {
+                btn.disabled = false;
+            }
+        });
+
+        // KHỞI TẠO HEADER & SIDEBAR KHI TẢI TRANG
+        document.addEventListener('DOMContentLoaded', async () => {
+            if (PP_USER) {
+                document.getElementById('userFullName').textContent = PP_USER.FullName || PP_USER.Username;
+                document.getElementById('userRoleBadge').textContent = PP_USER.RoleCode;
+                document.getElementById('userAvatar').textContent = (PP_USER.FullName || 'PP').trim().slice(0, 2).toUpperCase();
+            }
+            const pageRoles = document.body.getAttribute('data-page-roles');
+            if (pageRoles && !hasRole(pageRoles)) {
+                document.getElementById('mainContent').innerHTML = '<div class="panel p-4 text-danger fw-semibold">Bạn không có quyền truy cập trang này (403 Forbidden).</div>';
+                return;
+            }
+            applyRoles(document);
+
+            const curFile = location.pathname.split('/').pop() || 'index.html';
+            document.querySelectorAll('.sidebar .nav-item').forEach(a => {
+                if (a.getAttribute('href') === curFile) a.classList.add('active');
+            });
+
+            document.getElementById('btnLogout')?.addEventListener('click', () => {
+                sessionStorage.removeItem('pp_token');
+                sessionStorage.removeItem('pp_user');
+                location.replace('login.html');
+            });
+
+            await loadCatalogsInit();
+
+            const paramId = getParam('id');
+            if (paramId) {
+                await loadPatient360(paramId);
+            } else if (USE_MOCK) {
+                await loadPatient360('7');
+            }
+        });
+    </script>
+</body>
+
+</html>

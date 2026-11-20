@@ -1,510 +1,519 @@
 ﻿<!DOCTYPE html>
 <html lang="vi">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Danh mục thuốc – PharmaPro</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<style>
-/* Kế thừa 100% CSS cốt lõi từ index.html */
-:root{
-  --bg:#f5f7f6; --surface:#fff; --line:#e6ebe8;
-  --ink:#16221d; --muted:#6b7a73;
-  --brand:#0f766e; --brand-dark:#0b5a54; --brand-soft:#e3f3f0;
-  --warn:#b45309; --warn-soft:#fef3e2;
-  --danger:#b42318; --danger-soft:#fdeceb;
-  --ok:#15803d; --ok-soft:#e5f5ea;
-  --radius:12px;
-}
-*{box-sizing:border-box}
-body{background:var(--bg);color:var(--ink);font-family:'Be Vietnam Pro',sans-serif;font-size:14px;overflow-x:hidden}
-a{text-decoration:none}
-:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PharmaPro v2.0 – Danh mục & DDI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/theme.css">
+    <style>
+        .pill-rx {
+            background: var(--warn-soft, #fef3e2);
+            color: var(--warn, #b45309);
+            font-size: 11px;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 20px;
+        }
 
-/* Sidebar & Topbar */
-.sidebar{position:fixed;inset:0 auto 0 0;width:248px;background:var(--surface);border-right:1px solid var(--line);padding:20px 14px;display:flex;flex-direction:column;overflow-y:auto;z-index:20}
-.brand{display:flex;align-items:center;gap:10px;padding:4px 10px 22px;font-weight:700;font-size:1.15rem;color:var(--ink)}
-.brand-mark{width:34px;height:34px;border-radius:9px;background:var(--brand);color:#fff;display:grid;place-items:center;font-size:1rem}
-.nav-group{font-size:12px;color:var(--muted);padding:16px 12px 6px;font-weight:500}
-.sidebar .nav-item{display:flex;align-items:center;gap:12px;padding:10px 12px;margin-bottom:2px;border-radius:9px;color:#43524b;font-weight:500;transition:background .15s,color .15s}
-.sidebar .nav-item i{width:18px;text-align:center;color:#8a9a92}
-.sidebar .nav-item:hover{background:#f0f4f2;color:var(--ink)}
-.sidebar .nav-item.active{background:var(--brand-soft);color:var(--brand-dark)}
-.sidebar .nav-item.active i{color:var(--brand)}
-.nav-item .badge-count{margin-left:auto;background:var(--danger);color:#fff;border-radius:20px;font-size:11px;padding:1px 7px;font-weight:600}
+        .pill-ctrl {
+            background: var(--danger-soft, #fdeceb);
+            color: var(--danger, #b42318);
+            font-size: 11px;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 20px;
+        }
 
-/* Main */
-.main{margin-left:248px;padding:0 32px 40px}
-.topbar{position:sticky;top:0;z-index:10;background:rgba(245,247,246,.92);backdrop-filter:blur(8px);display:flex;align-items:center;gap:16px;padding:16px 0}
-.search{flex:1;max-width:460px;position:relative}
-.search i{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:#8a9a92}
-.search input{width:100%;border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:10px 14px 10px 40px;font:inherit}
-.search input:focus{border-color:var(--brand);outline:none;box-shadow:0 0 0 3px var(--brand-soft)}
-.search kbd{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:#eef2f0;color:var(--muted);border-radius:6px;font-size:11px;padding:2px 6px}
-.btn-new{background:var(--brand);color:#fff;font-weight:600;border-radius:10px;padding:10px 18px;display:inline-flex;align-items:center;gap:8px;border:0;transition:background .15s; cursor:pointer}
-.btn-new:hover{background:var(--brand-dark);color:#fff}
-.btn-new small{opacity:.75;font-weight:500}
-.user{display:flex;align-items:center;gap:10px;margin-left:8px}
-.avatar{width:38px;height:38px;border-radius:50%;background:var(--brand-soft);color:var(--brand-dark);display:grid;place-items:center;font-weight:700;font-size:13px}
-.user b{display:block;font-size:13px;line-height:1.2}
-.user span{font-size:12px;color:var(--muted)}
+        .pill-otc {
+            background: var(--ok-soft, #e5f5ea);
+            color: var(--ok, #15803d);
+            font-size: 11px;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 20px;
+        }
 
-.page-title{margin:10px 0 20px; display:flex; justify-content:space-between; align-items:flex-end}
-.page-title h1{font-size:1.5rem;font-weight:700;margin:0}
-.page-title p{margin:4px 0 0;color:var(--muted)}
+        .ddi-major {
+            background: var(--danger-soft, #fdeceb);
+            color: var(--danger, #b42318);
+            font-size: 12px;
+            font-weight: 600;
+            padding: 3px 10px;
+            border-radius: 20px;
+        }
 
-/* Panel & Chips */
-.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:20px;}
-.chip{display:inline-block; white-space:nowrap;font-size:12px;font-weight:600;border-radius:20px;padding:3px 10px}
-.chip.warn{background:var(--warn-soft);color:var(--warn)}
-.chip.danger{background:var(--danger-soft);color:var(--danger)}
-.chip.ok{background:var(--ok-soft);color:var(--ok)}
-.chip.gray{background:#eef2f0;color:#43524b}
+        .ddi-moderate {
+            background: var(--warn-soft, #fef3e2);
+            color: var(--warn, #b45309);
+            font-size: 12px;
+            font-weight: 600;
+            padding: 3px 10px;
+            border-radius: 20px;
+        }
 
-/* Table Specific cho Phân hệ */
-.tbl{width:100%;border-collapse:collapse}
-.tbl th{font-weight:600;color:var(--muted);font-size:12px;text-align:left;padding:12px 10px;border-bottom:1px solid var(--line); background:#f8fbfa; white-space:nowrap}
-.tbl td{padding:14px 10px;border-bottom:1px solid var(--line); vertical-align:middle}
-.tbl tr:last-child td{border-bottom:0}
-.tbl tbody tr:hover{background:#f8fbfa}
-.tbl .r{text-align:right}
-.drug-name{font-weight:600; color:var(--ink); display:block; margin-bottom:2px}
-.drug-meta{font-size:12px; color:var(--muted)}
-.action-btn{background:none; border:none; color:var(--muted); padding:4px 8px; cursor:pointer; border-radius:6px; transition:0.2s}
-.action-btn:hover{background:var(--line); color:var(--ink)}
-
-/* Thanh công cụ Bảng */
-.table-toolbar{display:flex; gap:12px; margin-bottom:16px}
-.filter-select{border:1px solid var(--line); padding:8px 12px; border-radius:8px; outline:none; font-size:13px; color:var(--ink); background:var(--surface)}
-.filter-select:focus{border-color:var(--brand)}
-
-/* CSS cho Modal Form */
-.modal-overlay {
-    display: none; /* Mặc định ẩn */
-    position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
-    z-index: 1000;
-    align-items: center;
-    justify-content: center;
-}
-.modal-content {
-    background: #fff;
-    padding: 24px;
-    border-radius: 8px;
-    width: 100%;
-    max-width: 600px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-}
-.modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px solid #eee;
-    padding-bottom: 12px;
-    margin-bottom: 20px;
-}
-.modal-header h3 { margin: 0; font-size: 1.2rem; }
-.btn-close { background: none; border: none; font-size: 1.5rem; cursor: pointer; }
-.form-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
-}
-.form-group { display: flex; flex-direction: column; }
-.form-group label { font-weight: 500; margin-bottom: 6px; font-size: 0.9rem; }
-.form-group input, .form-group select {
-    padding: 8px 12px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 0.9rem;
-}
-.form-group.full-width { grid-column: span 2; }
-.modal-footer {
-    margin-top: 24px;
-    display: flex;
-    justify-content: flex-end;
-    gap: 12px;
-}
-.btn-cancel { padding: 8px 16px; background: #f1f1f1; border: 1px solid #ccc; border-radius: 4px; cursor: pointer; }
-.btn-save { padding: 8px 16px; background: #0d6efd; color: white; border: none; border-radius: 4px; cursor: pointer; }
-</style>
+        .ddi-minor {
+            background: var(--brand-soft, #e3f3f0);
+            color: var(--brand, #0f766e);
+            font-size: 12px;
+            font-weight: 600;
+            padding: 3px 10px;
+            border-radius: 20px;
+        }
+    </style>
 </head>
-<body>
 
-<!-- SIDEBAR -->
-<!-- Cập nhật khối SIDEBAR (Thay thế toàn bộ thẻ <aside> cũ) -->
-<aside class="sidebar">
-  <div class="brand"><span class="brand-mark"><i class="fa-solid fa-staff-snake"></i></span>PharmaPro</div>
+<body data-page-roles="ADMIN,DOCTOR,PHARMACIST,WAREHOUSE,CASHIER">
+    <div class="app-shell d-flex min-vh-100">
+        <!-- SIDEBAR DÙNG CHUNG -->
+        <aside class="sidebar">
+            <div class="brand">
+                <span class="brand-mark"><i class="fa-solid fa-staff-snake"></i></span>
+                <span>PharmaPro <small class="text-muted">v2</small></span>
+            </div>
 
-  <div class="nav-group">Bán hàng</div>
-  <a href="index.html" class="nav-item"><i class="fa-solid fa-chart-pie"></i>Tổng quan</a>
-  <a href="pos.html" class="nav-item"><i class="fa-solid fa-desktop"></i>Bán hàng (POS)</a>
-  <a href="orders.html" class="nav-item"><i class="fa-solid fa-file-invoice-dollar"></i>Đơn hàng</a>
+            <div class="nav-group">
+                <div class="nav-label">Điều hành</div>
+                <a class="nav-item" href="index.html"><i class="fa-solid fa-chart-pie"></i> Tổng quan</a>
+            </div>
 
-  <div class="nav-group">Hàng hóa</div>
-  <a href="products.html" class="nav-item" class="active"><i class="fa-solid fa-pills"></i>Danh mục thuốc</a>
-  <a href="inventory.html" class="nav-item"><i class="fa-solid fa-boxes-stacked"></i>Quản lý kho<span class="badge-count">5</span></a>
+            <div class="nav-group">
+                <div class="nav-label">Dược lâm sàng & Bán hàng</div>
+                <a class="nav-item" href="pos.html" data-roles="ADMIN,DOCTOR,PHARMACIST"><i
+                        class="fa-solid fa-cash-register"></i> Kê đơn & POS</a>
+                <a class="nav-item" href="prescriptions.html" data-roles="ADMIN,DOCTOR,PHARMACIST,CASHIER"><i
+                        class="fa-solid fa-file-prescription"></i> Đơn thuốc GPP</a>
+                <a class="nav-item" href="patients.html" data-roles="ADMIN,DOCTOR,PHARMACIST"><i
+                        class="fa-solid fa-user-injured"></i> Hồ sơ Dược bạ 360°</a>
+            </div>
 
-  <div class="nav-group">Quản lý</div>
-  <a href="customers.html" class="nav-item"><i class="fa-solid fa-users"></i>Khách hàng</a>
-  <a href="users.html" class="nav-item"><i class="fa-solid fa-gear"></i>Cài đặt</a>
-</aside>
+            <div class="nav-group">
+                <div class="nav-label">Kho dược & Pháp lý</div>
+                <a class="nav-item" href="products.html"><i class="fa-solid fa-pills"></i> Danh mục & DDI</a>
+                <a class="nav-item" href="inventory.html" data-roles="ADMIN,PHARMACIST,WAREHOUSE"><i
+                        class="fa-solid fa-boxes-stacked"></i> Kho FEFO & TT 20/2017</a>
+                <a class="nav-item" href="audit.html" data-roles="ADMIN,PHARMACIST,WAREHOUSE"><i
+                        class="fa-solid fa-clock-rotate-left"></i> Thanh tra Temporal</a>
+            </div>
 
-<!-- MAIN -->
-<main class="main">
-  <header class="topbar">
-    <div class="search">
-      <i class="fa-solid fa-magnifying-glass"></i>
-      <!-- Đã thêm ID và onkeyup vào thẻ input bên dưới -->
-      <input type="search" id="inpTimKiem" placeholder="Tìm thuốc, mã vạch, thành phần..." aria-label="Tìm kiếm" onkeyup="xuLyLocDuLieu()">
-      <kbd>Ctrl K</kbd>
-    </div>
-    <div class="user ms-auto">
-      <div class="avatar">TS</div>
-      <div><b>Phạm Trường Sơn</b><span>Dược sĩ</span></div>
-    </div>
-  </header>
+            <div class="store-box mt-auto">
+                <div class="fw-semibold">Nhà thuốc GPP #79001</div>
+                <div class="small text-muted">Chuẩn Thông tư 02/2018</div>
+            </div>
+        </aside>
 
-  <div class="page-title">
-    <div>
-        <h1>Danh mục thuốc</h1>
-        <p>Quản lý toàn bộ danh sách dược phẩm và vật tư y tế</p>
-    </div>
-    <button class="btn-new" onclick="hienThiFormThem()"><i class="fa-solid fa-plus"></i>Thêm thuốc mới</button>
-  </div>
+        <!-- KHU VỰC CHÍNH -->
+        <div class="main flex-grow-1 d-flex flex-column">
+            <header class="topbar d-flex align-items-center justify-content-between">
+                <div class="page-title" id="pageTitle">Danh mục thuốc & Ma trận tương tác DDI</div>
+                <div class="user d-flex align-items-center gap-3">
+                    <div class="text-end">
+                        <div class="fw-semibold" id="userFullName">Đang tải...</div>
+                        <div class="small text-muted" id="userRoleBadge">ROLE</div>
+                    </div>
+                    <div class="avatar" id="userAvatar">PP</div>
+                    <button class="btn-ghost btn-sm" id="btnLogout" title="Đăng xuất"><i
+                            class="fa-solid fa-right-from-bracket"></i></button>
+                </div>
+            </header>
 
-  <!-- PANEL CHỨA BẢNG DỮ LIỆU -->
-  <!-- Bộ lọc -->
-    <div class="table-toolbar">
-        <select class="filter-select" id="selDanhHien" onchange="xuLyLocDuLieu()">
-            <option value="ALL">Tất cả loại thuốc</option>
-            <option value="KEDON">Thuốc kê đơn</option>
-            <option value="KHONGKEDON">Không kê đơn</option>
-        </select>
-        
-        <select class="filter-select" id="selTonKho" onchange="xuLyLocDuLieu()">
-            <option value="ALL">Tất cả trạng thái tồn</option>
-            <option value="SAP_HET">Sắp hết hàng (<= 30)</option>
-            <option value="HET_HANG">Đã hết hàng (0)</option>
-        </select>
-        
-        <button class="btn btn-light btn-sm border ms-auto" onclick="xuatExcel()"><i class="fa-solid fa-file-export"></i> Xuất Excel</button>
-    </div>
+            <main class="content p-4" id="mainContent">
+                <!-- Thống kê nhanh -->
+                <div class="row g-3 mb-4">
+                    <div class="col-sm-6 col-xl-3">
+                        <div class="panel">
+                            <div class="small text-muted">Tổng mặt hàng</div>
+                            <div class="fs-4 fw-bold mt-1" id="statTotalDrugs">0</div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-xl-3">
+                        <div class="panel">
+                            <div class="small text-muted">Thuốc kê đơn (Rx)</div>
+                            <div class="fs-4 fw-bold mt-1 text-warning" id="statRxDrugs">0</div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-xl-3">
+                        <div class="panel">
+                            <div class="small text-muted">Kiểm soát đặc biệt</div>
+                            <div class="fs-4 fw-bold mt-1 text-danger" id="statCtrlDrugs">0</div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-xl-3">
+                        <div class="panel">
+                            <div class="small text-muted">Cặp tương tác DDI</div>
+                            <div class="fs-4 fw-bold mt-1 text-primary" id="statDdiPairs">0</div>
+                        </div>
+                    </div>
+                </div>
 
-    <!-- Bảng Dữ liệu -->
-    <div class="table-responsive">
-      <table class="tbl" id="productTable">
-        <thead>
-            <tr>
-                <th>Mã SKU</th>
-                <th>Sản phẩm & Hoạt chất</th>
-                <th>Danh mục</th>
-                <th>Quy cách</th>
-                <th class="r">Giá bán lẻ</th>
-                <th>Trạng thái Tồn</th>
-                <th class="r">Hành động</th>
-            </tr>
-        </thead>
-        <tbody>
-          <!-- Dữ liệu mẫu chờ API đắp vào -->
-          <tr>
-            <td><b class="text-secondary">VD-1234</b></td>
-            <td>
-                <span class="drug-name">Paracetamol 500mg</span>
-                <span class="drug-meta">Hoạt chất: Paracetamol</span>
-            </td>
-            <td>Giảm đau hạ sốt</td>
-            <td>Hộp 10 vỉ</td>
-            <td class="r fw-bold">35.000đ</td>
-            <td><span class="chip ok">Còn 120 hộp</span></td>
-            <td class="r">
-                <button class="action-btn" title="Chỉnh sửa"><i class="fa-solid fa-pen"></i></button>
-                <button class="action-btn" title="Xóa"><i class="fa-solid fa-trash"></i></button>
-            </td>
-          </tr>
-          <tr>
-            <td><b class="text-secondary">VD-9981</b></td>
-            <td>
-                <span class="drug-name">Amoxicillin 500mg</span>
-                <span class="drug-meta">Hoạt chất: Amoxicillin trihydrate</span>
-            </td>
-            <td>Kháng sinh (Kê đơn)</td>
-            <td>Hộp 5 vỉ</td>
-            <td class="r fw-bold">75.000đ</td>
-            <td><span class="chip warn">Còn 8 hộp</span></td>
-            <td class="r">
-                <button class="action-btn" title="Chỉnh sửa"><i class="fa-solid fa-pen"></i></button>
-                <button class="action-btn" title="Xóa"><i class="fa-solid fa-trash"></i></button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-</main>
+                <!-- Bộ lọc danh mục thuốc -->
+                <div class="panel mb-4">
+                    <div class="row g-2 align-items-end">
+                        <div class="col-md-5">
+                            <label class="form-label small fw-semibold" for="inpSearchCatalog">Tìm tên thuốc / mã / hoạt
+                                chất</label>
+                            <input type="text" class="form-control form-control-sm" id="inpSearchCatalog"
+                                placeholder="Ví dụ: Paracetamol, Morphin, Warfarin...">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label small fw-semibold" for="selFilterType">Nhóm thuốc</label>
+                            <select class="form-select form-select-sm" id="selFilterType">
+                                <option value="ALL">Tất cả</option>
+                                <option value="OTC">Không kê đơn (OTC)</option>
+                                <option value="RX">Thuốc kê đơn (Rx)</option>
+                                <option value="CTRL">Kiểm soát đặc biệt</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4 d-flex gap-2">
+                            <button type="button" class="btn btn-sm btn-outline-secondary"
+                                id="btnResetCatalogFilter">Đặt lại</button>
+                            <a href="inventory.html" class="btn btn-sm btn-outline-primary"
+                                data-roles="ADMIN,PHARMACIST,WAREHOUSE">Xem tồn FEFO</a>
+                        </div>
+                    </div>
+                </div>
 
-<script>
-// 1. Phím tắt tìm kiếm (Ctrl+K)
-document.addEventListener('keydown', e => {
-    if (e.ctrlKey && e.key.toLowerCase() === 'k') { 
-        e.preventDefault(); 
-        document.getElementById('inpTimKiem').focus(); 
-    }
-});
+                <!-- Bảng danh mục thuốc -->
+                <div class="panel mb-4">
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <h2 class="h6 fw-bold mb-0">Danh mục thuốc hiện hành</h2>
+                        <span class="small text-muted" id="catalogCountLabel">0 mặt hàng</span>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-sm align-middle mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Mã thuốc</th>
+                                    <th>Tên thuốc & Nồng độ</th>
+                                    <th>Hoạt chất (INN)</th>
+                                    <th>Phân loại</th>
+                                    <th class="text-end">Tồn kho</th>
+                                    <th class="text-end">Giá bán</th>
+                                    <th class="text-end">Kiểm tra DDI</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tblCatalogBody">
+                                <tr>
+                                    <td colspan="7" class="text-center text-muted py-4">Đang tải danh mục...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
 
-// Biến toàn cục
-let danhSachThuocTam = []; 
-let cheDoForm = 'THEM'; 
+                <!-- Ma trận / Danh sách tương tác thuốc - thuốc (DDI) -->
+                <div class="panel">
+                    <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
+                        <div>
+                            <h2 class="h6 fw-bold mb-0">Ma trận tương tác thuốc – thuốc (Drug–Drug Interaction)</h2>
+                            <div class="small text-muted">Lọc nhanh theo hoạt chất hoặc mức độ tương tác lâm sàng</div>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <input type="text" class="form-control form-control-sm" id="inpFilterDdi"
+                                placeholder="Lọc hoạt chất DDI..." style="width:200px">
+                            <select class="form-select form-select-sm" id="selFilterSeverity" style="width:160px">
+                                <option value="ALL">Mọi mức độ</option>
+                                <option value="Major">Major (Nghiêm trọng)</option>
+                                <option value="Moderate">Moderate (Trung bình)</option>
+                                <option value="Minor">Minor (Nhẹ)</option>
+                            </select>
+                        </div>
+                    </div>
 
-// 2. HÀM RENDER (Tách riêng việc vẽ bảng HTML để dùng lại nhiều lần)
-function renderBangThuoc(mangDuLieu) {
-    const tbody = document.querySelector('#productTable tbody');
-    
-    if(mangDuLieu.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted py-4">Không tìm thấy dữ liệu phù hợp.</td></tr>';
-        return;
-    }
-
-    tbody.innerHTML = mangDuLieu.map(thuoc => {
-        let tonKho = thuoc.TongTonKho || 0;
-        let trangThaiClass = tonKho > 30 ? 'ok' : (tonKho > 0 ? 'warn' : 'danger');
-        let trangThaiText = tonKho > 30 ? `Còn ${tonKho}` : (tonKho > 0 ? `Sắp hết (${tonKho})` : 'Hết hàng');
-
-        return `
-        <tr>
-          <td><b class="text-secondary">${thuoc.MaThuoc}</b></td>
-          <td>
-              <span class="drug-name">${thuoc.TenThuoc}</span>
-              <span class="drug-meta">Hoạt chất: ${thuoc.HoatChat || 'N/A'}</span>
-          </td>
-          <td>${thuoc.MaNhom}</td>
-          <td>${thuoc.QuyCach || '-'}</td>
-          <td class="r fw-bold text-success">${parseInt(thuoc.GiaBan).toLocaleString('vi-VN')}đ</td>
-          <td><span class="chip ${trangThaiClass}">${trangThaiText}</span></td>
-          <td class="r">
-              <button class="action-btn" title="Chỉnh sửa" onclick="moFormSua('${thuoc.MaThuoc}')"><i class="fa-solid fa-pen"></i></button>
-              <button class="action-btn" title="Xóa" onclick="xoaThuoc('${thuoc.MaThuoc}')"><i class="fa-solid fa-trash"></i></button>
-          </td>
-        </tr>
-        `;
-    }).join('');
-}
-
-// 3. TẢI DỮ LIỆU TỪ DB (Chỉ gọi 1 lần khi mở trang)
-async function loadDanhSachThuoc() {
-    const tbody = document.querySelector('#productTable tbody');
-    tbody.innerHTML = '<tr><td colspan="7" class="text-center py-4 text-muted">Đang tải dữ liệu...</td></tr>';
-    try {
-        const response = await fetch('http://localhost:3001/api/thuoc/danhsach');
-        danhSachThuocTam = await response.json(); 
-        renderBangThuoc(danhSachThuocTam); 
-    } catch (error) {
-        tbody.innerHTML = '<tr><td colspan="7" class="text-center text-danger">Lỗi kết nối Backend.</td></tr>';
-    }
-}
-
-// 4. BỘ LỌC TÌM KIẾM TRỰC TIẾP TRÊN GIAO DIỆN
-function xuLyLocDuLieu() {
-    const tuKhoa = document.getElementById('inpTimKiem').value.toLowerCase().trim();
-    const loaiThuoc = document.getElementById('selDanhHien').value;
-    const tonKho = document.getElementById('selTonKho').value;
-
-    const ketQua = danhSachThuocTam.filter(thuoc => {
-        const ten = thuoc.TenThuoc ? thuoc.TenThuoc.toLowerCase() : '';
-        const ma = thuoc.MaThuoc ? thuoc.MaThuoc.toLowerCase() : '';
-        const khopTuKhoa = ten.includes(tuKhoa) || ma.includes(tuKhoa);
-
-        let khopLoai = true;
-        if(loaiThuoc === 'KEDON') khopLoai = (thuoc.LoaiThuoc == 1);
-        if(loaiThuoc === 'KHONGKEDON') khopLoai = (thuoc.LoaiThuoc == 0);
-
-        let soLuong = thuoc.TongTonKho || 0;
-        let khopTonKho = true;
-        if(tonKho === 'SAP_HET') khopTonKho = (soLuong > 0 && soLuong <= 30);
-        if(tonKho === 'HET_HANG') khopTonKho = (soLuong <= 0);
-
-        return khopTuKhoa && khopLoai && khopTonKho;
-    });
-    renderBangThuoc(ketQua);
-}
-
-// 5. CÁC HÀM XÓA, SỬA, THÊM (Đã hoàn thiện ở bước trước)
-async function xoaThuoc(maThuoc) {
-    if(!confirm(`Bạn có chắc muốn xóa thuốc [${maThuoc}]?`)) return;
-    try {
-        const response = await fetch('http://localhost:3001/api/thuoc/xoa', {
-            method: 'DELETE',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ MaThuoc: maThuoc })
-        });
-        const result = await response.json();
-        if(result.success) loadDanhSachThuoc();
-        else alert("Lỗi khi xóa: " + JSON.stringify(result.error));
-    } catch(err) { console.error(err); }
-}
-
-function moFormSua(maThuoc) {
-    cheDoForm = 'SUA';
-    document.querySelector('.modal-header h3').innerText = "Cập Nhật Thông Tin";
-    const thuoc = danhSachThuocTam.find(t => t.MaThuoc === maThuoc);
-    if(!thuoc) return;
-
-    document.getElementById('inpMaThuoc').value = thuoc.MaThuoc;
-    document.getElementById('inpMaThuoc').readOnly = true; 
-    document.getElementById('inpTenThuoc').value = thuoc.TenThuoc;
-    document.getElementById('inpMaNhom').value = thuoc.MaNhom;
-    document.getElementById('inpMaNCC').value = thuoc.MaNCC;
-    document.getElementById('inpSoDangKy').value = thuoc.SoDangKy;
-    document.getElementById('inpHoatChat').value = thuoc.HoatChat;
-    document.getElementById('inpQuyCach').value = thuoc.QuyCach;
-    document.getElementById('inpLoaiThuoc').value = thuoc.LoaiThuoc;
-    document.getElementById('inpGiaBan').value = thuoc.GiaBan;
-    document.getElementById('modalThemThuoc').style.display = 'flex';
-}
-
-function hienThiFormThem() {
-    cheDoForm = 'THEM';
-    document.querySelector('.modal-header h3').innerText = "Thêm Thuốc Mới";
-    document.getElementById('formThemThuoc').reset();
-    document.getElementById('inpMaThuoc').readOnly = false;
-    document.getElementById('modalThemThuoc').style.display = 'flex';
-}
-
-function dongFormThem() { document.getElementById('modalThemThuoc').style.display = 'none'; }
-
-async function submitThemThuoc(event) {
-    event.preventDefault();
-    const duLieu = {
-        MaThuoc: document.getElementById('inpMaThuoc').value,
-        TenThuoc: document.getElementById('inpTenThuoc').value,
-        MaNhom: document.getElementById('inpMaNhom').value,
-        MaNCC: document.getElementById('inpMaNCC').value,
-        SoDangKy: document.getElementById('inpSoDangKy').value,
-        HoatChat: document.getElementById('inpHoatChat').value,
-        QuyCach: document.getElementById('inpQuyCach').value,
-        LoaiThuoc: parseInt(document.getElementById('inpLoaiThuoc').value),
-        GiaBan: parseInt(document.getElementById('inpGiaBan').value)
-    };
-
-    const url = cheDoForm === 'THEM' ? '/api/thuoc/them' : '/api/thuoc/sua';
-    const method = cheDoForm === 'THEM' ? 'POST' : 'PUT';
-
-    try {
-        const response = await fetch(`http://localhost:3001${url}`, {
-            method: method,
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(duLieu)
-        });
-        const result = await response.json();
-        if(result.success) { dongFormThem(); loadDanhSachThuoc(); }
-        else alert("Lỗi: " + JSON.stringify(result.error));
-    } catch(err) { console.error(err); }
-}
-// 6. TÍNH NĂNG XUẤT EXCEL (CSV)
-function xuatExcel() {
-    if (danhSachThuocTam.length === 0) {
-        alert("Không có dữ liệu để xuất!");
-        return;
-    }
-
-    // Thêm chuỗi "\uFEFF" (BOM) vào đầu file để Excel hiểu đúng font Tiếng Việt có dấu
-    let noiDungCSV = "\uFEFF"; 
-    
-    // Tạo dòng Tiêu đề
-    noiDungCSV += "Mã Thuốc,Tên Sản Phẩm,Hoạt Chất,Danh Mục,Quy Cách,Giá Bán (VNĐ),Tồn Kho\n";
-
-    // Duyệt qua mảng dữ liệu và tạo từng dòng
-    danhSachThuocTam.forEach(thuoc => {
-        let tonKho = thuoc.TongTonKho || 0;
-        
-        // Đặt các chuỗi văn bản vào trong dấu ngoặc kép "..." để tránh lỗi nếu tên thuốc có chứa dấu phẩy
-        let dong = [
-            thuoc.MaThuoc,
-            `"${thuoc.TenThuoc || ''}"`,
-            `"${thuoc.HoatChat || ''}"`,
-            `"${thuoc.MaNhom || ''}"`,
-            `"${thuoc.QuyCach || ''}"`,
-            thuoc.GiaBan,
-            tonKho
-        ];
-        noiDungCSV += dong.join(",") + "\n";
-    });
-
-    // Tạo một đối tượng Blob (file ảo trong bộ nhớ trình duyệt)
-    const blob = new Blob([noiDungCSV], { type: 'text/csv;charset=utf-8;' });
-    
-    // Tạo một thẻ <a> ẩn để kích hoạt tải xuống
-    const link = document.createElement("a");
-    const url = URL.createObjectURL(blob);
-    link.setAttribute("href", url);
-    link.setAttribute("download", "Danh_Muc_Thuoc.csv"); // Tên file tải về
-    
-    document.body.appendChild(link);
-    link.click(); // Giả lập hành động click để tải file
-    document.body.removeChild(link); // Dọn dẹp thẻ ẩn
-}
-
-window.onload = loadDanhSachThuoc;
-</script>
-<!-- KHỐI MODAL THÊM THUỐC -->
-<div class="modal-overlay" id="modalThemThuoc">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h3>Thêm Thuốc Mới</h3>
-            <button class="btn-close" onclick="dongFormThem()">&times;</button>
+                    <div class="table-responsive">
+                        <table class="table table-sm align-middle mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Hoạt chất A</th>
+                                    <th>Hoạt chất B</th>
+                                    <th>Mức độ</th>
+                                    <th>Cơ chế & Khuyến cáo lâm sàng</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tblDdiBody">
+                                <tr>
+                                    <td colspan="4" class="text-center text-muted py-4">Đang tải dữ liệu DDI...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </main>
         </div>
-        <form id="formThemThuoc" onsubmit="submitThemThuoc(event)">
-            <div class="form-grid">
-                <div class="form-group">
-                    <label>Mã Thuốc (SKU)</label>
-                    <input type="text" id="inpMaThuoc" placeholder="VD: T0100" required>
-                </div>
-                <div class="form-group">
-                    <label>Số Đăng Ký</label>
-                    <input type="text" id="inpSoDangKy" placeholder="VD: VD-12345-19">
-                </div>
-                <div class="form-group full-width">
-                    <label>Tên Thuốc</label>
-                    <input type="text" id="inpTenThuoc" placeholder="Nhập tên thuốc..." required>
-                </div>
-                <div class="form-group">
-                    <label>Hoạt Chất</label>
-                    <input type="text" id="inpHoatChat" placeholder="Thành phần chính">
-                </div>
-                <div class="form-group">
-                    <label>Quy Cách</label>
-                    <input type="text" id="inpQuyCach" placeholder="VD: Hộp 10 vỉ x 10 viên">
-                </div>
-                <div class="form-group">
-                    <label>Danh Mục (Mã Nhóm)</label>
-                    <input type="text" id="inpMaNhom" value="NT001" required>
-                </div>
-                <div class="form-group">
-                    <label>Nhà Cung Cấp</label>
-                    <input type="text" id="inpMaNCC" value="NCC001" required>
-                </div>
-                <div class="form-group">
-                    <label>Loại Thuốc</label>
-                    <select id="inpLoaiThuoc">
-                        <option value="0">Không kê đơn</option>
-                        <option value="1">Thuốc kê đơn</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Giá Bán Lẻ (VNĐ)</label>
-                    <input type="number" id="inpGiaBan" placeholder="VD: 35000" required>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn-cancel" onclick="dongFormThem()">Hủy</button>
-                <button type="submit" class="btn-save">Lưu Thông Tin</button>
-            </div>
-        </form>
     </div>
-</div>
+
+    <!-- TOAST THÔNG BÁO -->
+    <div class="toast-x" id="toastBox" style="display:none; position:fixed; bottom:20px; right:20px; z-index:9999;">
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const API_BASE = 'http://localhost:3001/api/v2';
+        const USE_MOCK = true; // Đổi thành false khi chạy API thật
+
+        let PP_TOKEN = sessionStorage.getItem('pp_token');
+        let PP_USER = (() => {
+            try { return JSON.parse(sessionStorage.getItem('pp_user') || 'null'); } catch (e) { return null; }
+        })();
+
+        if (USE_MOCK && (!PP_TOKEN || !PP_USER)) {
+            PP_TOKEN = 'mock-jwt-token';
+            PP_USER = { UserID: '3', EmployeeCode: 'NV003', FullName: 'Lê Minh Khoa', RoleCode: 'WAREHOUSE' };
+        }
+
+        if (!PP_TOKEN || !PP_USER) {
+            const cur = location.pathname.split('/').pop() || 'index.html';
+            location.replace('login.html?next=' + encodeURIComponent(cur));
+        }
+
+        const num = v => { const n = Number(v); return Number.isFinite(n) ? n : 0; };
+        const flag = v => Number(v) === 1;
+        const esc = s => String(s ?? '').replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
+        const money = v => Math.round(num(v)).toLocaleString('vi-VN') + 'đ';
+
+        function toast(msg, isError = false) {
+            const box = document.getElementById('toastBox');
+            if (!box) return;
+            box.textContent = msg;
+            box.style.display = 'block';
+            box.style.background = isError ? 'var(--danger, #dc2626)' : 'var(--brand, #0d9488)';
+            box.style.color = '#fff';
+            box.style.padding = '12px 18px';
+            box.style.borderRadius = '10px';
+            box.style.boxShadow = '0 8px 24px rgba(0,0,0,0.15)';
+            clearTimeout(window._toastTimer);
+            window._toastTimer = setTimeout(() => { box.style.display = 'none'; }, 4000);
+        }
+
+        function hasRole(rolesCsv) {
+            if (!rolesCsv) return true;
+            const allow = String(rolesCsv).split(',').map(s => s.trim().toUpperCase()).filter(Boolean);
+            return allow.length === 0 || allow.includes(String(PP_USER?.RoleCode || '').toUpperCase());
+        }
+
+        function applyRoles(root = document) {
+            root.querySelectorAll('[data-roles]').forEach(el => {
+                if (!hasRole(el.getAttribute('data-roles'))) el.style.display = 'none';
+            });
+        }
+
+        async function api(method, path, body = null) {
+            const headers = { 'Authorization': 'Bearer ' + PP_TOKEN };
+            const opts = { method: method.toUpperCase(), headers };
+            if (body !== null && opts.method !== 'GET') {
+                headers['Content-Type'] = 'application/json';
+                opts.body = JSON.stringify(body);
+            }
+            const res = await fetch(API_BASE + path, opts);
+            let data = null;
+            try { data = await res.json(); } catch (e) { }
+
+            if (res.status === 401) {
+                sessionStorage.removeItem('pp_token');
+                sessionStorage.removeItem('pp_user');
+                location.replace('login.html?expired=1');
+                throw new Error('Phiên đăng nhập hết hạn.');
+            }
+
+            if (!res.ok) {
+                const errMsg = res.status === 403
+                    ? 'Bạn không có quyền thực hiện chức năng này!'
+                    : ((data && data.error) || ('Lỗi máy chủ (' + res.status + ')'));
+                const err = new Error(errMsg);
+                err.status = res.status;
+                err.data = data;
+                throw err;
+            }
+            return data;
+        }
+
+        const MOCK_CATALOG_DRUGS = [
+            { DrugID: '1', DrugCode: 'PARA500', DrugName: 'Paracetamol 500mg', Concentration: '500mg', IngredientName: 'Paracetamol', IsPrescriptionOnly: '0', IsControlled: '0', CurrentStock: '120', CurrentPrice: '35000.00' },
+            { DrugID: '2', DrugCode: 'HAPACOL500', DrugName: 'Hapacol 500mg DHG', Concentration: '500mg', IngredientName: 'Paracetamol', IsPrescriptionOnly: '0', IsControlled: '0', CurrentStock: '45', CurrentPrice: '38000.00' },
+            { DrugID: '3', DrugCode: 'KLACID500', DrugName: 'Klacid 500mg', Concentration: '500mg', IngredientName: 'Clarithromycin', IsPrescriptionOnly: '1', IsControlled: '0', CurrentStock: '0', CurrentPrice: '92000.00' },
+            { DrugID: '4', DrugCode: 'ZOCOR20', DrugName: 'Zocor 20mg', Concentration: '20mg', IngredientName: 'Simvastatin', IsPrescriptionOnly: '1', IsControlled: '0', CurrentStock: '30', CurrentPrice: '115000.00' },
+            { DrugID: '5', DrugCode: 'MORPHIN10', DrugName: 'Morphin Hydroclorid 10mg/1ml', Concentration: '10mg/1ml', IngredientName: 'Morphin', IsPrescriptionOnly: '1', IsControlled: '1', CurrentStock: '18', CurrentPrice: '65000.00' }
+        ];
+
+        const MOCK_DDI_LIST = [
+            { IngredientA: 'Clarithromycin', IngredientB: 'Simvastatin', Severity: 'Major', Description: 'Tăng nồng độ Statin trong huyết tương, nguy cơ tiêu cơ vân nặng.' },
+            { IngredientA: 'Morphin', IngredientB: 'Clarithromycin', Severity: 'Moderate', Description: 'Theo dõi tác dụng an thần và ức chế hô hấp khi dùng phối hợp.' },
+            { IngredientA: 'Paracetamol', IngredientB: 'Morphin', Severity: 'Minor', Description: 'Hiệp đồng giảm đau, lưu ý tổng liều Paracetamol/ngày.' }
+        ];
+
+        let catalogDrugs = [];
+        let ddiList = [];
+
+        function renderStats() {
+            document.getElementById('statTotalDrugs').textContent = String(catalogDrugs.length);
+            document.getElementById('statRxDrugs').textContent = String(catalogDrugs.filter(d => flag(d.IsPrescriptionOnly)).length);
+            document.getElementById('statCtrlDrugs').textContent = String(catalogDrugs.filter(d => flag(d.IsControlled)).length);
+            document.getElementById('statDdiPairs').textContent = String(ddiList.length);
+        }
+
+        function renderCatalog() {
+            const kw = document.getElementById('inpSearchCatalog').value.trim().toLowerCase();
+            const type = document.getElementById('selFilterType').value;
+
+            const filtered = catalogDrugs.filter(d => {
+                const matchKw = !kw ||
+                    String(d.DrugName || '').toLowerCase().includes(kw) ||
+                    String(d.DrugCode || '').toLowerCase().includes(kw) ||
+                    String(d.IngredientName || '').toLowerCase().includes(kw);
+
+                const isRx = flag(d.IsPrescriptionOnly);
+                const isCtrl = flag(d.IsControlled);
+                let matchType = true;
+                if (type === 'CTRL') matchType = isCtrl;
+                else if (type === 'RX') matchType = isRx && !isCtrl;
+                else if (type === 'OTC') matchType = !isRx && !isCtrl;
+
+                return matchKw && matchType;
+            });
+
+            document.getElementById('catalogCountLabel').textContent = filtered.length + ' mặt hàng';
+            const tbody = document.getElementById('tblCatalogBody');
+
+            if (!filtered.length) {
+                tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted py-4">Không có thuốc phù hợp bộ lọc.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = filtered.map(d => {
+                const badges = [];
+                if (flag(d.IsControlled)) badges.push('<span class="pill-ctrl">Kiểm soát đặc biệt</span>');
+                if (flag(d.IsPrescriptionOnly)) badges.push('<span class="pill-rx">Kê đơn (Rx)</span>');
+                if (!flag(d.IsPrescriptionOnly) && !flag(d.IsControlled)) badges.push('<span class="pill-otc">OTC</span>');
+
+                return `
+      <tr>
+        <td class="fw-semibold">${esc(d.DrugCode)}</td>
+        <td>
+          <div class="fw-semibold">${esc(d.DrugName)}</div>
+          <div class="small text-muted">${esc(d.Concentration || '')}</div>
+        </td>
+        <td>${esc(d.IngredientName || '—')}</td>
+        <td><div class="d-flex flex-wrap gap-1">${badges.join('')}</div></td>
+        <td class="text-end fw-semibold">${esc(num(d.CurrentStock))}</td>
+        <td class="text-end">${money(d.CurrentPrice)}</td>
+        <td class="text-end">
+          <button type="button" class="btn btn-sm btn-outline-primary btn-focus-ddi" data-ing="${esc(d.IngredientName || '')}">
+            Xem DDI
+          </button>
+        </td>
+      </tr>
+    `;
+            }).join('');
+
+            tbody.querySelectorAll('.btn-focus-ddi').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const ing = btn.getAttribute('data-ing') || '';
+                    document.getElementById('inpFilterDdi').value = ing;
+                    renderDdi();
+                    document.getElementById('tblDdiBody').scrollIntoView({ behavior: 'smooth', block: 'center' });
+                });
+            });
+        }
+
+        function renderDdi() {
+            const kw = document.getElementById('inpFilterDdi').value.trim().toLowerCase();
+            const sev = document.getElementById('selFilterSeverity').value;
+
+            const filtered = ddiList.filter(item => {
+                const a = String(item.IngredientA || '').toLowerCase();
+                const b = String(item.IngredientB || '').toLowerCase();
+                const matchKw = !kw || a.includes(kw) || b.includes(kw);
+                const matchSev = sev === 'ALL' || String(item.Severity || '').toLowerCase() === sev.toLowerCase();
+                return matchKw && matchSev;
+            });
+
+            const tbody = document.getElementById('tblDdiBody');
+            if (!filtered.length) {
+                tbody.innerHTML = '<tr><td colspan="4" class="text-center text-muted py-4">Không có cặp tương tác phù hợp.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = filtered.map(item => {
+                const s = String(item.Severity || '');
+                const cls = s.toLowerCase() === 'major'
+                    ? 'ddi-major'
+                    : (s.toLowerCase() === 'moderate' ? 'ddi-moderate' : 'ddi-minor');
+                return `
+      <tr>
+        <td class="fw-semibold">${esc(item.IngredientA)}</td>
+        <td class="fw-semibold">${esc(item.IngredientB)}</td>
+        <td><span class="${cls}">${esc(s)}</span></td>
+        <td>${esc(item.Description || '—')}</td>
+      </tr>
+    `;
+            }).join('');
+        }
+
+        async function initProducts() {
+            try {
+                if (USE_MOCK) {
+                    catalogDrugs = MOCK_CATALOG_DRUGS;
+                    ddiList = MOCK_DDI_LIST;
+                } else {
+                    const drugsRes = await api('GET', '/inventory/drugs');
+                    catalogDrugs = Array.isArray(drugsRes?.data) ? drugsRes.data : [];
+                    try {
+                        const ddiRes = await api('GET', '/clinical/ddi');
+                        ddiList = Array.isArray(ddiRes?.data) ? ddiRes.data : (Array.isArray(ddiRes) ? ddiRes : []);
+                    } catch (e) {
+                        ddiList = [];
+                    }
+                }
+                renderStats();
+                renderCatalog();
+                renderDdi();
+            } catch (e) {
+                toast(e.message, true);
+            }
+        }
+
+        document.getElementById('inpSearchCatalog').addEventListener('input', renderCatalog);
+        document.getElementById('selFilterType').addEventListener('change', renderCatalog);
+        document.getElementById('btnResetCatalogFilter').addEventListener('click', () => {
+            document.getElementById('inpSearchCatalog').value = '';
+            document.getElementById('selFilterType').value = 'ALL';
+            renderCatalog();
+        });
+        document.getElementById('inpFilterDdi').addEventListener('input', renderDdi);
+        document.getElementById('selFilterSeverity').addEventListener('change', renderDdi);
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            if (PP_USER) {
+                document.getElementById('userFullName').textContent = PP_USER.FullName || PP_USER.Username;
+                document.getElementById('userRoleBadge').textContent = PP_USER.RoleCode;
+                document.getElementById('userAvatar').textContent = (PP_USER.FullName || 'PP').trim().slice(0, 2).toUpperCase();
+            }
+            const pageRoles = document.body.getAttribute('data-page-roles');
+            if (pageRoles && !hasRole(pageRoles)) {
+                document.getElementById('mainContent').innerHTML = '<div class="panel p-4 text-danger fw-semibold">Bạn không có quyền truy cập trang này (403 Forbidden).</div>';
+                return;
+            }
+            applyRoles(document);
+
+            const curFile = location.pathname.split('/').pop() || 'index.html';
+            document.querySelectorAll('.sidebar .nav-item').forEach(a => {
+                if (a.getAttribute('href') === curFile) a.classList.add('active');
+            });
+
+            document.getElementById('btnLogout')?.addEventListener('click', () => {
+                sessionStorage.removeItem('pp_token');
+                sessionStorage.removeItem('pp_user');
+                location.replace('login.html');
+            });
+
+            await initProducts();
+        });
+    </script>
 </body>
+
 </html>

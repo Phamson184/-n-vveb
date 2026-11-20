@@ -1,542 +1,1307 @@
 ﻿<!DOCTYPE html>
 <html lang="vi">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PharmaPro – Bán hàng</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<style>
-:root{
-  --bg:#f5f7f6; --surface:#fff; --line:#e6ebe8; --ink:#16221d; --muted:#6b7a73;
-  --brand:#0f766e; --brand-dark:#0b5a54; --brand-soft:#e3f3f0;
-  --danger:#b42318; --danger-soft:#fdeceb; --warn:#b45309; --warn-soft:#fef3e2;
-}
-*{box-sizing:border-box}
-html,body{height:100%}
-body{background:var(--bg);color:var(--ink);font-family:'Be Vietnam Pro','Segoe UI',sans-serif;font-size:14px;display:flex;flex-direction:column;overflow:hidden}
-:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
-button{font:inherit}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PharmaPro v2.0 – Kê đơn & POS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="css/theme.css">
+  <style>
+    .pos-grid {
+      display: grid;
+      grid-template-columns: 1fr 390px;
+      gap: 16px;
+      align-items: start;
+    }
 
-/* Thanh trên: mỏng, thay cho sidebar */
-.bar{height:56px;flex:none;background:var(--surface);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:16px;padding:0 20px}
-.back{display:flex;align-items:center;gap:8px;color:var(--ink);text-decoration:none;font-weight:600;padding:6px 10px;border-radius:8px}
-.back:hover{background:#f0f4f2;color:var(--brand-dark)}
-.mark{width:28px;height:28px;border-radius:8px;background:var(--brand);color:#fff;display:grid;place-items:center;font-size:.8rem}
-.bar .grow{flex:1}
-.bar .meta{color:var(--muted);font-size:13px;display:flex;gap:18px;align-items:center}
-.bar .meta b{color:var(--ink);font-weight:600}
+    .search-box-wrap {
+      position: relative;
+    }
 
-/* Bố cục 2 cột */
-.pos{flex:1;min-height:0;display:grid;grid-template-columns:1fr 400px;gap:16px;padding:16px 20px}
-.left,.right{min-height:0;display:flex;flex-direction:column;gap:12px}
-.card-x{background:var(--surface);border:1px solid var(--line);border-radius:12px}
+    .search-dropdown {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: calc(100% + 4px);
+      background: var(--surface, #fff);
+      border: 1px solid var(--line, #e6ebe8);
+      border-radius: 10px;
+      box-shadow: 0 10px 26px rgba(0, 0, 0, 0.12);
+      max-height: 300px;
+      overflow-y: auto;
+      z-index: 30;
+      display: none;
+    }
 
-/* Tìm kiếm */
-.search-wrap{position:relative}
-.search-wrap i.ic{position:absolute;left:16px;top:50%;transform:translateY(-50%);color:#8a9a92;font-size:1.05rem}
-#searchInput{width:100%;border:2px solid var(--line);border-radius:12px;padding:14px 70px 14px 46px;font-size:1.05rem;background:var(--surface)}
-#searchInput:focus{outline:none;border-color:var(--brand);box-shadow:0 0 0 4px var(--brand-soft)}
-.search-wrap kbd{position:absolute;right:14px;top:50%;transform:translateY(-50%);background:#eef2f0;color:var(--muted);border-radius:6px;font-size:11px;padding:2px 7px}
-#results{position:absolute;z-index:20;left:0;right:0;top:calc(100% + 6px);max-height:340px;overflow-y:auto;box-shadow:0 12px 30px rgba(22,34,29,.14);display:none}
-.res{display:flex;align-items:center;gap:12px;padding:11px 16px;border-bottom:1px solid var(--line);cursor:pointer}
-.res:last-child{border-bottom:0}
-.res:hover,.res.on{background:var(--brand-soft)}
-.res .nm{font-weight:600}
-.res .sub{font-size:12px;color:var(--muted)}
-.res .pr{margin-left:auto;font-weight:600;white-space:nowrap}
+    .search-row {
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--line, #e6ebe8);
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
 
-/* Gợi ý nhanh */
-.quick{display:flex;gap:8px;overflow-x:auto;padding-bottom:2px}
-.quick button{flex:none;border:1px solid var(--line);background:var(--surface);border-radius:20px;padding:6px 14px;font-weight:500;cursor:pointer;transition:border-color .15s,background .15s}
-.quick button:hover{border-color:var(--brand);background:var(--brand-soft)}
-.quick span{align-self:center;color:var(--muted);font-size:12px;flex:none}
+    .search-row:last-child {
+      border-bottom: 0;
+    }
 
-/* Giỏ hàng */
-.cart{flex:1;min-height:0;display:flex;flex-direction:column}
-.cart-head{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--line)}
-.cart-head h2{font-size:1rem;font-weight:600;margin:0}
-.link-btn{background:none;border:0;color:var(--muted);cursor:pointer;font-size:13px}
-.link-btn:hover{color:var(--danger)}
-.cart-body{flex:1;overflow-y:auto}
-.tbl{width:100%;border-collapse:collapse}
-.tbl th{position:sticky;top:0;background:var(--surface);font-weight:500;color:var(--muted);font-size:12px;text-align:left;padding:10px 12px;border-bottom:1px solid var(--line)}
-.tbl td{padding:12px;border-bottom:1px solid var(--line);vertical-align:middle}
-.tbl .r{text-align:right}
-.tbl .nm{font-weight:600;line-height:1.3}
-.tbl .sub{font-size:12px;color:var(--muted)}
-.qty{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:9px;overflow:hidden}
-.qty button{width:30px;height:32px;border:0;background:#f5f7f6;cursor:pointer;color:var(--ink)}
-.qty button:hover{background:var(--brand-soft)}
-.qty input{width:44px;height:32px;border:0;text-align:center;font-weight:600;-moz-appearance:textfield}
-.qty input::-webkit-outer-spin-button,.qty input::-webkit-inner-spin-button{-webkit-appearance:none}
-.del{border:0;background:none;color:#98a69f;cursor:pointer;padding:6px 8px;border-radius:6px}
-.del:hover{background:var(--danger-soft);color:var(--danger)}
-.empty{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--muted);gap:6px;padding:40px 0;text-align:center}
-.empty i{font-size:2.2rem;color:#c3cfc9;margin-bottom:6px}
+    .search-row:hover,
+    .search-row.active {
+      background: var(--brand-soft, #e3f3f0);
+    }
 
-/* Thanh toán */
-.pay{flex:1;display:flex;flex-direction:column;padding:18px;gap:14px;min-height:0;overflow-y:auto}
-.lbl{font-size:12px;color:var(--muted);font-weight:500;margin-bottom:6px;display:block}
-.inp{width:100%;border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:var(--surface)}
-.inp:focus{outline:none;border-color:var(--brand);box-shadow:0 0 0 3px var(--brand-soft)}
-.cust{display:flex;align-items:center;gap:10px;margin-top:8px;font-size:13px}
-.tag{background:var(--brand-soft);color:var(--brand-dark);border-radius:20px;padding:2px 10px;font-weight:500;font-size:12px}
-.rx{display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer}
-.rx input{accent-color:var(--brand);width:16px;height:16px}
-#rxBox{display:none}
-.seg{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
-.seg button{border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:9px 4px;font-weight:500;cursor:pointer;transition:all .15s}
-.seg button.on{border-color:var(--brand);background:var(--brand-soft);color:var(--brand-dark);font-weight:600}
-.sum{display:flex;justify-content:space-between;color:var(--muted)}
-.sum b{color:var(--ink);font-weight:600}
-.total{display:flex;justify-content:space-between;align-items:baseline;padding-top:12px;border-top:1px dashed var(--line)}
-.total span{font-weight:600}
-.total strong{font-size:1.9rem;color:var(--brand-dark);letter-spacing:-.5px}
-.cash-quick{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
-.cash-quick button{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:4px 10px;font-size:12px;cursor:pointer}
-.cash-quick button:hover{border-color:var(--brand);background:var(--brand-soft)}
-.change{display:flex;justify-content:space-between;margin-top:8px;font-weight:600}
-.change.neg b{color:var(--danger)}
-.actions{margin-top:auto;display:flex;flex-direction:column;gap:8px}
-.btn-pay{background:var(--brand);color:#fff;border:0;border-radius:12px;padding:16px;font-size:1.1rem;font-weight:700;cursor:pointer;transition:background .15s}
-.btn-pay:hover:not(:disabled){background:var(--brand-dark)}
-.btn-pay:disabled{background:#b9c8c3;cursor:not-allowed}
-.btn-pay small{opacity:.75;font-weight:500;margin-left:6px}
-.btn-ghost{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:11px;font-weight:500;cursor:pointer}
-.btn-ghost:hover{background:#f0f4f2}
+    .badge-rx {
+      background: var(--warn-soft, #fef3e2);
+      color: var(--warn, #b45309);
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 20px;
+    }
 
-.toast-x{position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;padding:12px 20px;border-radius:10px;opacity:0;pointer-events:none;transition:all .25s;z-index:50}
-.toast-x.show{opacity:1;transform:translateX(-50%)}
+    .badge-ctrl {
+      background: var(--danger-soft, #fdeceb);
+      color: var(--danger, #b42318);
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 20px;
+    }
 
-@media (max-width:991px){
-  body{overflow:auto}
-  .pos{grid-template-columns:1fr;display:flex;flex-direction:column}
-  .bar .meta{display:none}
-}
-@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+    .tr-warn {
+      background: var(--warn-soft, #fef3e2) !important;
+    }
 
-/* ==========================================
-   QUY TẮC IN BILL CHUYÊN NGHIỆP (K80mm)
-   ========================================== */
-@page {
-  size: auto;
-  margin: 0mm; /* Bỏ lề mặc định để xóa tiêu đề localhost/ngày tháng trên đầu trang */
-}
+    .soft-stop-box {
+      background: var(--warn-soft, #fef3e2);
+      border: 1px solid var(--warn, #b45309);
+      border-radius: 10px;
+      padding: 12px;
+    }
 
-@media print {
-  /* Ẩn toàn bộ giao diện màn hình POS */
-  body {
-    background: #ffffff !important;
-    margin: 0 !important;
-    padding: 0 !important;
-  }
-  
-  body * {
-    visibility: hidden;
-  }
+    .hard-stop-box {
+      background: var(--danger-soft, #fdeceb);
+      border: 1px solid var(--danger, #b42318);
+      border-radius: 10px;
+      padding: 12px;
+    }
 
-  /* Chỉ hiển thị khung Hóa Đơn */
-  #modalBill, #modalBill * {
-    visibility: visible;
-  }
+    @media (max-width: 991px) {
+      .pos-grid {
+        grid-template-columns: 1fr;
+      }
+    }
 
-  #modalBill {
-    position: absolute !important;
-    left: 0 !important;
-    top: 0 !important;
-    width: 100% !important;
-    height: auto !important;
-    background: none !important;
-    box-shadow: none !important;
-    display: flex !important;
-    justify-content: center !important;
-    align-items: flex-start !important;
-    padding: 10mm 0 0 0 !important;
-    margin: 0 !important;
-  }
-
-  /* Ép phiếu in về đúng khổ giấy Bill 80mm */
-  #modalBill > div {
-    width: 78mm !important; /* Khổ in hóa đơn nhiệt tiêu chuẩn */
-    margin: 0 auto !important;
-    padding: 5mm !important;
-    box-shadow: none !important;
-    border: none !important;
-    font-family: 'Courier New', Courier, monospace !important;
-    color: #000000 !important;
-    background: #ffffff !important;
-  }
-
-  /* Định dạng lại bảng tránh bị lệch cột */
-  #modalBill table {
-    width: 100% !important;
-    border-collapse: collapse !important;
-    margin: 8px 0 !important;
-  }
-
-  #modalBill th, #modalBill td {
-    padding: 4px 0 !important;
-    border: none !important;
-    font-size: 13px !important;
-  }
-
-  /* Ẩn nút In Hóa Đơn và Đóng */
-  #modalBill button {
-    display: none !important;
-  }
-}
-</style>
-</head>
-<body>
-
-<header class="bar">
-  <a href="index.html" class="back"><i class="fa-solid fa-arrow-left"></i><span class="mark"><i class="fa-solid fa-staff-snake"></i></span>PharmaPro</a>
-  <span class="grow"></span>
-  <div class="meta">
-    <span>Dược sĩ: <b>Phạm Trường Sơn</b></span>
-    <span><i class="fa-regular fa-clock"></i> <b id="clock">--:--</b></span>
-  </div>
-</header>
-
-<div class="pos">
-  <!-- TRÁI: tìm kiếm + giỏ hàng -->
-  <section class="left">
-    <div class="search-wrap">
-      <i class="fa-solid fa-magnifying-glass ic"></i>
-      <input type="text" id="searchInput" placeholder="Quét mã vạch hoặc gõ tên thuốc, hoạt chất" autocomplete="off" autofocus>
-      <kbd>F1</kbd>
-      <div id="results" class="card-x"></div>
-    </div>
-
-    <div class="quick" id="quick"><span>Hay bán:</span></div>
-
-    <div class="card-x cart">
-      <div class="cart-head">
-        <h2>Giỏ hàng <span id="cartCount" class="tag">0 sản phẩm</span></h2>
-        <button class="link-btn" id="clearBtn"><i class="fa-regular fa-trash-can"></i> Hủy đơn <small>F4</small></button>
-      </div>
-      <div class="cart-body">
-        <table class="tbl">
-          <thead><tr><th>Sản phẩm</th><th>ĐVT</th><th>Số lượng</th><th class="r">Đơn giá</th><th class="r">Thành tiền</th><th></th></tr></thead>
-          <tbody id="cartItems"></tbody>
-        </table>
-        <div class="empty" id="emptyCart"><i class="fa-solid fa-cart-shopping"></i><b>Giỏ hàng đang trống</b><span>Quét mã vạch hoặc gõ tên thuốc ở ô tìm kiếm phía trên</span></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- PHẢI: khách hàng + thanh toán -->
-  <aside class="right">
-    <div class="card-x pay">
-      <div>
-        <label class="lbl" for="phone">Khách hàng</label>
-        <input class="inp" id="phone" type="tel" placeholder="Nhập số điện thoại để tìm khách">
-        <div class="cust"><i class="fa-regular fa-user"></i> Khách lẻ <span class="tag">Mặc định</span></div>
-      </div>
-
-      <label class="rx"><input type="checkbox" id="rxCheck"> Bán theo đơn thuốc</label>
-      <div id="rxBox"><input class="inp" placeholder="Tên bác sĩ / cơ sở kê đơn"></div>
-
-      <div>
-        <span class="lbl">Hình thức thanh toán</span>
-        <div class="seg" id="method">
-          <button class="on" data-m="cash">Tiền mặt</button>
-          <button data-m="bank">Chuyển khoản</button>
-          <button data-m="debt">Ghi nợ</button>
-        </div>
-      </div>
-
-      <div>
-        <div class="sum"><span>Tổng tiền hàng</span><b id="subtotal">0đ</b></div>
-        <div class="sum mt-2 align-items-center"><span>Giảm giá</span>
-          <input class="inp" id="discount" type="number" min="0" value="0" style="width:130px;text-align:right;padding:5px 10px" aria-label="Giảm giá">
-        </div>
-      </div>
-
-      <div class="total"><span>Khách cần trả</span><strong id="grand">0đ</strong></div>
-
-      <div id="cashBox">
-        <label class="lbl" for="received">Khách đưa</label>
-        <input class="inp" id="received" type="number" min="0" placeholder="0">
-        <div class="cash-quick" id="cashQuick"></div>
-        <div class="change" id="changeRow"><span>Tiền thừa</span><b id="change">0đ</b></div>
-      </div>
-
-      <div class="actions">
-        <button class="btn-pay" id="payBtn" disabled>Thanh toán <small>F3</small></button>
-        <button class="btn-ghost" id="saveBtn">Lưu tạm đơn hàng</button>
-      </div>
-    </div>
-  </aside>
-</div>
-
-<!-- MODAL XEM VÀ IN HÓA ĐƠN -->
-<div class="modal-overlay" id="modalBill" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.6); z-index:2000; align-items:center; justify-content:center;">
-  <div style="background:#fff; padding:24px; border-radius:8px; width:100%; max-width:400px; box-shadow:0 10px 25px rgba(0,0,0,0.3); font-family:monospace;">
-    <div style="text-align:center; border-bottom:1px dashed #ccc; padding-bottom:12px; margin-bottom:12px;">
-      <h2 style="margin:0; font-size:1.3rem;">NHÀ THUỐC PHARMAPRO</h2>
-      <p style="margin:4px 0; font-size:0.85rem;">Mã HD: <b id="billMaHD">HD000</b></p>
-      <p style="margin:0; font-size:0.8rem; color:#666;" id="billNgay">00/00/0000 00:00</p>
-    </div>
-    
-    <table style="width:100%; font-size:0.85rem; border-collapse:collapse; margin-bottom:12px;">
-      <thead>
-        <tr style="border-bottom:1px solid #eee; text-align:left;">
-          <th>Tên thuốc</th>
-          <th style="text-align:center;">SL</th>
-          <th style="text-align:right;">T.Tiền</th>
-        </tr>
-      </thead>
-      <tbody id="billBody"></tbody>
-    </table>
-
-    <div style="border-top:1px dashed #ccc; padding-top:8px; font-size:0.9rem;">
-      <div style="display:flex; justify-content:space-between;"><span>Tổng tiền:</span><b id="billTongTien">0đ</b></div>
-      <div style="display:flex; justify-content:space-between; margin-top:4px;"><span>Khách đưa:</span><span id="billKhachDua">0đ</span></div>
-      <div style="display:flex; justify-content:space-between; margin-top:4px;"><span>Tiền thừa:</span><span id="billTienThua">0đ</span></div>
-    </div>
-
-    <div style="margin-top:20px; display:flex; gap:8px;">
-      <button onclick="window.print()" style="flex:1; padding:8px; background:#198754; color:#fff; border:none; border-radius:4px; cursor:pointer;"><i class="fa-solid fa-print"></i> In Hóa Đơn</button>
-      <button onclick="document.getElementById('modalBill').style.display='none'" style="flex:1; padding:8px; background:#6c757d; color:#fff; border:none; border-radius:4px; cursor:pointer;">Đóng</button>
-    </div>
-  </div>
-</div>
-
-<div class="toast-x" id="toast"></div>
-
-<script>
-const API = 'http://localhost:3001/api/thuoc/danhsach';
-// Giả định: API trả về TenThuoc, HoatChat, QuyCach; nếu có GiaBan / DonViTinh thì dùng, không thì lấy giá trị mặc định bên dưới.
-const FALLBACK_PRICE = 25000, FALLBACK_UNIT = 'Hộp';
-
-let products = [], cart = [], method = 'cash', activeIdx = -1, shown = [];
-const $ = id => document.getElementById(id);
-const money = n => (Math.round(n) || 0).toLocaleString('vi-VN') + 'đ';
-const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-
-/* ---- Dữ liệu thuốc ---- */
-async function loadProducts() {
-  try {
-    const res = await fetch(API);
-    const data = await res.json();
-    products = data.map((t, i) => ({
-      id: t.MaThuoc ?? t.id ?? i,
-      name: t.TenThuoc, ingredient: t.HoatChat || '', spec: t.QuyCach || '',
-      unit: t.DonViTinh || FALLBACK_UNIT, price: Number(t.GiaBan) || FALLBACK_PRICE
-    }));
-    $('quick').innerHTML = '<span>Hay bán:</span>' + products.slice(0, 6)
-      .map(p => `<button data-id="${esc(p.id)}">${esc(p.name)}</button>`).join('');
-  } catch (e) {
-    $('quick').innerHTML = '<span style="color:var(--danger)"><i class="fa-solid fa-plug-circle-xmark"></i> Không kết nối được máy chủ dữ liệu (localhost:3001)</span>';
-  }
-}
-$('quick').addEventListener('click', e => {
-  const b = e.target.closest('button'); if (!b) return;
-  const p = products.find(x => String(x.id) === b.dataset.id); if (p) addToCart(p);
-});
-
-/* ---- Tìm kiếm ---- */
-const norm = s => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g, 'd').toLowerCase();
-function renderResults() {
-  const q = norm($('searchInput').value.trim());
-  const box = $('results');
-  if (!q) { box.style.display = 'none'; shown = []; return; }
-  shown = products.filter(p => norm(p.name + ' ' + p.ingredient).includes(q)).slice(0, 8);
-  activeIdx = shown.length ? 0 : -1;
-  box.innerHTML = shown.length ? shown.map((p, i) => `
-    <div class="res ${i === 0 ? 'on' : ''}" data-i="${i}">
-      <div><div class="nm">${esc(p.name)}</div><div class="sub">${esc(p.ingredient)} ${p.spec ? '· ' + esc(p.spec) : ''}</div></div>
-      <span class="pr">${money(p.price)}</span>
-    </div>`).join('') : '<div class="res" style="color:var(--muted);cursor:default">Không tìm thấy thuốc phù hợp</div>';
-  box.style.display = 'block';
-}
-$('searchInput').addEventListener('input', renderResults);
-$('searchInput').addEventListener('keydown', e => {
-  if (!shown.length) return;
-  if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
-    e.preventDefault();
-    activeIdx = (activeIdx + (e.key === 'ArrowDown' ? 1 : -1) + shown.length) % shown.length;
-    document.querySelectorAll('.res').forEach((el, i) => el.classList.toggle('on', i === activeIdx));
-  }
-  if (e.key === 'Enter' && activeIdx >= 0) pick(shown[activeIdx]);
-  if (e.key === 'Escape') { $('results').style.display = 'none'; }
-});
-$('results').addEventListener('click', e => {
-  const r = e.target.closest('.res[data-i]'); if (r) pick(shown[+r.dataset.i]);
-});
-function pick(p) {
-  addToCart(p);
-  $('searchInput').value = ''; $('results').style.display = 'none'; shown = [];
-  $('searchInput').focus();
-}
-document.addEventListener('click', e => { if (!e.target.closest('.search-wrap')) $('results').style.display = 'none'; });
-
-/* ---- Giỏ hàng ---- */
-function addToCart(p) {
-  const line = cart.find(l => l.id === p.id);
-  line ? line.qty++ : cart.push({ ...p, qty: 1 });
-  render();
-}
-function render() {
-  $('cartItems').innerHTML = cart.map((l, i) => `
-    <tr>
-      <td><div class="nm">${esc(l.name)}</div><div class="sub">${esc(l.ingredient)} ${l.spec ? '· ' + esc(l.spec) : ''}</div></td>
-      <td>${esc(l.unit)}</td>
-      <td><div class="qty"><button data-a="dec" data-i="${i}" aria-label="Giảm">−</button>
-        <input type="number" min="1" value="${l.qty}" data-a="set" data-i="${i}" aria-label="Số lượng">
-        <button data-a="inc" data-i="${i}" aria-label="Tăng">+</button></div></td>
-      <td class="r">${money(l.price)}</td>
-      <td class="r"><b>${money(l.price * l.qty)}</b></td>
-      <td><button class="del" data-a="del" data-i="${i}" aria-label="Xóa dòng"><i class="fa-solid fa-xmark"></i></button></td>
-    </tr>`).join('');
-  $('emptyCart').style.display = cart.length ? 'none' : 'flex';
-  $('cartCount').textContent = cart.reduce((s, l) => s + l.qty, 0) + ' sản phẩm';
-  totals();
-}
-$('cartItems').addEventListener('click', e => {
-  const b = e.target.closest('[data-a]'); if (!b || b.tagName === 'INPUT') return;
-  const i = +b.dataset.i, a = b.dataset.a;
-  if (a === 'inc') cart[i].qty++;
-  if (a === 'dec') cart[i].qty = Math.max(1, cart[i].qty - 1);
-  if (a === 'del') cart.splice(i, 1);
-  render();
-});
-$('cartItems').addEventListener('change', e => {
-  if (e.target.dataset.a === 'set') { cart[+e.target.dataset.i].qty = Math.max(1, parseInt(e.target.value) || 1); render(); }
-});
-$('clearBtn').onclick = () => { if (cart.length && confirm('Hủy đơn hàng hiện tại?')) { cart = []; render(); } };
-
-/* ---- Tính tiền ---- */
-let grand = 0;
-function totals() {
-  const sub = cart.reduce((s, l) => s + l.price * l.qty, 0);
-  const disc = Math.min(Math.max(+$('discount').value || 0, 0), sub);
-  grand = sub - disc;
-  $('subtotal').textContent = money(sub);
-  $('grand').textContent = money(grand);
-  const quick = [grand, 50000, 100000, 200000, 500000].filter((v, i) => v > 0 && (i === 0 || v > grand));
-  $('cashQuick').innerHTML = quick.map((v, i) => `<button data-v="${v}">${i === 0 ? 'Đủ tiền' : money(v)}</button>`).join('');
-  const got = +$('received').value || 0, diff = got - grand;
-  $('change').textContent = money(Math.abs(diff));
-  $('changeRow').classList.toggle('neg', diff < 0 && got > 0);
-  $('changeRow').firstElementChild.textContent = diff < 0 && got > 0 ? 'Còn thiếu' : 'Tiền thừa';
-  $('payBtn').disabled = !cart.length || (method === 'cash' && got > 0 && got < grand);
-}
-$('discount').addEventListener('input', totals);
-$('received').addEventListener('input', totals);
-$('cashQuick').addEventListener('click', e => {
-  const b = e.target.closest('button'); if (b) { $('received').value = b.dataset.v; totals(); }
-});
-$('method').addEventListener('click', e => {
-  const b = e.target.closest('button'); if (!b) return;
-  method = b.dataset.m;
-  document.querySelectorAll('#method button').forEach(x => x.classList.toggle('on', x === b));
-  $('cashBox').style.display = method === 'cash' ? 'block' : 'none';
-  totals();
-});
-$('rxCheck').addEventListener('change', e => { $('rxBox').style.display = e.target.checked ? 'block' : 'none'; });
-
-/* ---- Thanh toán / Lưu tạm ---- */
-function toast(msg) { const t = $('toast'); t.textContent = msg; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 2200); }
-function reset() { cart = []; $('discount').value = 0; $('received').value = ''; render(); $('searchInput').focus(); }
-/* ---- Thanh toán thực tế xuống Backend API (FEFO Auto-Deduction) ---- */
-async function checkout() {
-  // Kiểm tra giỏ hàng và trạng thái nút
-  if ($('payBtn').disabled || !cart.length) return;
-
-  // Khóa nút thanh toán tránh bấm đúp (double-click)
-  const originalPayBtnHtml = $('payBtn').innerHTML;
-  $('payBtn').disabled = true;
-  $('payBtn').textContent = 'Đang xử lý FEFO...';
-
-  // 1. Đóng gói Payload theo đúng DDL & API Backend
-  const payload = {
-    MaHoaDon: 'HD' + Date.now(),
-    MaNhanVien: 'NV001', // Mã nhân viên mặc định (hoặc từ phiên đăng nhập)
-    MaKhachHang: 'KH001', // Mặc định Khách lẻ
-    MaDonThuoc: $('rxCheck').checked ? ($('rxBox').querySelector('input').value.trim() || 'Đơn thuốc tại quầy') : null,
-    GioHang: cart.map(item => ({
-      MaThuoc: String(item.id),
-      SoLuong: item.qty,
-      DonGia: item.price
-    }))
-  };
-
-  try {
-    // 2. Gọi API Bán hàng (Backend tự chạy Transaction & trừ kho lô cận date trước)
-    const res = await fetch('http://localhost:3001/api/hoadon/tao', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
-
-    const result = await res.json();
-
-    if (result.success) {
-      // 3. Thanh toán thành công -> Thông báo & Reset đơn
-      toast(`Thanh toán thành công! Mã HD: ${result.MaHoaDon}`);
-      
-      // Mở Modal xem Bill hóa đơn (nếu có)
-      if (typeof hienThiBillModal === 'function') {
-        hienThiBillModal(result.MaHoaDon, payload, grand);
+    @media print {
+      body * {
+        visibility: hidden;
       }
 
-      reset();
-      localStorage.removeItem('pos_draft'); // Xóa đơn lưu tạm
-    } else {
-      // 4. Nếu Backend báo lỗi (ví dụ: Không đủ tồn kho FEFO)
-      console.error("Lỗi từ CSDL POS:", result);
-      alert("KHÔNG THỂ THANH TOÁN:\n" + (result.error || "Lỗi hệ thống CSDL"));
+      #modalBill,
+      #modalBill * {
+        visibility: visible;
+      }
+
+      #modalBill {
+        position: fixed !important;
+        inset: 0 !important;
+        background: #fff !important;
+        z-index: 99999 !important;
+      }
+
+      #modalBill .no-print {
+        display: none !important;
+      }
     }
-  } catch (err) {
-    console.error("Lỗi kết nối API POS:", err);
-    alert("Không thể kết nối đến máy chủ Backend (localhost:3001)!");
-  } finally {
-    // Mở lại nút thanh toán
-    $('payBtn').disabled = false;
-    $('payBtn').innerHTML = originalPayBtnHtml;
-  }
-}
+  </style>
+</head>
 
-/* ---- Phím tắt (F1 tìm kiếm, F3 thanh toán, F4 hủy đơn) & đồng hồ ---- */
-document.addEventListener('keydown', e => {
-  if (e.key === 'F1') { e.preventDefault(); $('searchInput').focus(); $('searchInput').select(); }
-  if (e.key === 'F3') { e.preventDefault(); checkout(); }
-  if (e.key === 'F4') { e.preventDefault(); $('clearBtn').click(); }
-});
-setInterval(() => $('clock').textContent = new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }), 1000);
-$('clock').textContent = new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+<body data-page-roles="ADMIN,DOCTOR,PHARMACIST">
+  <div class="app-shell d-flex min-vh-100">
+    <!-- SIDEBAR DÙNG CHUNG -->
+    <aside class="sidebar">
+      <div class="brand">
+        <span class="brand-mark"><i class="fa-solid fa-staff-snake"></i></span>
+        <span>PharmaPro <small class="text-muted">v2</small></span>
+      </div>
 
-window.onload = () => {
-  $('searchInput').focus();
-  try { const d = JSON.parse(localStorage.getItem('pos_draft') || 'null'); if (d && d.length) { cart = d; toast('Đã khôi phục đơn lưu tạm'); } } catch (e) {}
-  render(); loadProducts();
-};
-function hienThiBillModal(maHD, payload, tongTien) {
-  $('billMaHD').innerText = maHD;
-  $('billNgay').innerText = new Date().toLocaleString('vi-VN');
-  
-  $('billBody').innerHTML = cart.map(item => `
-    <tr>
-      <td style="padding:4px 0;">${esc(item.name)}</td>
-      <td style="text-align:center;">${item.qty}</td>
-      <td style="text-align:right;">${money(item.price * item.qty)}</td>
-    </tr>
+      <div class="nav-group">
+        <div class="nav-label">Điều hành</div>
+        <a class="nav-item" href="index.html"><i class="fa-solid fa-chart-pie"></i> Tổng quan</a>
+      </div>
+
+      <div class="nav-group">
+        <div class="nav-label">Dược lâm sàng & Bán hàng</div>
+        <a class="nav-item" href="pos.html" data-roles="ADMIN,DOCTOR,PHARMACIST"><i
+            class="fa-solid fa-cash-register"></i> Kê đơn & POS</a>
+        <a class="nav-item" href="prescriptions.html" data-roles="ADMIN,DOCTOR,PHARMACIST,CASHIER"><i
+            class="fa-solid fa-file-prescription"></i> Đơn thuốc GPP</a>
+        <a class="nav-item" href="patients.html" data-roles="ADMIN,DOCTOR,PHARMACIST"><i
+            class="fa-solid fa-user-injured"></i> Hồ sơ Dược bạ 360°</a>
+      </div>
+
+      <div class="nav-group">
+        <div class="nav-label">Kho dược & Pháp lý</div>
+        <a class="nav-item" href="products.html"><i class="fa-solid fa-pills"></i> Danh mục & DDI</a>
+        <a class="nav-item" href="inventory.html" data-roles="ADMIN,PHARMACIST,WAREHOUSE"><i
+            class="fa-solid fa-boxes-stacked"></i> Kho FEFO & TT 20/2017</a>
+        <a class="nav-item" href="audit.html" data-roles="ADMIN,PHARMACIST,WAREHOUSE"><i
+            class="fa-solid fa-clock-rotate-left"></i> Thanh tra Temporal</a>
+      </div>
+
+      <div class="store-box mt-auto">
+        <div class="fw-semibold">Nhà thuốc GPP #79001</div>
+        <div class="small text-muted">Chuẩn Thông tư 02/2018</div>
+      </div>
+    </aside>
+
+    <!-- KHU VỰC CHÍNH -->
+    <div class="main flex-grow-1 d-flex flex-column">
+      <header class="topbar d-flex align-items-center justify-content-between">
+        <div class="page-title" id="pageTitle">Kê đơn & POS (v2.0)</div>
+        <div class="user d-flex align-items-center gap-3">
+          <div class="text-end">
+            <div class="fw-semibold" id="userFullName">Đang tải...</div>
+            <div class="small text-muted" id="userRoleBadge">ROLE</div>
+          </div>
+          <div class="avatar" id="userAvatar">PP</div>
+          <button class="btn-ghost btn-sm" id="btnLogout" title="Đăng xuất"><i
+              class="fa-solid fa-right-from-bracket"></i></button>
+        </div>
+      </header>
+
+      <main class="content p-4" id="mainContent">
+        <!-- Banner thông báo tạo đơn thành công -->
+        <div class="panel mb-3 d-none" id="createdRxBanner">
+          <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
+            <div>
+              <i class="fa-solid fa-circle-check text-success me-1"></i>
+              Tạo đơn thành công (trạng thái <strong>Pending</strong>) —
+              Mã đơn quốc gia: <strong id="createdNationalCode"></strong>
+            </div>
+            <div class="d-flex gap-2">
+              <a href="prescriptions.html" class="btn btn-sm btn-primary" id="linkCreatedRx">
+                Xem đơn tại prescriptions.html
+              </a>
+              <button type="button" class="btn btn-sm btn-outline-secondary" id="btnPrintDraftBill">
+                <i class="fa-solid fa-print me-1"></i> In phiếu nháp
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="pos-grid">
+          <!-- CỘT TRÁI: TÌM THUỐC + GIỎ HÀNG -->
+          <div class="d-flex flex-column gap-3">
+            <div class="panel">
+              <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-2">
+                <label class="form-label fw-bold mb-0" for="searchDrugInput">
+                  Tìm thuốc theo tên hoặc hoạt chất <span class="badge bg-light text-dark border ms-1">F1</span>
+                </label>
+                <button type="button" class="btn btn-sm btn-outline-primary" id="btnOpenOcr"
+                  data-roles="ADMIN,DOCTOR,PHARMACIST">
+                  <i class="fa-solid fa-file-lines me-1"></i> Nhập từ OCR
+                </button>
+              </div>
+              <div class="search-box-wrap">
+                <input type="text" class="form-control" id="searchDrugInput"
+                  placeholder="Gõ tên thuốc (Hapacol, Morphin...) hoặc hoạt chất..." autocomplete="off">
+                <div class="search-dropdown" id="searchResults"></div>
+              </div>
+              <div class="d-flex flex-wrap gap-2 mt-2" id="quickDrugs"></div>
+            </div>
+
+            <div class="panel">
+              <div class="d-flex align-items-center justify-content-between mb-3">
+                <h2 class="h6 fw-bold mb-0">Giỏ kê đơn <span class="badge bg-secondary ms-1"
+                    id="cartCountBadge">0</span></h2>
+                <button type="button" class="btn btn-sm btn-outline-danger" id="btnClearCart"
+                  data-roles="ADMIN,DOCTOR,PHARMACIST">
+                  <i class="fa-solid fa-trash me-1"></i> Xóa giỏ (F4)
+                </button>
+              </div>
+
+              <div class="table-responsive">
+                <table class="table table-sm align-middle mb-0">
+                  <thead>
+                    <tr>
+                      <th>Thuốc & Cảnh báo</th>
+                      <th style="width:120px">SL kê</th>
+                      <th>Cách dùng (DosageInstruction)</th>
+                      <th class="text-end">Đơn giá</th>
+                      <th class="text-end">Thành tiền</th>
+                      <th class="text-end">Thao tác</th>
+                    </tr>
+                  </thead>
+                  <tbody id="cartBody">
+                    <tr>
+                      <td colspan="6" class="text-center text-muted py-4">Chưa có thuốc trong giỏ.</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Khung cảnh báo SOFT_STOP -->
+            <div class="soft-stop-box d-none" id="softStopPanel">
+              <div class="fw-bold mb-2">
+                <i class="fa-solid fa-triangle-exclamation me-1"></i>
+                Cảnh báo lâm sàng SOFT_STOP — Vui lòng nhập lý do vượt cảnh báo (OverrideReason) để gửi lại
+              </div>
+              <div id="softStopList" class="d-flex flex-column gap-2"></div>
+            </div>
+          </div>
+
+          <!-- CỘT PHẢI: THÔNG TIN ĐƠN & TẠO ĐƠN -->
+          <div class="panel">
+            <h2 class="h6 fw-bold mb-3">Thông tin đơn thuốc</h2>
+
+            <div class="mb-3">
+              <div class="d-flex justify-content-between align-items-center">
+                <label class="form-label small fw-semibold mb-1" for="inpPatientId">PatientID (số) <span
+                    class="text-danger">*</span></label>
+                <a href="patients.html" class="small text-decoration-underline" id="linkPatient360">Mở hồ sơ 360°</a>
+              </div>
+              <input type="number" min="1" step="1" class="form-control form-control-sm" id="inpPatientId"
+                placeholder="Ví dụ: 7">
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label small fw-semibold mb-1" for="inpDiagnosis">Chẩn đoán (Diagnosis) <span
+                  class="text-danger">*</span></label>
+              <input type="text" class="form-control form-control-sm" id="inpDiagnosis"
+                placeholder="Ví dụ: Sốt siêu vi, Viêm họng...">
+            </div>
+
+            <div class="form-check mb-2">
+              <input class="form-check-input" type="checkbox" id="chkIsChronic">
+              <label class="form-check-label small fw-semibold" for="chkIsChronic">Đơn thuốc mạn tính
+                (IsChronic)</label>
+            </div>
+
+            <div class="mb-3 d-none" id="chronicDaysWrap">
+              <label class="form-label small fw-semibold mb-1" for="selChronicDays">Số ngày điều trị mạn tính</label>
+              <select class="form-select form-select-sm" id="selChronicDays">
+                <option value="30">30 ngày</option>
+                <option value="90">90 ngày</option>
+              </select>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label small fw-semibold mb-1" for="selControlledType">Loại kiểm soát
+                (ControlledType)</label>
+              <select class="form-select form-select-sm" id="selControlledType">
+                <option value="C" selected>C — Thường</option>
+                <option value="N">N — Gây nghiện</option>
+                <option value="H">H — Hướng thần</option>
+              </select>
+              <div class="form-text small text-danger d-none" id="controlledHint">
+                Giỏ có thuốc kiểm soát đặc biệt: bắt buộc chọn N hoặc H!
+              </div>
+            </div>
+
+            <hr>
+
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <span class="fw-semibold">Tổng tiền dự kiến</span>
+              <strong class="fs-5" id="totalAmountText">0đ</strong>
+            </div>
+
+            <button type="button" class="btn btn-primary w-100 py-2 fw-bold" id="btnSubmitRx"
+              data-roles="ADMIN,DOCTOR,PHARMACIST">
+              <i class="fa-solid fa-paper-plane me-1"></i> Tạo đơn (F3)
+            </button>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- MODAL THUỐC THAY THẾ -->
+  <div class="modal fade" id="modalSubstitutes" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title fw-bold" id="subModalTitle">Thuốc thay thế tương đương</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+        </div>
+        <div class="modal-body">
+          <div class="small text-muted mb-2" id="subPriceWindow"></div>
+          <div class="table-responsive">
+            <table class="table table-sm align-middle mb-0">
+              <thead>
+                <tr>
+                  <th>Tên thuốc</th>
+                  <th class="text-end">Giá</th>
+                  <th class="text-end">Tồn</th>
+                  <th>Hạn xa nhất (FurthestExpiryDate)</th>
+                  <th class="text-end">Chọn</th>
+                </tr>
+              </thead>
+              <tbody id="subListBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL CẢNH BÁO HARD_STOP -->
+  <div class="modal fade" id="modalHardStop" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header bg-danger text-white">
+          <h5 class="modal-title fw-bold"><i class="fa-solid fa-ban me-1"></i> Chặn kê đơn — HARD_STOP</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Đóng"></button>
+        </div>
+        <div class="modal-body">
+          <div class="hard-stop-box mb-2" id="hardStopList"></div>
+          <div class="small text-muted">Cảnh báo mức HARD_STOP không thể vượt qua khi tạo đơn.</div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Đã hiểu</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL NHẬP TỪ OCR -->
+  <div class="modal fade" id="modalOcr" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title fw-bold">Nhập đơn từ OCR</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <div class="d-flex justify-content-between align-items-center mb-1">
+              <label class="form-label small fw-semibold mb-0" for="txtOcrJson">Dán JSON danh sách dòng OCR (hoặc thêm
+                dòng thủ công)</label>
+              <div class="d-flex gap-2">
+                <button type="button" class="btn btn-sm btn-outline-secondary" id="btnAddOcrRow">+ Thêm dòng</button>
+                <button type="button" class="btn btn-sm btn-outline-primary" id="btnApplyOcrJson">Nạp từ JSON</button>
+              </div>
+            </div>
+            <textarea class="form-control form-control-sm font-monospace" rows="3"
+              id="txtOcrJson">[{"drug_name":"Paracetamol","concentration":"500mg","quantity":10,"dosage_instruction":"Sáng 1, Tối 1","confidence_score":0.96},{"drug_name":"Morphin","concentration":"10mg","quantity":2,"dosage_instruction":"Khi đau nhiều","confidence_score":0.72}]</textarea>
+          </div>
+
+          <div class="table-responsive mb-3">
+            <table class="table table-sm align-middle">
+              <thead>
+                <tr>
+                  <th>drug_name</th>
+                  <th>concentration</th>
+                  <th style="width:90px">quantity</th>
+                  <th>dosage_instruction</th>
+                  <th style="width:120px">confidence_score</th>
+                  <th style="width:50px"></th>
+                </tr>
+              </thead>
+              <tbody id="ocrInputRows"></tbody>
+            </table>
+          </div>
+
+          <button type="button" class="btn btn-primary btn-sm mb-3" id="btnRunOcrMap">
+            <i class="fa-solid fa-wand-magic-sparkles me-1"></i> Đối chiếu danh mục (POST /prescriptions/ocr-map)
+          </button>
+
+          <div id="ocrMappedSection" class="d-none">
+            <h6 class="fw-bold">Kết quả đối chiếu (mapped_pos_items)</h6>
+            <div class="table-responsive">
+              <table class="table table-sm align-middle">
+                <thead>
+                  <tr>
+                    <th style="width:50px">Chọn</th>
+                    <th>Thuốc khớp (matched_drug)</th>
+                    <th>confidence_score</th>
+                    <th>Cảnh báo độ tin cậy</th>
+                  </tr>
+                </thead>
+                <tbody id="ocrMappedBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Đóng</button>
+          <button type="button" class="btn btn-success" id="btnAddMappedToCart">
+            <i class="fa-solid fa-cart-plus me-1"></i> Thêm vào giỏ
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL IN PHIẾU NHÁP -->
+  <div class="modal fade" id="modalBill" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-sm modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header no-print">
+          <h5 class="modal-title fw-bold">Phiếu kê đơn nháp</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+        </div>
+        <div class="modal-body" id="billPrintContent"></div>
+        <div class="modal-footer no-print">
+          <button type="button" class="btn btn-primary btn-sm" onclick="window.print()">In</button>
+          <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Đóng</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST THÔNG BÁO -->
+  <div class="toast-x" id="toastBox" style="display:none; position:fixed; bottom:20px; right:20px; z-index:9999;"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    const API_BASE = 'http://localhost:3001/api/v2';
+    const USE_MOCK = true; // Đổi thành false khi chạy API thật
+
+    // 1. KIỂM TRA ĐĂNG NHẬP JWT
+    let PP_TOKEN = sessionStorage.getItem('pp_token');
+    let PP_USER = (() => {
+      try { return JSON.parse(sessionStorage.getItem('pp_user') || 'null'); } catch (e) { return null; }
+    })();
+
+    if (USE_MOCK && (!PP_TOKEN || !PP_USER)) {
+      PP_TOKEN = 'mock-jwt-token';
+      PP_USER = { UserID: '2', EmployeeCode: 'NV002', FullName: 'Trần Thị Thu Hà', RoleCode: 'PHARMACIST' };
+    }
+
+    if (!PP_TOKEN || !PP_USER) {
+      const cur = location.pathname.split('/').pop() || 'index.html';
+      location.replace('login.html?next=' + encodeURIComponent(cur));
+    }
+
+    // 2. CÁC HÀM TIỆN ÍCH CHUẨN BẮT BUỘC (AI_CONTEXT_V2)
+    const num = v => { const n = Number(v); return Number.isFinite(n) ? n : 0; };
+    const flag = v => Number(v) === 1;
+    const esc = s => String(s ?? '').replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
+    const money = v => Math.round(num(v)).toLocaleString('vi-VN') + 'đ';
+    const getParam = k => new URLSearchParams(location.search).get(k);
+
+    function fmtDate(iso) {
+      if (!iso) return '—';
+      const d = new Date(iso);
+      if (isNaN(d)) return esc(iso);
+      return String(d.getDate()).padStart(2, '0') + '/' + String(d.getMonth() + 1).padStart(2, '0') + '/' + d.getFullYear();
+    }
+
+    function fmtDateTime(iso) {
+      if (!iso) return '—';
+      const d = new Date(iso);
+      if (isNaN(d)) return esc(iso);
+      return fmtDate(iso) + ' ' + String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+    }
+
+    function toast(msg, isError = false) {
+      const box = document.getElementById('toastBox');
+      if (!box) return;
+      box.textContent = msg;
+      box.style.display = 'block';
+      box.style.background = isError ? 'var(--danger, #dc2626)' : 'var(--brand, #0d9488)';
+      box.style.color = '#fff';
+      box.style.padding = '12px 18px';
+      box.style.borderRadius = '10px';
+      box.style.boxShadow = '0 8px 24px rgba(0,0,0,0.15)';
+      clearTimeout(window._toastTimer);
+      window._toastTimer = setTimeout(() => { box.style.display = 'none'; }, 4000);
+    }
+
+    // 3. PHÂN QUYỀN GIAO DIỆN RBAC
+    function hasRole(rolesCsv) {
+      if (!rolesCsv) return true;
+      const allow = String(rolesCsv).split(',').map(s => s.trim().toUpperCase()).filter(Boolean);
+      return allow.length === 0 || allow.includes(String(PP_USER?.RoleCode || '').toUpperCase());
+    }
+
+    function applyRoles(root = document) {
+      root.querySelectorAll('[data-roles]').forEach(el => {
+        if (!hasRole(el.getAttribute('data-roles'))) el.style.display = 'none';
+      });
+    }
+
+    // 4. HÀM GỌI API TRUNG TÂM (TỰ GẮN JWT, BẮT 401/403/422)
+    async function api(method, path, body = null) {
+      const headers = { 'Authorization': 'Bearer ' + PP_TOKEN };
+      const opts = { method: method.toUpperCase(), headers };
+      if (body !== null && opts.method !== 'GET') {
+        headers['Content-Type'] = 'application/json';
+        opts.body = JSON.stringify(body);
+      }
+      const res = await fetch(API_BASE + path, opts);
+      let data = null;
+      try { data = await res.json(); } catch (e) { }
+
+      if (res.status === 401) {
+        sessionStorage.removeItem('pp_token');
+        sessionStorage.removeItem('pp_user');
+        location.replace('login.html?expired=1');
+        throw new Error('Phiên đăng nhập hết hạn.');
+      }
+
+      if (!res.ok) {
+        const errMsg = res.status === 403
+          ? 'Bạn không có quyền thực hiện chức năng này!'
+          : ((data && data.error) || ('Lỗi máy chủ (' + res.status + ')'));
+        const err = new Error(errMsg);
+        err.status = res.status;
+        err.data = data;
+        throw err;
+      }
+      return data;
+    }
+
+    /* =====================================================
+       DỮ LIỆU GIẢ CHUẨN KIỂU CHUỖI CHO V2 (KHI USE_MOCK = true)
+    ===================================================== */
+    const MOCK_DRUGS = [
+      { DrugID: '1', DrugCode: 'PARA500', DrugName: 'Paracetamol 500mg', Concentration: '500mg', IsPrescriptionOnly: '0', IsControlled: '0', CurrentPrice: '35000.00', CurrentStock: '120', IngredientName: 'Paracetamol' },
+      { DrugID: '2', DrugCode: 'HAPACOL500', DrugName: 'Hapacol 500mg DHG', Concentration: '500mg', IsPrescriptionOnly: '0', IsControlled: '0', CurrentPrice: '38000.00', CurrentStock: '45', IngredientName: 'Paracetamol' },
+      { DrugID: '3', DrugCode: 'KLACID500', DrugName: 'Klacid 500mg', Concentration: '500mg', IsPrescriptionOnly: '1', IsControlled: '0', CurrentPrice: '92000.00', CurrentStock: '0', IngredientName: 'Clarithromycin' },
+      { DrugID: '4', DrugCode: 'ZOCOR20', DrugName: 'Zocor 20mg', Concentration: '20mg', IsPrescriptionOnly: '1', IsControlled: '0', CurrentPrice: '115000.00', CurrentStock: '30', IngredientName: 'Simvastatin' },
+      { DrugID: '5', DrugCode: 'MORPHIN10', DrugName: 'Morphin Hydroclorid 10mg/1ml', Concentration: '10mg/1ml', IsPrescriptionOnly: '1', IsControlled: '1', CurrentPrice: '65000.00', CurrentStock: '18', IngredientName: 'Morphin' }
+    ];
+
+    const MOCK_SUBSTITUTES = {
+      '3': {
+        success: true,
+        price_window: { min: 73600, max: 110400, tolerance: '±20%' },
+        substitutes: [
+          { DrugID: '2', DrugCode: 'HAPACOL500', DrugName: 'Hapacol 500mg DHG', CurrentPrice: '85000.00', CurrentStock: '45', FurthestExpiryDate: '2028-11-08', IsPrescriptionOnly: '1', IsControlled: '0' }
+        ]
+      },
+      '1': {
+        success: true,
+        price_window: { min: 28000, max: 42000, tolerance: '±20%' },
+        substitutes: [
+          { DrugID: '2', DrugCode: 'HAPACOL500', DrugName: 'Hapacol 500mg DHG', CurrentPrice: '38000.00', CurrentStock: '45', FurthestExpiryDate: '2028-11-08', IsPrescriptionOnly: '0', IsControlled: '0' }
+        ]
+      }
+    };
+
+    let drugs = [];
+    let cart = []; // { DrugID, DrugCode, DrugName, IngredientName, CurrentPrice, CurrentStock, IsPrescriptionOnly, IsControlled, PrescribedQty, DosageInstruction, OverrideReason }
+    let searchMatches = [];
+    let activeMatchIdx = -1;
+    let overrideReasonsByDrug = {};
+    let softStopMessagesByDrug = {};
+    let mappedOcrItems = [];
+    let lastBillData = null;
+
+    const subModal = new bootstrap.Modal(document.getElementById('modalSubstitutes'));
+    const hardStopModal = new bootstrap.Modal(document.getElementById('modalHardStop'));
+    const ocrModal = new bootstrap.Modal(document.getElementById('modalOcr'));
+    const billModal = new bootstrap.Modal(document.getElementById('modalBill'));
+
+    function hasControlledInCart() {
+      return cart.some(item => flag(item.IsControlled));
+    }
+
+    function syncControlledRule() {
+      const sel = document.getElementById('selControlledType');
+      const hint = document.getElementById('controlledHint');
+      const hasCtrl = hasControlledInCart();
+      if (hasCtrl) {
+        hint.classList.remove('d-none');
+        if (sel.value === 'C') {
+          sel.value = 'N';
+        }
+      } else {
+        hint.classList.add('d-none');
+      }
+    }
+
+    function calcTotal() {
+      const sum = cart.reduce((acc, item) => acc + (num(item.CurrentPrice) * num(item.PrescribedQty)), 0);
+      document.getElementById('totalAmountText').textContent = money(sum);
+      return sum;
+    }
+
+    function renderSoftStopBox() {
+      const panel = document.getElementById('softStopPanel');
+      const list = document.getElementById('softStopList');
+      const drugIds = Object.keys(softStopMessagesByDrug);
+      if (!drugIds.length) {
+        panel.classList.add('d-none');
+        list.innerHTML = '';
+        return;
+      }
+      panel.classList.remove('d-none');
+      list.innerHTML = drugIds.map(did => {
+        const item = cart.find(c => String(c.DrugID) === String(did));
+        const name = item ? item.DrugName : ('DrugID #' + did);
+        const reasonVal = overrideReasonsByDrug[did] || '';
+        return `
+      <div class="bg-white p-2 rounded border">
+        <div class="small fw-semibold mb-1">${esc(name)} — ${esc(softStopMessagesByDrug[did])}</div>
+        <input type="text" class="form-control form-control-sm" data-override-drug="${esc(did)}"
+          value="${esc(reasonVal)}" placeholder="Nhập OverrideReason bắt buộc...">
+      </div>
+    `;
+      }).join('');
+
+      list.querySelectorAll('[data-override-drug]').forEach(inp => {
+        inp.addEventListener('input', () => {
+          overrideReasonsByDrug[inp.getAttribute('data-override-drug')] = inp.value;
+        });
+      });
+    }
+
+    function renderCart() {
+      const tbody = document.getElementById('cartBody');
+      document.getElementById('cartCountBadge').textContent = String(cart.length);
+
+      if (!cart.length) {
+        tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted py-4">Chưa có thuốc trong giỏ.</td></tr>';
+        syncControlledRule();
+        calcTotal();
+        return;
+      }
+
+      tbody.innerHTML = cart.map((item, idx) => {
+        const stock = num(item.CurrentStock);
+        const price = num(item.CurrentPrice);
+        const qty = num(item.PrescribedQty);
+        const lineTotal = price * qty;
+        const isRx = flag(item.IsPrescriptionOnly);
+        const isCtrl = flag(item.IsControlled);
+
+        return `
+      <tr>
+        <td>
+          <div class="fw-semibold">${esc(item.DrugName)}</div>
+          <div class="small text-muted">${esc(item.IngredientName || '')} · Tồn: ${esc(stock)}</div>
+          <div class="d-flex flex-wrap gap-1 mt-1">
+            ${isRx ? '<span class="badge-rx">Kê đơn</span>' : ''}
+            ${isCtrl ? '<span class="badge-ctrl">Kiểm soát đặc biệt</span>' : ''}
+          </div>
+        </td>
+        <td>
+          <div class="input-group input-group-sm">
+            <button type="button" class="btn btn-outline-secondary" data-cart-act="dec" data-idx="${idx}">-</button>
+            <input type="number" min="1" max="${Math.max(1, stock)}" class="form-control text-center"
+              data-cart-act="qty" data-idx="${idx}" value="${esc(qty)}">
+            <button type="button" class="btn btn-outline-secondary" data-cart-act="inc" data-idx="${idx}">+</button>
+          </div>
+        </td>
+        <td>
+          <input type="text" class="form-control form-control-sm" data-cart-act="dosage" data-idx="${idx}"
+            value="${esc(item.DosageInstruction || '')}" placeholder="Cách dùng...">
+        </td>
+        <td class="text-end">${money(price)}</td>
+        <td class="text-end fw-semibold">${money(lineTotal)}</td>
+        <td class="text-end">
+          <div class="btn-group btn-group-sm">
+            <button type="button" class="btn btn-outline-info" data-cart-act="sub" data-idx="${idx}" title="Thuốc thay thế">
+              <i class="fa-solid fa-repeat"></i>
+            </button>
+            <button type="button" class="btn btn-outline-danger" data-cart-act="del" data-idx="${idx}" title="Xóa">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          </div>
+        </td>
+      </tr>
+    `;
+      }).join('');
+
+      tbody.querySelectorAll('[data-cart-act]').forEach(el => {
+        const idx = num(el.getAttribute('data-idx'));
+        const act = el.getAttribute('data-cart-act');
+        if (act === 'dec') {
+          el.addEventListener('click', () => {
+            const nextQty = num(cart[idx].PrescribedQty) - 1;
+            cart[idx].PrescribedQty = Math.max(1, nextQty);
+            renderCart();
+          });
+        } else if (act === 'inc') {
+          el.addEventListener('click', () => {
+            const maxStock = num(cart[idx].CurrentStock);
+            const curQty = num(cart[idx].PrescribedQty);
+            if (maxStock <= 0) {
+              toast('Thuốc hết tồn kho, hãy chọn thuốc thay thế.', true);
+              openSubstitutes(cart[idx].DrugID, idx);
+              return;
+            }
+            if (curQty + 1 > maxStock) {
+              toast('Số lượng không được vượt quá tồn kho (' + maxStock + ').', true);
+              return;
+            }
+            cart[idx].PrescribedQty = curQty + 1;
+            renderCart();
+          });
+        } else if (act === 'qty') {
+          el.addEventListener('change', () => {
+            const maxStock = Math.max(1, num(cart[idx].CurrentStock));
+            let val = Math.floor(num(el.value));
+            if (val < 1) val = 1;
+            if (num(cart[idx].CurrentStock) > 0 && val > maxStock) {
+              toast('Tối đa ' + maxStock + ' theo tồn kho.', true);
+              val = maxStock;
+            }
+            cart[idx].PrescribedQty = val;
+            renderCart();
+          });
+        } else if (act === 'dosage') {
+          el.addEventListener('input', () => {
+            cart[idx].DosageInstruction = el.value;
+          });
+        } else if (act === 'sub') {
+          el.addEventListener('click', () => openSubstitutes(cart[idx].DrugID, idx));
+        } else if (act === 'del') {
+          el.addEventListener('click', () => {
+            const removedId = String(cart[idx].DrugID);
+            delete overrideReasonsByDrug[removedId];
+            delete softStopMessagesByDrug[removedId];
+            cart.splice(idx, 1);
+            renderCart();
+            renderSoftStopBox();
+          });
+        }
+      });
+
+      syncControlledRule();
+      calcTotal();
+    }
+
+    async function openSubstitutes(drugId, replaceCartIdx = null) {
+      const did = String(drugId ?? '');
+      if (!did) return;
+      try {
+        const res = USE_MOCK
+          ? (MOCK_SUBSTITUTES[did] || { price_window: null, substitutes: [] })
+          : await api('GET', '/inventory/drugs/substitutes?DrugID=' + encodeURIComponent(did));
+
+        const pw = res?.price_window;
+        document.getElementById('subPriceWindow').textContent = pw
+          ? `Biên độ giá (${esc(pw.tolerance || '±20%')}): ${money(pw.min)} – ${money(pw.max)}`
+          : '';
+
+        const list = Array.isArray(res?.substitutes) ? res.substitutes : [];
+        const body = document.getElementById('subListBody');
+        if (!list.length) {
+          body.innerHTML = '<tr><td colspan="5" class="text-center text-muted py-3">Không có thuốc thay thế khả dụng.</td></tr>';
+        } else {
+          body.innerHTML = list.map((s, i) => `
+        <tr>
+          <td class="fw-semibold">${esc(s.DrugName)} <span class="text-muted small">(${esc(s.DrugCode || '')})</span></td>
+          <td class="text-end">${money(s.CurrentPrice)}</td>
+          <td class="text-end">${esc(s.CurrentStock)}</td>
+          <td>${fmtDate(s.FurthestExpiryDate)}</td>
+          <td class="text-end">
+            <button type="button" class="btn btn-sm btn-primary" data-sub-pick="${i}">Chọn</button>
+          </td>
+        </tr>
+      `).join('');
+
+          body.querySelectorAll('[data-sub-pick]').forEach(btn => {
+            btn.addEventListener('click', () => {
+              const chosen = list[num(btn.getAttribute('data-sub-pick'))];
+              if (!chosen) return;
+              const mapped = {
+                DrugID: String(chosen.DrugID),
+                DrugCode: chosen.DrugCode || '',
+                DrugName: chosen.DrugName || '',
+                IngredientName: chosen.IngredientName || '',
+                CurrentPrice: String(chosen.CurrentPrice ?? '0'),
+                CurrentStock: String(chosen.CurrentStock ?? '0'),
+                IsPrescriptionOnly: String(chosen.IsPrescriptionOnly ?? '0'),
+                IsControlled: String(chosen.IsControlled ?? '0'),
+                PrescribedQty: replaceCartIdx !== null && cart[replaceCartIdx] ? cart[replaceCartIdx].PrescribedQty : 1,
+                DosageInstruction: replaceCartIdx !== null && cart[replaceCartIdx] ? (cart[replaceCartIdx].DosageInstruction || '') : ''
+              };
+              if (replaceCartIdx !== null && cart[replaceCartIdx]) {
+                cart[replaceCartIdx] = mapped;
+              } else {
+                addDrugToCart(mapped, true);
+              }
+              subModal.hide();
+              renderCart();
+              toast('Đã đổi sang thuốc thay thế: ' + mapped.DrugName);
+            });
+          });
+        }
+        subModal.show();
+      } catch (e) {
+        toast(e.message, true);
+      }
+    }
+
+    function addDrugToCart(drugObj, skipStockPrompt = false) {
+      const stock = num(drugObj.CurrentStock);
+      if (stock <= 0 && !skipStockPrompt) {
+        toast('Thuốc hết tồn kho (0), mở danh sách thuốc thay thế.', true);
+        openSubstitutes(drugObj.DrugID, null);
+        return;
+      }
+
+      const existingIdx = cart.findIndex(c => String(c.DrugID) === String(drugObj.DrugID));
+      if (existingIdx >= 0) {
+        const nextQty = num(cart[existingIdx].PrescribedQty) + 1;
+        if (stock > 0 && nextQty > stock) {
+          toast('Không vượt quá tồn kho hiện tại (' + stock + ').', true);
+          return;
+        }
+        cart[existingIdx].PrescribedQty = nextQty;
+      } else {
+        cart.push({
+          DrugID: String(drugObj.DrugID),
+          DrugCode: drugObj.DrugCode || '',
+          DrugName: drugObj.DrugName || '',
+          IngredientName: drugObj.IngredientName || '',
+          CurrentPrice: String(drugObj.CurrentPrice ?? '0'),
+          CurrentStock: String(drugObj.CurrentStock ?? '0'),
+          IsPrescriptionOnly: String(drugObj.IsPrescriptionOnly ?? '0'),
+          IsControlled: String(drugObj.IsControlled ?? '0'),
+          PrescribedQty: 1,
+          DosageInstruction: drugObj.DosageInstruction || ''
+        });
+      }
+      renderCart();
+    }
+
+    function renderSearchDropdown() {
+      const kw = document.getElementById('searchDrugInput').value.trim().toLowerCase();
+      const box = document.getElementById('searchResults');
+      if (!kw) {
+        box.style.display = 'none';
+        searchMatches = [];
+        activeMatchIdx = -1;
+        return;
+      }
+
+      searchMatches = drugs.filter(d => {
+        const name = String(d.DrugName || '').toLowerCase();
+        const ing = String(d.IngredientName || '').toLowerCase();
+        return name.includes(kw) || ing.includes(kw);
+      });
+
+      activeMatchIdx = searchMatches.length ? 0 : -1;
+      if (!searchMatches.length) {
+        box.innerHTML = '<div class="search-row text-muted">Không tìm thấy thuốc phù hợp</div>';
+        box.style.display = 'block';
+        return;
+      }
+
+      box.innerHTML = searchMatches.map((d, idx) => `
+    <div class="search-row ${idx === 0 ? 'active' : ''}" data-pick-idx="${idx}">
+      <div>
+        <div class="fw-semibold">${esc(d.DrugName)}</div>
+        <div class="small text-muted">${esc(d.IngredientName || '')} · Tồn: ${esc(d.CurrentStock)}</div>
+        <div class="d-flex gap-1 mt-1">
+          ${flag(d.IsPrescriptionOnly) ? '<span class="badge-rx">Kê đơn</span>' : ''}
+          ${flag(d.IsControlled) ? '<span class="badge-ctrl">Kiểm soát đặc biệt</span>' : ''}
+        </div>
+      </div>
+      <div class="fw-bold text-end">${money(d.CurrentPrice)}</div>
+    </div>
   `).join('');
 
-  const got = +$('received').value || tongTien;
-  $('billTongTien').innerText = money(tongTien);
-  $('billKhachDua').innerText = money(got);
-  $('billTienThua').innerText = money(Math.max(0, got - tongTien));
+      box.querySelectorAll('[data-pick-idx]').forEach(row => {
+        row.addEventListener('click', () => {
+          const picked = searchMatches[num(row.getAttribute('data-pick-idx'))];
+          if (picked) {
+            addDrugToCart(picked);
+            document.getElementById('searchDrugInput').value = '';
+            box.style.display = 'none';
+          }
+        });
+      });
 
-  $('modalBill').style.display = 'flex';
-}
+      box.style.display = 'block';
+    }
 
-</script>
+    async function loadDrugs() {
+      try {
+        const res = USE_MOCK ? { success: true, data: MOCK_DRUGS } : await api('GET', '/inventory/drugs');
+        drugs = Array.isArray(res?.data) ? res.data : [];
+        const quickWrap = document.getElementById('quickDrugs');
+        quickWrap.innerHTML = drugs.slice(0, 5).map(d => `
+      <button type="button" class="btn btn-sm btn-outline-secondary" data-quick-id="${esc(d.DrugID)}">
+        ${esc(d.DrugName)}
+      </button>
+    `).join('');
+        quickWrap.querySelectorAll('[data-quick-id]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const d = drugs.find(x => String(x.DrugID) === btn.getAttribute('data-quick-id'));
+            if (d) addDrugToCart(d);
+          });
+        });
+      } catch (e) {
+        toast(e.message, true);
+      }
+    }
+
+    async function createPrescription() {
+      const btn = document.getElementById('btnSubmitRx');
+      if (btn.disabled) return;
+
+      const patientIdVal = document.getElementById('inpPatientId').value.trim();
+      const Diagnosis = document.getElementById('inpDiagnosis').value.trim();
+      const IsChronic = document.getElementById('chkIsChronic').checked;
+      const ChronicDurationDays = IsChronic ? Number(document.getElementById('selChronicDays').value) : null;
+      const ControlledType = document.getElementById('selControlledType').value;
+
+      if (!/^\d+$/.test(patientIdVal) || Number(patientIdVal) <= 0) {
+        toast('Vui lòng nhập PatientID (số nguyên dương).', true);
+        return;
+      }
+      if (!Diagnosis) {
+        toast('Vui lòng nhập chẩn đoán (Diagnosis).', true);
+        return;
+      }
+      if (!cart.length) {
+        toast('Giỏ hàng đang trống.', true);
+        return;
+      }
+      if (hasControlledInCart() && !['N', 'H'].includes(ControlledType)) {
+        toast('Giỏ có thuốc kiểm soát đặc biệt: bắt buộc chọn ControlledType N hoặc H.', true);
+        return;
+      }
+
+      for (const did of Object.keys(softStopMessagesByDrug)) {
+        if (!String(overrideReasonsByDrug[did] || '').trim()) {
+          toast('Vui lòng nhập OverrideReason cho các thuốc cảnh báo SOFT_STOP.', true);
+          return;
+        }
+      }
+
+      const payload = {
+        PatientID: Number(patientIdVal),
+        Diagnosis,
+        IsChronic: IsChronic ? 1 : 0,
+        ChronicDurationDays,
+        ControlledType,
+        items: cart.map(item => ({
+          DrugID: Number(item.DrugID),
+          PrescribedQty: Number(item.PrescribedQty),
+          DosageInstruction: String(item.DosageInstruction || '').trim() || 'Theo hướng dẫn bác sĩ',
+          OverrideReason: String(overrideReasonsByDrug[String(item.DrugID)] || '').trim() || null
+        }))
+      };
+
+      btn.disabled = true;
+      try {
+        let result;
+        if (USE_MOCK) {
+          result = {
+            success: true,
+            PrescriptionID: 901,
+            NationalCode: '79001RX90100-' + (ControlledType === 'C' ? 'C' : ControlledType),
+            Status: 'Pending',
+            TotalAmount: calcTotal()
+          };
+        } else {
+          result = await api('POST', '/prescriptions', payload);
+        }
+
+        softStopMessagesByDrug = {};
+        overrideReasonsByDrug = {};
+        renderSoftStopBox();
+
+        const rxId = result?.PrescriptionID ?? '';
+        const natCode = result?.NationalCode ?? '';
+
+        lastBillData = {
+          nationalCode: natCode,
+          patientId: patientIdVal,
+          diagnosis: Diagnosis,
+          items: cart.map(i => ({ ...i })),
+          total: calcTotal()
+        };
+
+        document.getElementById('createdNationalCode').textContent = natCode;
+        document.getElementById('linkCreatedRx').href = 'prescriptions.html?id=' + encodeURIComponent(rxId);
+        document.getElementById('createdRxBanner').classList.remove('d-none');
+
+        cart = [];
+        renderCart();
+        toast('Đã tạo đơn thuốc ' + natCode + ' (Pending)');
+      } catch (e) {
+        if (e.status === 422 && e.data?.blocked_by === 'HARD_STOP') {
+          const hardList = Array.isArray(e.data?.safety_report?.hard_stops) ? e.data.safety_report.hard_stops : [];
+          document.getElementById('hardStopList').innerHTML = hardList.length
+            ? '<ul class="mb-0">' + hardList.map(h => `<li>${esc(typeof h === 'string' ? h : (h.message || h.reason || JSON.stringify(h)))}</li>`).join('') + '</ul>'
+            : esc(e.message);
+          hardStopModal.show();
+        } else if (e.status === 422 && e.data?.blocked_by === 'SOFT_STOP') {
+          const softList = Array.isArray(e.data?.safety_report?.soft_stops) ? e.data.safety_report.soft_stops : [];
+          softStopMessagesByDrug = {};
+          softList.forEach(s => {
+            const targetId = String(s.DrugID ?? s.drug_id ?? cart[0]?.DrugID ?? '');
+            if (targetId) {
+              softStopMessagesByDrug[targetId] = typeof s === 'string' ? s : (s.message || s.reason || 'Cảnh báo SOFT_STOP');
+            }
+          });
+          renderSoftStopBox();
+          toast('Đơn gặp cảnh báo SOFT_STOP — hãy nhập OverrideReason rồi bấm Tạo đơn lại.', true);
+        } else {
+          toast(e.message, true);
+        }
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    // OCR helpers
+    function addOcrRow(row = { drug_name: '', concentration: '', quantity: 1, dosage_instruction: '', confidence_score: 0.9 }) {
+      const tbody = document.getElementById('ocrInputRows');
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+    <td><input type="text" class="form-control form-control-sm ocr-name" value="${esc(row.drug_name)}"></td>
+    <td><input type="text" class="form-control form-control-sm ocr-conc" value="${esc(row.concentration)}"></td>
+    <td><input type="number" min="1" class="form-control form-control-sm ocr-qty" value="${esc(row.quantity)}"></td>
+    <td><input type="text" class="form-control form-control-sm ocr-dose" value="${esc(row.dosage_instruction)}"></td>
+    <td><input type="number" step="0.01" min="0" max="1" class="form-control form-control-sm ocr-conf" value="${esc(row.confidence_score)}"></td>
+    <td><button type="button" class="btn btn-sm btn-outline-danger ocr-del">&times;</button></td>
+  `;
+      tr.querySelector('.ocr-del').addEventListener('click', () => tr.remove());
+      tbody.appendChild(tr);
+    }
+
+    function collectOcrRows() {
+      return Array.from(document.querySelectorAll('#ocrInputRows tr')).map(tr => ({
+        drug_name: tr.querySelector('.ocr-name').value.trim(),
+        concentration: tr.querySelector('.ocr-conc').value.trim(),
+        quantity: num(tr.querySelector('.ocr-qty').value) || 1,
+        dosage_instruction: tr.querySelector('.ocr-dose').value.trim(),
+        confidence_score: num(tr.querySelector('.ocr-conf').value)
+      })).filter(r => r.drug_name);
+    }
+
+    function renderMappedOcr(items) {
+      mappedOcrItems = Array.isArray(items) ? items : [];
+      const sec = document.getElementById('ocrMappedSection');
+      const body = document.getElementById('ocrMappedBody');
+      sec.classList.remove('d-none');
+
+      body.innerHTML = mappedOcrItems.map((m, idx) => {
+        const needYellow = Boolean(m.needs_yellow_highlight);
+        const md = m.matched_drug || {};
+        return `
+      <tr class="${needYellow ? 'tr-warn' : ''}">
+        <td><input type="checkbox" class="form-check-input ocr-check" data-ocr-idx="${idx}"></td>
+        <td>
+          <div class="fw-semibold">${esc(md.DrugName || m.drug_name || 'Chưa khớp thuốc')}</div>
+          <div class="small text-muted">${esc(m.dosage_instruction || '')} · SL: ${esc(m.quantity ?? 1)}</div>
+        </td>
+        <td>${esc(m.confidence_score)}</td>
+        <td>${needYellow ? '<span class="badge-rx">Độ tin cậy thấp — cần tích xác nhận</span>' : '<span class="badge bg-success">Đạt</span>'}</td>
+      </tr>
+    `;
+      }).join('');
+    }
+
+    document.getElementById('btnOpenOcr').addEventListener('click', () => {
+      document.getElementById('ocrInputRows').innerHTML = '';
+      document.getElementById('ocrMappedSection').classList.add('d-none');
+      mappedOcrItems = [];
+      addOcrRow();
+      ocrModal.show();
+    });
+
+    document.getElementById('btnAddOcrRow').addEventListener('click', () => addOcrRow());
+
+    document.getElementById('btnApplyOcrJson').addEventListener('click', () => {
+      try {
+        const parsed = JSON.parse(document.getElementById('txtOcrJson').value);
+        if (!Array.isArray(parsed)) throw new Error('JSON phải là một mảng.');
+        document.getElementById('ocrInputRows').innerHTML = '';
+        parsed.forEach(item => addOcrRow(item));
+      } catch (e) {
+        toast('JSON OCR không hợp lệ: ' + e.message, true);
+      }
+    });
+
+    document.getElementById('btnRunOcrMap').addEventListener('click', async () => {
+      const rows = collectOcrRows();
+      if (!rows.length) {
+        toast('Vui lòng nhập ít nhất 1 dòng OCR.', true);
+        return;
+      }
+      try {
+        let res;
+        if (USE_MOCK) {
+          res = {
+            success: true,
+            mapped_pos_items: rows.map(r => {
+              const found = drugs.find(d => String(d.DrugName || '').toLowerCase().includes(r.drug_name.toLowerCase())) || drugs[0] || {};
+              const conf = num(r.confidence_score);
+              return {
+                matched_drug: found,
+                quantity: r.quantity,
+                dosage_instruction: r.dosage_instruction,
+                confidence_score: String(conf),
+                needs_yellow_highlight: conf < 0.85
+              };
+            })
+          };
+        } else {
+          res = await api('POST', '/prescriptions/ocr-map', { items: rows });
+        }
+        renderMappedOcr(res?.mapped_pos_items || []);
+      } catch (e) {
+        toast(e.message, true);
+      }
+    });
+
+    document.getElementById('btnAddMappedToCart').addEventListener('click', () => {
+      const checkedBoxes = Array.from(document.querySelectorAll('.ocr-check:checked'));
+      if (!checkedBoxes.length) {
+        toast('Vui lòng tích chọn ít nhất 1 dòng để thêm vào giỏ.', true);
+        return;
+      }
+      let added = 0;
+      checkedBoxes.forEach(cb => {
+        const idx = num(cb.getAttribute('data-ocr-idx'));
+        const entry = mappedOcrItems[idx];
+        if (!entry || !entry.matched_drug || !entry.matched_drug.DrugID) return;
+        addDrugToCart({
+          ...entry.matched_drug,
+          DosageInstruction: entry.dosage_instruction || ''
+        });
+        const lastItem = cart[cart.length - 1];
+        if (lastItem && num(entry.quantity) > 0) {
+          const maxS = num(lastItem.CurrentStock);
+          lastItem.PrescribedQty = maxS > 0 ? Math.min(maxS, num(entry.quantity)) : num(entry.quantity);
+        }
+        added++;
+      });
+      renderCart();
+      ocrModal.hide();
+      toast('Đã thêm ' + added + ' dòng từ OCR vào giỏ.');
+    });
+
+    document.getElementById('btnPrintDraftBill').addEventListener('click', () => {
+      if (!lastBillData) return;
+      document.getElementById('billPrintContent').innerHTML = `
+    <div class="text-center border-bottom pb-2 mb-2">
+      <div class="fw-bold">NHÀ THUỐC PHARMAPRO v2.0</div>
+      <div class="small">Mã đơn: <strong>${esc(lastBillData.nationalCode)}</strong></div>
+      <div class="small text-muted">PatientID: ${esc(lastBillData.patientId)} · Chẩn đoán: ${esc(lastBillData.diagnosis)}</div>
+    </div>
+    ${lastBillData.items.map(i => `
+      <div class="d-flex justify-content-between small mb-1">
+        <span>${esc(i.DrugName)} x${esc(i.PrescribedQty)}</span>
+        <span>${money(num(i.CurrentPrice) * num(i.PrescribedQty))}</span>
+      </div>
+    `).join('')}
+    <hr>
+    <div class="d-flex justify-content-between fw-bold">
+      <span>Tổng cộng</span>
+      <span>${money(lastBillData.total)}</span>
+    </div>
+  `;
+      billModal.show();
+    });
+
+    // Events & Shortcuts
+    document.getElementById('searchDrugInput').addEventListener('input', renderSearchDropdown);
+    document.getElementById('searchDrugInput').addEventListener('keydown', e => {
+      if (!searchMatches.length) return;
+      if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+        e.preventDefault();
+        activeMatchIdx = (activeMatchIdx + (e.key === 'ArrowDown' ? 1 : -1) + searchMatches.length) % searchMatches.length;
+        document.querySelectorAll('#searchResults .search-row').forEach((el, i) => {
+          el.classList.toggle('active', i === activeMatchIdx);
+        });
+      } else if (e.key === 'Enter' && activeMatchIdx >= 0) {
+        e.preventDefault();
+        const picked = searchMatches[activeMatchIdx];
+        if (picked) {
+          addDrugToCart(picked);
+          document.getElementById('searchDrugInput').value = '';
+          document.getElementById('searchResults').style.display = 'none';
+        }
+      } else if (e.key === 'Escape') {
+        document.getElementById('searchResults').style.display = 'none';
+      }
+    });
+
+    document.addEventListener('click', e => {
+      if (!e.target.closest('.search-box-wrap')) {
+        document.getElementById('searchResults').style.display = 'none';
+      }
+    });
+
+    document.getElementById('chkIsChronic').addEventListener('change', e => {
+      document.getElementById('chronicDaysWrap').classList.toggle('d-none', !e.target.checked);
+    });
+
+    document.getElementById('inpPatientId').addEventListener('input', e => {
+      const pid = e.target.value.trim();
+      document.getElementById('linkPatient360').href = pid ? ('patients.html?id=' + encodeURIComponent(pid)) : 'patients.html';
+    });
+
+    document.getElementById('btnClearCart').addEventListener('click', () => {
+      cart = [];
+      softStopMessagesByDrug = {};
+      overrideReasonsByDrug = {};
+      renderSoftStopBox();
+      renderCart();
+    });
+
+    document.getElementById('btnSubmitRx').addEventListener('click', createPrescription);
+
+    document.addEventListener('keydown', e => {
+      if (e.key === 'F1') {
+        e.preventDefault();
+        const inp = document.getElementById('searchDrugInput');
+        inp.focus();
+        inp.select();
+      } else if (e.key === 'F3') {
+        e.preventDefault();
+        createPrescription();
+      } else if (e.key === 'F4') {
+        e.preventDefault();
+        document.getElementById('btnClearCart').click();
+      }
+    });
+
+    // KHỞI TẠO HEADER & SIDEBAR KHI TẢI TRANG
+    document.addEventListener('DOMContentLoaded', async () => {
+      if (PP_USER) {
+        document.getElementById('userFullName').textContent = PP_USER.FullName || PP_USER.Username;
+        document.getElementById('userRoleBadge').textContent = PP_USER.RoleCode;
+        document.getElementById('userAvatar').textContent = (PP_USER.FullName || 'PP').trim().slice(0, 2).toUpperCase();
+      }
+      const pageRoles = document.body.getAttribute('data-page-roles');
+      if (pageRoles && !hasRole(pageRoles)) {
+        document.getElementById('mainContent').innerHTML = '<div class="panel p-4 text-danger fw-semibold">Bạn không có quyền truy cập trang này (403 Forbidden).</div>';
+        return;
+      }
+      applyRoles(document);
+
+      const curFile = location.pathname.split('/').pop() || 'index.html';
+      document.querySelectorAll('.sidebar .nav-item').forEach(a => {
+        if (a.getAttribute('href') === curFile) a.classList.add('active');
+      });
+
+      document.getElementById('btnLogout')?.addEventListener('click', () => {
+        sessionStorage.removeItem('pp_token');
+        sessionStorage.removeItem('pp_user');
+        location.replace('login.html');
+      });
+
+      const qPatientId = getParam('patientId');
+      if (qPatientId) {
+        document.getElementById('inpPatientId').value = qPatientId;
+        document.getElementById('linkPatient360').href = 'patients.html?id=' + encodeURIComponent(qPatientId);
+      }
+
+      await loadDrugs();
+      renderCart();
+    });
+  </script>
 </body>
-</html>
 
+</html>

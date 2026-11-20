@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PharmaPro v2.0 – Thanh tra Temporal</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/theme.css">
+    <style>
+        .act-insert {
+            background: var(--ok-soft, #e5f5ea);
+            color: var(--ok, #15803d);
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 9px;
+            border-radius: 20px;
+        }
+
+        .act-update {
+            background: var(--warn-soft, #fef3e2);
+            color: var(--warn, #b45309);
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 9px;
+            border-radius: 20px;
+        }
+
+        .act-delete {
+            background: var(--danger-soft, #fdeceb);
+            color: var(--danger, #b42318);
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 9px;
+            border-radius: 20px;
+        }
+
+        .diff-box {
+            background: #f8fafc;
+            border: 1px solid var(--line, #e6ebe8);
+            border-radius: 10px;
+            padding: 12px;
+            font-size: 13px;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .diff-old {
+            border-left: 4px solid var(--danger, #dc2626);
+        }
+
+        .diff-new {
+            border-left: 4px solid var(--ok, #16a34a);
+        }
+    </style>
+</head>
+
+<body data-page-roles="ADMIN,PHARMACIST,WAREHOUSE">
+    <div class="app-shell d-flex min-vh-100">
+        <!-- SIDEBAR DÙNG CHUNG -->
+        <aside class="sidebar">
+            <div class="brand">
+                <span class="brand-mark"><i class="fa-solid fa-staff-snake"></i></span>
+                <span>PharmaPro <small class="text-muted">v2</small></span>
+            </div>
+
+            <div class="nav-group">
+                <div class="nav-label">Điều hành</div>
+                <a class="nav-item" href="index.html"><i class="fa-solid fa-chart-pie"></i> Tổng quan</a>
+            </div>
+
+            <div class="nav-group">
+                <div class="nav-label">Dược lâm sàng & Bán hàng</div>
+                <a class="nav-item" href="pos.html" data-roles="ADMIN,DOCTOR,PHARMACIST"><i
+                        class="fa-solid fa-cash-register"></i> Kê đơn & POS</a>
+                <a class="nav-item" href="prescriptions.html" data-roles="ADMIN,DOCTOR,PHARMACIST,CASHIER"><i
+                        class="fa-solid fa-file-prescription"></i> Đơn thuốc GPP</a>
+                <a class="nav-item" href="patients.html" data-roles="ADMIN,DOCTOR,PHARMACIST"><i
+                        class="fa-solid fa-user-injured"></i> Hồ sơ Dược bạ 360°</a>
+            </div>
+
+            <div class="nav-group">
+                <div class="nav-label">Kho dược & Pháp lý</div>
+                <a class="nav-item" href="products.html"><i class="fa-solid fa-pills"></i> Danh mục & DDI</a>
+                <a class="nav-item" href="inventory.html" data-roles="ADMIN,PHARMACIST,WAREHOUSE"><i
+                        class="fa-solid fa-boxes-stacked"></i> Kho FEFO & TT 20/2017</a>
+                <a class="nav-item" href="audit.html" data-roles="ADMIN,PHARMACIST,WAREHOUSE"><i
+                        class="fa-solid fa-clock-rotate-left"></i> Thanh tra Temporal</a>
+            </div>
+
+            <div class="store-box mt-auto">
+                <div class="fw-semibold">Nhà thuốc GPP #79001</div>
+                <div class="small text-muted">Chuẩn Thông tư 02/2018</div>
+            </div>
+        </aside>
+
+        <!-- KHU VỰC CHÍNH -->
+        <div class="main flex-grow-1 d-flex flex-column">
+            <header class="topbar d-flex align-items-center justify-content-between">
+                <div class="page-title" id="pageTitle">Thanh tra lịch sử dữ liệu (Temporal Tables)</div>
+                <div class="user d-flex align-items-center gap-3">
+                    <div class="text-end">
+                        <div class="fw-semibold" id="userFullName">Đang tải...</div>
+                        <div class="small text-muted" id="userRoleBadge">ROLE</div>
+                    </div>
+                    <div class="avatar" id="userAvatar">PP</div>
+                    <button class="btn-ghost btn-sm" id="btnLogout" title="Đăng xuất"><i
+                            class="fa-solid fa-right-from-bracket"></i></button>
+                </div>
+            </header>
+
+            <main class="content p-4" id="mainContent">
+                <!-- Thống kê nhanh -->
+                <div class="row g-3 mb-4">
+                    <div class="col-sm-6 col-xl-3">
+                        <div class="panel">
+                            <div class="small text-muted">Tổng bản ghi lịch sử</div>
+                            <div class="fs-4 fw-bold mt-1" id="statAuditTotal">0</div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-xl-3">
+                        <div class="panel">
+                            <div class="small text-muted">Thao tác cập nhật (UPDATE)</div>
+                            <div class="fs-4 fw-bold mt-1 text-warning" id="statAuditUpdate">0</div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-xl-3">
+                        <div class="panel">
+                            <div class="small text-muted">Thao tác thêm mới (INSERT)</div>
+                            <div class="fs-4 fw-bold mt-1 text-success" id="statAuditInsert">0</div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-xl-3">
+                        <div class="panel">
+                            <div class="small text-muted">Thao tác xóa / hủy (DELETE)</div>
+                            <div class="fs-4 fw-bold mt-1 text-danger" id="statAuditDelete">0</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bộ lọc Temporal -->
+                <div class="panel mb-4">
+                    <div class="row g-2 align-items-end">
+                        <div class="col-md-3">
+                            <label class="form-label small fw-semibold" for="selAuditTable">Bảng / Thực thể</label>
+                            <select class="form-select form-select-sm" id="selAuditTable">
+                                <option value="ALL">Tất cả bảng</option>
+                                <option value="Batches">Batches (Lô kho FEFO)</option>
+                                <option value="Drugs">Drugs (Danh mục thuốc)</option>
+                                <option value="Patients">Patients (Hồ sơ bệnh nhân)</option>
+                                <option value="Prescriptions">Prescriptions (Đơn thuốc)</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label small fw-semibold" for="selAuditAction">Thao tác</label>
+                            <select class="form-select form-select-sm" id="selAuditAction">
+                                <option value="ALL">Tất cả</option>
+                                <option value="INSERT">INSERT</option>
+                                <option value="UPDATE">UPDATE</option>
+                                <option value="DELETE">DELETE</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label small fw-semibold" for="inpAuditRecordId">Mã bản ghi / Từ
+                                khóa</label>
+                            <input type="text" class="form-control form-control-sm" id="inpAuditRecordId"
+                                placeholder="Ví dụ: LOT202601A, #2, 7...">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label small fw-semibold" for="inpAsOfTime">Mốc thời gian (AsOf)</label>
+                            <input type="datetime-local" class="form-control form-control-sm" id="inpAsOfTime">
+                        </div>
+                        <div class="col-md-2 d-flex gap-2">
+                            <button type="button" class="btn btn-sm btn-primary flex-grow-1" id="btnRunAuditQuery">
+                                <i class="fa-solid fa-magnifying-glass me-1"></i> Tra cứu
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-secondary" id="btnResetAudit"
+                                title="Đặt lại">
+                                <i class="fa-solid fa-rotate-left"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bảng nhật ký biến động Temporal -->
+                <div class="panel">
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <h2 class="h6 fw-bold mb-0">Nhật ký biến động theo thời gian</h2>
+                        <span class="small text-muted" id="auditCountLabel">0 bản ghi</span>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-sm align-middle mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Thời điểm ghi nhận</th>
+                                    <th>Bảng</th>
+                                    <th>Mã bản ghi</th>
+                                    <th>Thao tác</th>
+                                    <th>Người thực hiện</th>
+                                    <th>Hiệu lực (SysStart → SysEnd)</th>
+                                    <th class="text-end">Đối chiếu</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tblAuditBody">
+                                <tr>
+                                    <td colspan="7" class="text-center text-muted py-4">Đang tải dữ liệu thanh tra...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- MODAL ĐỐI CHIẾU TRƯỚC / SAU -->
+    <div class="modal fade" id="modalAuditDiff" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold" id="auditDiffTitle">Chi tiết biến động dữ liệu</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="small text-muted mb-3" id="auditDiffMeta"></div>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="fw-semibold small text-danger mb-1">Dữ liệu trước thay đổi (OldValues)</div>
+                            <div class="diff-box diff-old" id="auditOldJson"></div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="fw-semibold small text-success mb-1">Dữ liệu sau thay đổi (NewValues)</div>
+                            <div class="diff-box diff-new" id="auditNewJson"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Đóng</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST THÔNG BÁO -->
+    <div class="toast-x" id="toastBox" style="display:none; position:fixed; bottom:20px; right:20px; z-index:9999;">
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const API_BASE = 'http://localhost:3001/api/v2';
+        const USE_MOCK = true; // Đổi thành false khi chạy API thật
+
+        let PP_TOKEN = sessionStorage.getItem('pp_token');
+        let PP_USER = (() => {
+            try { return JSON.parse(sessionStorage.getItem('pp_user') || 'null'); } catch (e) { return null; }
+        })();
+
+        if (USE_MOCK && (!PP_TOKEN || !PP_USER)) {
+            PP_TOKEN = 'mock-jwt-token';
+            PP_USER = { UserID: '3', EmployeeCode: 'NV003', FullName: 'Lê Minh Khoa', RoleCode: 'WAREHOUSE' };
+        }
+
+        if (!PP_TOKEN || !PP_USER) {
+            const cur = location.pathname.split('/').pop() || 'index.html';
+            location.replace('login.html?next=' + encodeURIComponent(cur));
+        }
+
+        const num = v => { const n = Number(v); return Number.isFinite(n) ? n : 0; };
+        const flag = v => Number(v) === 1;
+        const esc = s => String(s ?? '').replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
+
+        function fmtDate(iso) {
+            if (!iso) return '—';
+            const d = new Date(iso);
+            if (isNaN(d)) return esc(iso);
+            return String(d.getDate()).padStart(2, '0') + '/' + String(d.getMonth() + 1).padStart(2, '0') + '/' + d.getFullYear();
+        }
+
+        function fmtDateTime(iso) {
+            if (!iso) return 'Hiện tại';
+            const d = new Date(iso);
+            if (isNaN(d)) return esc(iso);
+            return fmtDate(iso) + ' ' + String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+        }
+
+        function toast(msg, isError = false) {
+            const box = document.getElementById('toastBox');
+            if (!box) return;
+            box.textContent = msg;
+            box.style.display = 'block';
+            box.style.background = isError ? 'var(--danger, #dc2626)' : 'var(--brand, #0d9488)';
+            box.style.color = '#fff';
+            box.style.padding = '12px 18px';
+            box.style.borderRadius = '10px';
+            box.style.boxShadow = '0 8px 24px rgba(0,0,0,0.15)';
+            clearTimeout(window._toastTimer);
+            window._toastTimer = setTimeout(() => { box.style.display = 'none'; }, 4000);
+        }
+
+        function hasRole(rolesCsv) {
+            if (!rolesCsv) return true;
+            const allow = String(rolesCsv).split(',').map(s => s.trim().toUpperCase()).filter(Boolean);
+            return allow.length === 0 || allow.includes(String(PP_USER?.RoleCode || '').toUpperCase());
+        }
+
+        function applyRoles(root = document) {
+            root.querySelectorAll('[data-roles]').forEach(el => {
+                if (!hasRole(el.getAttribute('data-roles'))) el.style.display = 'none';
+            });
+        }
+
+        async function api(method, path, body = null) {
+            const headers = { 'Authorization': 'Bearer ' + PP_TOKEN };
+            const opts = { method: method.toUpperCase(), headers };
+            if (body !== null && opts.method !== 'GET') {
+                headers['Content-Type'] = 'application/json';
+                opts.body = JSON.stringify(body);
+            }
+            const res = await fetch(API_BASE + path, opts);
+            let data = null;
+            try { data = await res.json(); } catch (e) { }
+
+            if (res.status === 401) {
+                sessionStorage.removeItem('pp_token');
+                sessionStorage.removeItem('pp_user');
+                location.replace('login.html?expired=1');
+                throw new Error('Phiên đăng nhập hết hạn.');
+            }
+
+            if (!res.ok) {
+                const errMsg = res.status === 403
+                    ? 'Bạn không có quyền thực hiện chức năng này!'
+                    : ((data && data.error) || ('Lỗi máy chủ (' + res.status + ')'));
+                const err = new Error(errMsg);
+                err.status = res.status;
+                err.data = data;
+                throw err;
+            }
+            return data;
+        }
+
+        const MOCK_AUDIT_LOGS = [
+            {
+                AuditID: '101',
+                TableName: 'Batches',
+                RecordKey: 'LOT202601A (#1)',
+                Action: 'UPDATE',
+                ChangedBy: 'Lê Minh Khoa (WAREHOUSE)',
+                ChangedAt: '2026-11-20T09:15:00',
+                SysStartTime: '2026-11-20T09:15:00',
+                SysEndTime: null,
+                OldValues: { BatchNumber: 'LOT202601A', Quantity: 40, UnitCost: 32000 },
+                NewValues: { BatchNumber: 'LOT202601A', Quantity: 25, UnitCost: 32000 }
+            },
+            {
+                AuditID: '102',
+                TableName: 'Batches',
+                RecordKey: 'TT20-N-09 (#3)',
+                Action: 'INSERT',
+                ChangedBy: 'Lê Minh Khoa (WAREHOUSE)',
+                ChangedAt: '2026-11-18T14:30:00',
+                SysStartTime: '2026-11-18T14:30:00',
+                SysEndTime: null,
+                OldValues: null,
+                NewValues: { BatchNumber: 'TT20-N-09', DrugName: 'Morphin Hydroclorid 10mg/1ml', Quantity: 18, ControlledType: 'N' }
+            },
+            {
+                AuditID: '103',
+                TableName: 'Drugs',
+                RecordKey: 'KLACID500 (#3)',
+                Action: 'UPDATE',
+                ChangedBy: 'Trần Thị Thu Hà (PHARMACIST)',
+                ChangedAt: '2026-11-15T10:05:00',
+                SysStartTime: '2026-11-15T10:05:00',
+                SysEndTime: '2026-11-20T08:00:00',
+                OldValues: { DrugName: 'Klacid 500mg', CurrentPrice: '88000.00', CurrentStock: '12' },
+                NewValues: { DrugName: 'Klacid 500mg', CurrentPrice: '92000.00', CurrentStock: '0' }
+            },
+            {
+                AuditID: '104',
+                TableName: 'Patients',
+                RecordKey: 'BN202607 (#7)',
+                Action: 'UPDATE',
+                ChangedBy: 'Trần Thị Thu Hà (PHARMACIST)',
+                ChangedAt: '2026-11-12T16:40:00',
+                SysStartTime: '2026-11-12T16:40:00',
+                SysEndTime: null,
+                OldValues: { SerumCreatinine: '1.60', ChronicCondition: 'Tăng huyết áp' },
+                NewValues: { SerumCreatinine: '1.85', ChronicCondition: 'Suy thận mạn, Tăng huyết áp' }
+            }
+        ];
+
+        let auditLogs = [];
+        const diffModal = new bootstrap.Modal(document.getElementById('modalAuditDiff'));
+
+        function renderAuditStats(list) {
+            document.getElementById('statAuditTotal').textContent = String(list.length);
+            document.getElementById('statAuditUpdate').textContent = String(list.filter(x => String(x.Action).toUpperCase() === 'UPDATE').length);
+            document.getElementById('statAuditInsert').textContent = String(list.filter(x => String(x.Action).toUpperCase() === 'INSERT').length);
+            document.getElementById('statAuditDelete').textContent = String(list.filter(x => String(x.Action).toUpperCase() === 'DELETE').length);
+        }
+
+        function getFilteredAudit() {
+            const tbl = document.getElementById('selAuditTable').value;
+            const act = document.getElementById('selAuditAction').value;
+            const kw = document.getElementById('inpAuditRecordId').value.trim().toLowerCase();
+            const asOfRaw = document.getElementById('inpAsOfTime').value;
+            const asOfTime = asOfRaw ? new Date(asOfRaw).getTime() : null;
+
+            return auditLogs.filter(row => {
+                const matchTbl = tbl === 'ALL' || String(row.TableName) === tbl;
+                const matchAct = act === 'ALL' || String(row.Action).toUpperCase() === act;
+                const matchKw = !kw ||
+                    String(row.RecordKey || '').toLowerCase().includes(kw) ||
+                    String(row.ChangedBy || '').toLowerCase().includes(kw) ||
+                    String(row.TableName || '').toLowerCase().includes(kw);
+
+                let matchTime = true;
+                if (asOfTime && !isNaN(asOfTime)) {
+                    const startTs = row.SysStartTime ? new Date(row.SysStartTime).getTime() : 0;
+                    const endTs = row.SysEndTime ? new Date(row.SysEndTime).getTime() : Number.MAX_SAFE_INTEGER;
+                    matchTime = asOfTime >= startTs && asOfTime <= endTs;
+                }
+
+                return matchTbl && matchAct && matchKw && matchTime;
+            });
+        }
+
+        function renderAuditTable() {
+            const filtered = getFilteredAudit();
+            renderAuditStats(filtered);
+            document.getElementById('auditCountLabel').textContent = filtered.length + ' bản ghi';
+
+            const tbody = document.getElementById('tblAuditBody');
+            if (!filtered.length) {
+                tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted py-4">Không tìm thấy bản ghi biến động phù hợp.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = filtered.map((row, idx) => {
+                const actUp = String(row.Action || '').toUpperCase();
+                const actBadge = actUp === 'INSERT'
+                    ? '<span class="act-insert">INSERT</span>'
+                    : (actUp === 'DELETE'
+                        ? '<span class="act-delete">DELETE</span>'
+                        : '<span class="act-update">UPDATE</span>');
+
+                return `
+      <tr>
+        <td>${fmtDateTime(row.ChangedAt || row.SysStartTime)}</td>
+        <td class="fw-semibold">${esc(row.TableName)}</td>
+        <td><code>${esc(row.RecordKey)}</code></td>
+        <td>${actBadge}</td>
+        <td>${esc(row.ChangedBy || '—')}</td>
+        <td class="small text-muted">${fmtDateTime(row.SysStartTime)} → ${fmtDateTime(row.SysEndTime)}</td>
+        <td class="text-end">
+          <button type="button" class="btn btn-sm btn-outline-primary btn-view-diff" data-audit-idx="${idx}">
+            Chi tiết
+          </button>
+        </td>
+      </tr>
+    `;
+            }).join('');
+
+            tbody.querySelectorAll('.btn-view-diff').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const item = filtered[num(btn.getAttribute('data-audit-idx'))];
+                    if (!item) return;
+                    document.getElementById('auditDiffTitle').textContent = `Biến động ${item.TableName} — ${item.RecordKey}`;
+                    document.getElementById('auditDiffMeta').textContent =
+                        `Thao tác: ${item.Action} · Người thực hiện: ${item.ChangedBy || '—'} · Thời điểm: ${fmtDateTime(item.ChangedAt || item.SysStartTime)}`;
+                    document.getElementById('auditOldJson').textContent = item.OldValues ? JSON.stringify(item.OldValues, null, 2) : '(Không có dữ liệu trước)';
+                    document.getElementById('auditNewJson').textContent = item.NewValues ? JSON.stringify(item.NewValues, null, 2) : '(Không có dữ liệu sau)';
+                    diffModal.show();
+                });
+            });
+        }
+
+        async function initAudit() {
+            try {
+                if (USE_MOCK) {
+                    auditLogs = MOCK_AUDIT_LOGS;
+                } else {
+                    const tbl = document.getElementById('selAuditTable').value;
+                    const q = tbl !== 'ALL' ? ('?table=' + encodeURIComponent(tbl)) : '';
+                    const res = await api('GET', '/audit/temporal' + q);
+                    auditLogs = Array.isArray(res?.data) ? res.data : (Array.isArray(res) ? res : []);
+                }
+                renderAuditTable();
+            } catch (e) {
+                toast(e.message, true);
+            }
+        }
+
+        document.getElementById('btnRunAuditQuery').addEventListener('click', () => {
+            if (!USE_MOCK) {
+                initAudit();
+            } else {
+                renderAuditTable();
+            }
+        });
+
+        document.getElementById('btnResetAudit').addEventListener('click', () => {
+            document.getElementById('selAuditTable').value = 'ALL';
+            document.getElementById('selAuditAction').value = 'ALL';
+            document.getElementById('inpAuditRecordId').value = '';
+            document.getElementById('inpAsOfTime').value = '';
+            if (!USE_MOCK) {
+                initAudit();
+            } else {
+                renderAuditTable();
+            }
+        });
+
+        document.getElementById('selAuditTable').addEventListener('change', () => {
+            if (!USE_MOCK) initAudit();
+            else renderAuditTable();
+        });
+        document.getElementById('selAuditAction').addEventListener('change', renderAuditTable);
+        document.getElementById('inpAuditRecordId').addEventListener('input', renderAuditTable);
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            if (PP_USER) {
+                document.getElementById('userFullName').textContent = PP_USER.FullName || PP_USER.Username;
+                document.getElementById('userRoleBadge').textContent = PP_USER.RoleCode;
+                document.getElementById('userAvatar').textContent = (PP_USER.FullName || 'PP').trim().slice(0, 2).toUpperCase();
+            }
+            const pageRoles = document.body.getAttribute('data-page-roles');
+            if (pageRoles && !hasRole(pageRoles)) {
+                document.getElementById('mainContent').innerHTML = '<div class="panel p-4 text-danger fw-semibold">Bạn không có quyền truy cập trang này (403 Forbidden).</div>';
+                return;
+            }
+            applyRoles(document);
+
+            const curFile = location.pathname.split('/').pop() || 'index.html';
+            document.querySelectorAll('.sidebar .nav-item').forEach(a => {
+                if (a.getAttribute('href') === curFile) a.classList.add('active');
+            });
+
+            document.getElementById('btnLogout')?.addEventListener('click', () => {
+                sessionStorage.removeItem('pp_token');
+                sessionStorage.removeItem('pp_user');
+                location.replace('login.html');
+            });
+
+            await initAudit();
+        });
+    </script>
+</body>
+
+</html>
