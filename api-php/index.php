@@ -57,6 +57,7 @@ $router->add('POST', '/api/v2/inventory/controlled-audit', [$inventoryController
 $router->add('GET',  '/api/v2/reports/department-consumption', [$inventoryController, 'getDepartmentConsumptionReport'], ['ADMIN', 'DOCTOR', 'PHARMACIST']);
 
 // --- ROUTES: CLINICAL ---
+$router->add('GET',  '/api/v2/clinical/patients', [$clinicalController, 'searchPatients'], ['ADMIN', 'DOCTOR', 'PHARMACIST']);
 $router->add('POST', '/api/v2/clinical/patients', [$clinicalController, 'createPatient'], ['ADMIN', 'DOCTOR', 'PHARMACIST']);
 $router->add('POST', '/api/v2/clinical/allergies', [$clinicalController, 'addAllergy'], ['ADMIN', 'DOCTOR', 'PHARMACIST']);
 $router->add('GET',  '/api/v2/clinical/patients/360', [$clinicalController, 'getPatient360'], ['ADMIN', 'DOCTOR', 'PHARMACIST']);
