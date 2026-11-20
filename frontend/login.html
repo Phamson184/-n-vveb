@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PharmaPro – Đăng nhập</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="css/theme.css">
+<style>
+  body { min-height: 100vh; display: grid; place-items: center; padding: 24px; }
+  .login-card { width: 100%; max-width: 400px; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 32px; }
+  .login-brand { display: flex; align-items: center; justify-content: center; gap: 10px; font-weight: 700; font-size: 1.4rem; margin-bottom: 6px; }
+  .login-sub { text-align: center; color: var(--muted); margin-bottom: 24px; }
+  .pw { position: relative; }
+  .pw button { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); border: 0; background: none; color: var(--muted); padding: 6px 10px; cursor: pointer; }
+  .msg { border-radius: 10px; padding: 10px 12px; font-size: 14px; margin-bottom: 14px; }
+  .msg.error { background: var(--danger-soft); color: var(--danger); }
+  .msg.info { background: var(--brand-soft); color: var(--brand-dark); }
+  .demo { text-align: center; margin-top: 16px; font-size: 13px; }
+  .demo button { border: 0; background: none; color: var(--brand); cursor: pointer; font-weight: 500; }
+</style>
+</head>
+<body>
+<div class="login-card">
+  <div class="login-brand"><span class="brand-mark"><i class="fa-solid fa-staff-snake"></i></span>PharmaPro</div>
+  <div class="login-sub">Hệ thống quản lý nhà thuốc theo chuẩn GPP</div>
+
+  <div class="msg d-none" id="msg" role="alert"></div>
+  <form id="frm" novalidate>
+    <div class="mb-3"><label class="lbl" for="username">Tên đăng nhập</label>
+      <input class="inp" id="username" autocomplete="username" autofocus></div>
+    <div class="mb-3"><label class="lbl" for="password">Mật khẩu</label>
+      <div class="pw"><input class="inp" id="password" type="password" autocomplete="current-password">
+        <button type="button" id="togglePw" aria-label="Hiện hoặc ẩn mật khẩu"><i class="fa-regular fa-eye"></i></button></div></div>
+    <button class="btn-brand w-100 justify-content-center" id="btnLogin" type="submit">Đăng nhập</button>
+  </form>
+  <div class="demo d-none" id="demo"><button type="button" id="btnDemo">Điền tài khoản demo (chỉ dùng khi phát triển)</button></div>
+</div>
+
+<script>
+const API = 'http://localhost:3001/api/v2';
+const SHOW_DEMO = true;
+const $ = id => document.getElementById(id);
+
+function safeNext() {
+  const n = new URLSearchParams(location.search).get('next') || '';
+  return /^[\w-]+\.html(\?[\w=&.%-]*)?$/.test(n) ? n : 'index.html';
+}
+function showMsg(text, type) { const m = $('msg'); m.textContent = text; m.className = 'msg ' + type; }
+
+if (sessionStorage.getItem('pp_token')) location.replace(safeNext());
+if (new URLSearchParams(location.search).get('expired')) showMsg('Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại.', 'info');
+if (SHOW_DEMO) $('demo').classList.remove('d-none');
+
+$('togglePw').addEventListener('click', () => {
+  const p = $('password'); const show = p.type === 'password'; p.type = show ? 'text' : 'password';
+  $('togglePw').innerHTML = '<i class="fa-regular ' + (show ? 'fa-eye-slash' : 'fa-eye') + '"></i>';
+});
+$('btnDemo').addEventListener('click', () => { $('username').value = 'duocsi01'; $('password').value = '123456'; $('password').focus(); });
+
+$('frm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const Username = $('username').value.trim(), Password = $('password').value;
+  if (!Username || !Password) return showMsg('Vui lòng nhập tên đăng nhập và mật khẩu.', 'error');
+  const btn = $('btnLogin'); btn.disabled = true; btn.textContent = 'Đang đăng nhập...';
+  try {
+    const res = await fetch(API + '/auth/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ Username, Password }) });
+    let data = null; try { data = await res.json(); } catch (err) {}
+    if (!res.ok || !data || !data.token) { showMsg((data && data.error) || 'Đăng nhập không thành công (' + res.status + ').', 'error'); return; }
+    sessionStorage.setItem('pp_token', data.token);
+    sessionStorage.setItem('pp_user', JSON.stringify(data.user));
+    location.replace(safeNext());
+  } catch (err) {
+    showMsg('Không kết nối được máy chủ (localhost:3001). Kiểm tra Docker đã chạy chưa.', 'error');
+  } finally { btn.disabled = false; btn.textContent = 'Đăng nhập'; }
+});
+</script>
+</body>
+</html>
