@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PharmaPro v2.0 – Đơn thuốc GPP</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/theme.css">
+    <style>
+        .st-pending {
+            background: var(--warn-soft, #fef3e2);
+            color: var(--warn, #b45309);
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 9px;
+            border-radius: 20px;
+        }
+
+        .st-completed {
+            background: var(--ok-soft, #e5f5ea);
+            color: var(--ok, #15803d);
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 9px;
+            border-radius: 20px;
+        }
+
+        .st-cancelled {
+            background: var(--danger-soft, #fdeceb);
+            color: var(--danger, #b42318);
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 9px;
+            border-radius: 20px;
+        }
+
+        .ctrl-tag {
+            background: var(--danger-soft, #fdeceb);
+            color: var(--danger, #b42318);
+            font-size: 11px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 20px;
+        }
+    </style>
+</head>
+
+<body data-page-roles="ADMIN,DOCTOR,PHARMACIST,CASHIER">
+    <div class="app-shell d-flex min-vh-100">
+        <!-- SIDEBAR DÙNG CHUNG -->
+        <aside class="sidebar">
+            <div class="brand">
+                <span class="brand-mark"><i class="fa-solid fa-staff-snake"></i></span>
+                <span>PharmaPro <small class="text-muted">v2</small></span>
+            </div>
+
+            <div class="nav-group">
+                <div class="nav-label">Điều hành</div>
+                <a class="nav-item" href="index.html"><i class="fa-solid fa-chart-pie"></i> Tổng quan</a>
+            </div>
+
+            <div class="nav-group">
+                <div class="nav-label">Dược lâm sàng & Bán hàng</div>
+                <a class="nav-item" href="pos.html" data-roles="ADMIN,DOCTOR,PHARMACIST"><i
+                        class="fa-solid fa-cash-register"></i> Kê đơn & POS</a>
+                <a class="nav-item" href="prescriptions.html" data-roles="ADMIN,DOCTOR,PHARMACIST,CASHIER"><i
+                        class="fa-solid fa-file-prescription"></i> Đơn thuốc GPP</a>
+                <a class="nav-item" href="patients.html" data-roles="ADMIN,DOCTOR,PHARMACIST"><i
+                        class="fa-solid fa-user-injured"></i> Hồ sơ Dược bạ 360°</a>
+            </div>
+
+            <div class="nav-group">
+                <div class="nav-label">Kho dược & Pháp lý</div>
+                <a class="nav-item" href="products.html"><i class="fa-solid fa-pills"></i> Danh mục & DDI</a>
+                <a class="nav-item" href="inventory.html" data-roles="ADMIN,PHARMACIST,WAREHOUSE"><i
+                        class="fa-solid fa-boxes-stacked"></i> Kho FEFO & TT 20/2017</a>
+                <a class="nav-item" href="audit.html" data-roles="ADMIN,PHARMACIST,WAREHOUSE"><i
+                        class="fa-solid fa-clock-rotate-left"></i> Thanh tra Temporal</a>
+            </div>
+
+            <div class="store-box mt-auto">
+                <div class="fw-semibold">Nhà thuốc GPP #79001</div>
+                <div class="small text-muted">Chuẩn Thông tư 02/2018</div>
+            </div>
+        </aside>
+
+        <!-- KHU VỰC CHÍNH -->
+        <div class="main flex-grow-1 d-flex flex-column">
+            <header class="topbar d-flex align-items-center justify-content-between">
+                <div class="page-title" id="pageTitle">Quản lý Đơn thuốc GPP</div>
+                <div class="user d-flex align-items-center gap-3">
+                    <div class="text-end">
+                        <div class="fw-semibold" id="userFullName">Đang tải...</div>
+                        <div class="small text-muted" id="userRoleBadge">ROLE</div>
+                    </div>
+                    <div class="avatar" id="userAvatar">PP</div>
+                    <button class="btn-ghost btn-sm" id="btnLogout" title="Đăng xuất"><i
+                            class="fa-solid fa-right-from-bracket"></i></button>
+                </div>
+            </header>
+
+            <main class="content p-4" id="mainContent">
+                <!-- Thống kê đơn thuốc -->
+                <div class="row g-3 mb-4">
+                    <div class="col-sm-6 col-xl-3">
+                        <div class="panel">
+                            <div class="small text-muted">Tổng đơn thuốc</div>
+                            <div class="fs-4 fw-bold mt-1" id="statRxAll">0</div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-xl-3">
+                        <div class="panel">
+                            <div class="small text-muted">Chờ cấp phát (Pending)</div>
+                            <div class="fs-4 fw-bold mt-1 text-warning" id="statRxPending">0</div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-xl-3">
+                        <div class="panel">
+                            <div class="small text-muted">Đã hoàn tất (Completed)</div>
+                            <div class="fs-4 fw-bold mt-1 text-success" id="statRxCompleted">0</div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-xl-3">
+                        <div class="panel">
+                            <div class="small text-muted">Doanh thu đơn hoàn tất</div>
+                            <div class="fs-4 fw-bold mt-1 text-primary" id="statRxRevenue">0đ</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bộ lọc đơn thuốc -->
+                <div class="panel mb-4">
+                    <div class="row g-2 align-items-end">
+                        <div class="col-md-4">
+                            <label class="form-label small fw-semibold" for="inpSearchRx">Tìm mã đơn / tên BN / chẩn
+                                đoán</label>
+                            <input type="text" class="form-control form-control-sm" id="inpSearchRx"
+                                placeholder="Ví dụ: 79001A1B2C3D-C, Nguyễn Thị Lan...">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label small fw-semibold" for="selStatusRx">Trạng thái</label>
+                            <select class="form-select form-select-sm" id="selStatusRx">
+                                <option value="ALL">Tất cả trạng thái</option>
+                                <option value="Pending">Pending (Chờ cấp phát)</option>
+                                <option value="Completed">Completed (Đã hoàn tất)</option>
+                                <option value="Cancelled">Cancelled (Đã hủy)</option>
+                            </select>
+                        </div>
+                        <div class="col-md-5 d-flex gap-2 justify-content-md-end">
+                            <button type="button" class="btn btn-sm btn-outline-secondary" id="btnResetRxFilter">Đặt
+                                lại</button>
+                            <a href="pos.html" class="btn btn-sm btn-primary" data-roles="ADMIN,DOCTOR,PHARMACIST">
+                                <i class="fa-solid fa-plus me-1"></i> Kê đơn mới tại POS
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bảng danh sách đơn thuốc -->
+                <div class="panel">
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <h2 class="h6 fw-bold mb-0">Danh sách đơn thuốc GPP</h2>
+                        <span class="small text-muted" id="rxCountLabel">0 đơn</span>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-sm align-middle mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Mã đơn quốc gia</th>
+                                    <th>Bệnh nhân</th>
+                                    <th>Chẩn đoán</th>
+                                    <th>Loại kiểm soát</th>
+                                    <th>Trạng thái</th>
+                                    <th class="text-end">Tổng tiền</th>
+                                    <th class="text-end">Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tblRxBody">
+                                <tr>
+                                    <td colspan="7" class="text-center text-muted py-4">Đang tải danh sách đơn thuốc...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- MODAL CHI TIẾT ĐƠN THUỐC -->
+    <div class="modal fade" id="modalRxDetail" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold" id="rxDetailTitle">Chi tiết đơn thuốc</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+                </div>
+                <div class="modal-body" id="rxDetailBody"></div>
+                <div class="modal-footer" id="rxDetailFooter">
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Đóng</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST THÔNG BÁO -->
+    <div class="toast-x" id="toastBox" style="display:none; position:fixed; bottom:20px; right:20px; z-index:9999;">
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const API_BASE = 'http://localhost:3001/api/v2';
+        const USE_MOCK = false; // Đổi thành false khi chạy API thật
+
+        let PP_TOKEN = sessionStorage.getItem('pp_token');
+        let PP_USER = (() => {
+            try { return JSON.parse(sessionStorage.getItem('pp_user') || 'null'); } catch (e) { return null; }
+        })();
+
+        if (USE_MOCK && (!PP_TOKEN || !PP_USER)) {
+            PP_TOKEN = 'mock-jwt-token';
+            PP_USER = { UserID: '2', EmployeeCode: 'NV002', FullName: 'Trần Thị Thu Hà', RoleCode: 'PHARMACIST' };
+        }
+
+        if (!PP_TOKEN || !PP_USER) {
+            const cur = location.pathname.split('/').pop() || 'index.html';
+            location.replace('login.html?next=' + encodeURIComponent(cur));
+        }
+
+        const num = v => { const n = Number(v); return Number.isFinite(n) ? n : 0; };
+        const flag = v => Number(v) === 1;
+        const esc = s => String(s ?? '').replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
+        const money = v => Math.round(num(v)).toLocaleString('vi-VN') + 'đ';
+        const getParam = k => new URLSearchParams(location.search).get(k);
+
+        function fmtDateTime(iso) {
+            if (!iso) return '—';
+            const d = new Date(iso);
+            if (isNaN(d)) return esc(iso);
+            return String(d.getDate()).padStart(2, '0') + '/' +
+                String(d.getMonth() + 1).padStart(2, '0') + '/' +
+                d.getFullYear() + ' ' +
+                String(d.getHours()).padStart(2, '0') + ':' +
+                String(d.getMinutes()).padStart(2, '0');
+        }
+
+        function toast(msg, isError = false) {
+            const box = document.getElementById('toastBox');
+            if (!box) return;
+            box.textContent = msg;
+            box.style.display = 'block';
+            box.style.background = isError ? 'var(--danger, #dc2626)' : 'var(--brand, #0d9488)';
+            box.style.color = '#fff';
+            box.style.padding = '12px 18px';
+            box.style.borderRadius = '10px';
+            box.style.boxShadow = '0 8px 24px rgba(0,0,0,0.15)';
+            clearTimeout(window._toastTimer);
+            window._toastTimer = setTimeout(() => { box.style.display = 'none'; }, 4000);
+        }
+
+        function hasRole(rolesCsv) {
+            if (!rolesCsv) return true;
+            const allow = String(rolesCsv).split(',').map(s => s.trim().toUpperCase()).filter(Boolean);
+            return allow.length === 0 || allow.includes(String(PP_USER?.RoleCode || '').toUpperCase());
+        }
+
+        function applyRoles(root = document) {
+            root.querySelectorAll('[data-roles]').forEach(el => {
+                if (!hasRole(el.getAttribute('data-roles'))) el.style.display = 'none';
+            });
+        }
+
+        async function api(method, path, body = null) {
+            const headers = { 'Authorization': 'Bearer ' + PP_TOKEN };
+            const opts = { method: method.toUpperCase(), headers };
+            if (body !== null && opts.method !== 'GET') {
+                headers['Content-Type'] = 'application/json';
+                opts.body = JSON.stringify(body);
+            }
+            const res = await fetch(API_BASE + path, opts);
+            let data = null;
+            try { data = await res.json(); } catch (e) { }
+
+            if (res.status === 401) {
+                sessionStorage.removeItem('pp_token');
+                sessionStorage.removeItem('pp_user');
+                location.replace('login.html?expired=1');
+                throw new Error('Phiên đăng nhập hết hạn.');
+            }
+
+            if (!res.ok) {
+                const errMsg = res.status === 403
+                    ? 'Bạn không có quyền thực hiện chức năng này!'
+                    : ((data && data.error) || ('Lỗi máy chủ (' + res.status + ')'));
+                const err = new Error(errMsg);
+                err.status = res.status;
+                err.data = data;
+                throw err;
+            }
+            return data;
+        }
+
+        const MOCK_PRESCRIPTIONS = [
+            {
+                PrescriptionID: '901',
+                NationalCode: '79001RX90100-C',
+                PatientID: '7',
+                PatientCode: 'BN202607',
+                PatientName: 'Nguyễn Thị Lan',
+                Diagnosis: 'Sốt siêu vi, Viêm họng cấp',
+                ControlledType: 'C',
+                Status: 'Pending',
+                TotalAmount: '76000.00',
+                CreatedAt: '2026-11-20T10:15:00',
+                items: [
+                    { DrugName: 'Paracetamol 500mg', PrescribedQty: '2', UnitPrice: '35000.00', DosageInstruction: 'Sáng 1 viên, Tối 1 viên khi sốt' }
+                ]
+            },
+            {
+                PrescriptionID: '895',
+                NationalCode: '79001A1B2C3D-C',
+                PatientID: '7',
+                PatientCode: 'BN202607',
+                PatientName: 'Nguyễn Thị Lan',
+                Diagnosis: 'Viêm họng cấp',
+                ControlledType: 'C',
+                Status: 'Completed',
+                TotalAmount: '125000.00',
+                CreatedAt: '2026-11-14T15:20:00',
+                items: [
+                    { DrugName: 'Hapacol 500mg DHG', PrescribedQty: '2', UnitPrice: '38000.00', DosageInstruction: 'Uống sau ăn' },
+                    { DrugName: 'Zocor 20mg', PrescribedQty: '1', UnitPrice: '49000.00', DosageInstruction: 'Tối 1 viên' }
+                ]
+            },
+            {
+                PrescriptionID: '888',
+                NationalCode: '79001RX88800-N',
+                PatientID: '12',
+                PatientCode: 'BN202612',
+                PatientName: 'Phạm Quốc Bảo',
+                Diagnosis: 'Đau sau phẫu thuật',
+                ControlledType: 'N',
+                Status: 'Pending',
+                TotalAmount: '130000.00',
+                CreatedAt: '2026-11-19T08:40:00',
+                items: [
+                    { DrugName: 'Morphin Hydroclorid 10mg/1ml', PrescribedQty: '2', UnitPrice: '65000.00', DosageInstruction: 'Theo chỉ định bác sĩ chuyên khoa' }
+                ]
+            }
+        ];
+
+        let prescriptions = [];
+        const rxModal = new bootstrap.Modal(document.getElementById('modalRxDetail'));
+
+        function statusBadge(st) {
+            const s = String(st || '');
+            if (s.toLowerCase() === 'completed') return `<span class="st-completed">${esc(s)}</span>`;
+            if (s.toLowerCase() === 'cancelled') return `<span class="st-cancelled">${esc(s)}</span>`;
+            return `<span class="st-pending">${esc(s || 'Pending')}</span>`;
+        }
+
+        function renderStats() {
+            document.getElementById('statRxAll').textContent = String(prescriptions.length);
+            document.getElementById('statRxPending').textContent = String(prescriptions.filter(x => String(x.Status).toLowerCase() === 'pending').length);
+            document.getElementById('statRxCompleted').textContent = String(prescriptions.filter(x => String(x.Status).toLowerCase() === 'completed').length);
+            const rev = prescriptions
+                .filter(x => String(x.Status).toLowerCase() === 'completed')
+                .reduce((sum, x) => sum + num(x.TotalAmount), 0);
+            document.getElementById('statRxRevenue').textContent = money(rev);
+        }
+
+        function openRxDetail(rx) {
+            if (!rx) return;
+            document.getElementById('rxDetailTitle').textContent = `Đơn thuốc ${rx.NationalCode || ('#' + rx.PrescriptionID)}`;
+            const items = Array.isArray(rx.items) ? rx.items : [];
+            document.getElementById('rxDetailBody').innerHTML = `
+    <div class="row g-2 mb-3 small">
+      <div class="col-md-6"><strong>Bệnh nhân:</strong> ${esc(rx.PatientName || ('BN #' + rx.PatientID))} (${esc(rx.PatientCode || '')})</div>
+      <div class="col-md-6"><strong>Thời gian tạo:</strong> ${fmtDateTime(rx.CreatedAt)}</div>
+      <div class="col-md-6"><strong>Chẩn đoán:</strong> ${esc(rx.Diagnosis || '—')}</div>
+      <div class="col-md-6"><strong>Loại kiểm soát:</strong> ${esc(rx.ControlledType || 'C')} · <strong>Trạng thái:</strong> ${esc(rx.Status)}</div>
+    </div>
+    <div class="table-responsive">
+      <table class="table table-sm align-middle mb-0">
+        <thead>
+          <tr>
+            <th>Thuốc</th>
+            <th class="text-end">SL</th>
+            <th>Cách dùng</th>
+            <th class="text-end">Đơn giá</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${items.length ? items.map(it => `
+            <tr>
+              <td class="fw-semibold">${esc(it.DrugName)}</td>
+              <td class="text-end">${esc(num(it.PrescribedQty))}</td>
+              <td>${esc(it.DosageInstruction || '—')}</td>
+              <td class="text-end">${money(it.UnitPrice)}</td>
+            </tr>
+          `).join('') : '<tr><td colspan="4" class="text-center text-muted">Không có chi tiết thuốc.</td></tr>'}
+        </tbody>
+      </table>
+    </div>
+    <div class="text-end fw-bold fs-6 mt-3">Tổng tiền: ${money(rx.TotalAmount)}</div>
+  `;
+
+            const footer = document.getElementById('rxDetailFooter');
+            const canProcess = hasRole('ADMIN,PHARMACIST,CASHIER') && String(rx.Status).toLowerCase() === 'pending';
+            footer.innerHTML = `
+    <a href="patients.html?id=${encodeURIComponent(rx.PatientID || '')}" class="btn btn-outline-primary btn-sm me-auto">Hồ sơ BN 360°</a>
+    ${canProcess ? `
+      <button type="button" class="btn btn-danger btn-sm" id="btnCancelRx">Hủy đơn</button>
+      <button type="button" class="btn btn-success btn-sm" id="btnCompleteRx">Cấp phát & Hoàn tất</button>
+    ` : ''}
+    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Đóng</button>
+  `;
+
+            if (canProcess) {
+                document.getElementById('btnCompleteRx')?.addEventListener('click', () => updateRxStatus(rx, 'Completed'));
+                document.getElementById('btnCancelRx')?.addEventListener('click', () => updateRxStatus(rx, 'Cancelled'));
+            }
+            rxModal.show();
+        }
+
+        async function updateRxStatus(rx, nextStatus) {
+            try {
+                if (!USE_MOCK) {
+                    if (nextStatus === 'Completed') { await api('POST', '/prescriptions/validate', { PrescriptionID: Number(rx.PrescriptionID), Decision: 'Validated', DigitalSignature: 'SIG-DS-79001' }); await api('POST', '/prescriptions/dispense', { PrescriptionID: Number(rx.PrescriptionID), HandoverReportCode: 'BB-GN-2026-01' }); await api('POST', '/prescriptions/complete', { PrescriptionID: Number(rx.PrescriptionID) }); } else { await api('POST', '/prescriptions/validate', { PrescriptionID: Number(rx.PrescriptionID), Decision: 'Rejected', ClinicalInterventionNote: 'Huy don' }); }
+                }
+                rx.Status = nextStatus;
+                renderStats();
+                renderRxTable();
+                rxModal.hide();
+                toast(`Đã cập nhật đơn ${rx.NationalCode} sang ${nextStatus}.`);
+            } catch (e) {
+                toast(e.message, true);
+            }
+        }
+
+        function renderRxTable() {
+            const kw = document.getElementById('inpSearchRx').value.trim().toLowerCase();
+            const st = document.getElementById('selStatusRx').value;
+
+            const filtered = prescriptions.filter(rx => {
+                const matchKw = !kw ||
+                    String(rx.NationalCode || '').toLowerCase().includes(kw) ||
+                    String(rx.PatientName || '').toLowerCase().includes(kw) ||
+                    String(rx.Diagnosis || '').toLowerCase().includes(kw);
+                const matchSt = st === 'ALL' || String(rx.Status || '').toLowerCase() === st.toLowerCase();
+                return matchKw && matchSt;
+            });
+
+            document.getElementById('rxCountLabel').textContent = filtered.length + ' đơn';
+            const tbody = document.getElementById('tblRxBody');
+
+            if (!filtered.length) {
+                tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted py-4">Không tìm thấy đơn thuốc phù hợp.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = filtered.map((rx, idx) => {
+                const cType = String(rx.ControlledType || 'C').toUpperCase();
+                const ctrlHtml = ['N', 'H'].includes(cType)
+                    ? `<span class="ctrl-tag">${esc(cType)}</span>`
+                    : `<span class="badge bg-light text-dark border">${esc(cType)}</span>`;
+
+                return `
+      <tr>
+        <td><code>${esc(rx.NationalCode)}</code></td>
+        <td>
+          <div class="fw-semibold">${esc(rx.PatientName || ('BN #' + rx.PatientID))}</div>
+          <div class="small text-muted">${esc(rx.PatientCode || '')}</div>
+        </td>
+        <td>${esc(rx.Diagnosis || '—')}</td>
+        <td>${ctrlHtml}</td>
+        <td>${statusBadge(rx.Status)}</td>
+        <td class="text-end fw-semibold">${money(rx.TotalAmount)}</td>
+        <td class="text-end">
+          <button type="button" class="btn btn-sm btn-outline-primary btn-rx-view" data-rx-idx="${idx}">Chi tiết</button>
+        </td>
+      </tr>
+    `;
+            }).join('');
+
+            tbody.querySelectorAll('.btn-rx-view').forEach(btn => {
+                btn.addEventListener('click', () => openRxDetail(filtered[num(btn.getAttribute('data-rx-idx'))]));
+            });
+        }
+
+        async function initPrescriptions() {
+            try {
+                if (USE_MOCK) {
+                    prescriptions = MOCK_PRESCRIPTIONS;
+                } else {
+                    const res = await api('GET', '/prescriptions');
+                    const rxArr = res?.prescriptions || res?.data || (Array.isArray(res) ? res : []); prescriptions = Array.isArray(rxArr) ? rxArr : [];
+                }
+                renderStats();
+                renderRxTable();
+
+                const focusId = getParam('id');
+                if (focusId) {
+                    const found = prescriptions.find(x => String(x.PrescriptionID) === String(focusId));
+                    if (found) openRxDetail(found);
+                }
+            } catch (e) {
+                toast(e.message, true);
+            }
+        }
+
+        document.getElementById('inpSearchRx').addEventListener('input', renderRxTable);
+        document.getElementById('selStatusRx').addEventListener('change', renderRxTable);
+        document.getElementById('btnResetRxFilter').addEventListener('click', () => {
+            document.getElementById('inpSearchRx').value = '';
+            document.getElementById('selStatusRx').value = 'ALL';
+            renderRxTable();
+        });
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            if (PP_USER) {
+                document.getElementById('userFullName').textContent = PP_USER.FullName || PP_USER.Username;
+                document.getElementById('userRoleBadge').textContent = PP_USER.RoleCode;
+                document.getElementById('userAvatar').textContent = (PP_USER.FullName || 'PP').trim().slice(0, 2).toUpperCase();
+            }
+            const pageRoles = document.body.getAttribute('data-page-roles');
+            if (pageRoles && !hasRole(pageRoles)) {
+                document.getElementById('mainContent').innerHTML = '<div class="panel p-4 text-danger fw-semibold">Bạn không có quyền truy cập trang này (403 Forbidden).</div>';
+                return;
+            }
+            applyRoles(document);
+
+            const curFile = location.pathname.split('/').pop() || 'index.html';
+            document.querySelectorAll('.sidebar .nav-item').forEach(a => {
+                if (a.getAttribute('href') === curFile) a.classList.add('active');
+            });
+
+            document.getElementById('btnLogout')?.addEventListener('click', () => {
+                sessionStorage.removeItem('pp_token');
+                sessionStorage.removeItem('pp_user');
+                location.replace('login.html');
+            });
+
+            await initPrescriptions();
+        });
+    </script>
+</body>
+
+</html>

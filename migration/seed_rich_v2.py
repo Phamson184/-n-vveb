@@ -3,7 +3,7 @@ from datetime import date, timedelta
 
 conn_str = (
     "DRIVER={ODBC Driver 17 for SQL Server};"
-    "SERVER=127.0.0.1,1433;"
+    "SERVER=127.0.0.1,1434;"
     "DATABASE=PharmaPro_v2;"
     "UID=sa;"
     "PWD=YourStrong@Passw0rd123;"
@@ -15,11 +15,12 @@ cur = conn.cursor()
 
 def get_or_insert(select_sql, select_params, insert_sql, insert_params):
     cur.execute(select_sql, select_params)
-    row = cur.fetchone()
-    if row:
-        return int(row[0])
+    rows = cur.fetchall()
+    if rows:
+        return int(rows[0][0])
     cur.execute(insert_sql, insert_params)
-    return int(cur.fetchone()[0])
+    out = cur.fetchall()
+    return int(out[0][0])
 
 try:
     # 1. Khoa chuyên môn & Dạng bào chế (DosageForms dùng FormName + RouteOfAdmin)

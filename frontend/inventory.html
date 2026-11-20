@@ -1,526 +1,672 @@
 ﻿<!DOCTYPE html>
 <html lang="vi">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Quản lý kho – PharmaPro</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<style>
-/* Kế thừa Design System */
-:root{
-  --bg:#f5f7f6; --surface:#fff; --line:#e6ebe8;
-  --ink:#16221d; --muted:#6b7a73;
-  --brand:#0f766e; --brand-dark:#0b5a54; --brand-soft:#e3f3f0;
-  --warn:#b45309; --warn-soft:#fef3e2;
-  --danger:#b42318; --danger-soft:#fdeceb;
-  --ok:#15803d; --ok-soft:#e5f5ea;
-  --radius:12px;
-}
-*{box-sizing:border-box}
-body{background:var(--bg);color:var(--ink);font-family:'Be Vietnam Pro',sans-serif;font-size:14px;overflow-x:hidden}
-a{text-decoration:none}
-.sidebar{position:fixed;inset:0 auto 0 0;width:248px;background:var(--surface);border-right:1px solid var(--line);padding:20px 14px;display:flex;flex-direction:column;z-index:20}
-.brand{display:flex;align-items:center;gap:10px;padding:4px 10px 22px;font-weight:700;font-size:1.15rem;color:var(--ink)}
-.brand-mark{width:34px;height:34px;border-radius:9px;background:var(--brand);color:#fff;display:grid;place-items:center;font-size:1rem}
-.nav-group{font-size:12px;color:var(--muted);padding:16px 12px 6px;font-weight:500}
-.sidebar .nav-item{display:flex;align-items:center;gap:12px;padding:10px 12px;margin-bottom:2px;border-radius:9px;color:#43524b;font-weight:500;transition:0.15s}
-.sidebar .nav-item i{width:18px;text-align:center;color:#8a9a92}
-.sidebar .nav-item:hover{background:#f0f4f2;color:var(--ink)}
-.sidebar .nav-item.active{background:var(--brand-soft);color:var(--brand-dark)}
-.sidebar .nav-item.active i{color:var(--brand)}
-.nav-item .badge-count{margin-left:auto;background:var(--danger);color:#fff;border-radius:20px;font-size:11px;padding:1px 7px;font-weight:600}
-.main{margin-left:248px;padding:0 32px 40px}
-.topbar{position:sticky;top:0;z-index:10;background:rgba(245,247,246,.92);backdrop-filter:blur(8px);display:flex;align-items:center;gap:16px;padding:16px 0}
-.search{flex:1;max-width:460px;position:relative}
-.search i{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:#8a9a92}
-.search input{width:100%;border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:10px 14px 10px 40px;font:inherit}
-.search input:focus{border-color:var(--brand);outline:none;box-shadow:0 0 0 3px var(--brand-soft)}
-.user{display:flex;align-items:center;gap:10px;margin-left:auto}
-.avatar{width:38px;height:38px;border-radius:50%;background:var(--brand-soft);color:var(--brand-dark);display:grid;place-items:center;font-weight:700;font-size:13px}
-.user b{display:block;font-size:13px;line-height:1.2}
-.user span{font-size:12px;color:var(--muted)}
-.page-title{margin:10px 0 20px; display:flex; justify-content:space-between; align-items:flex-end}
-.page-title h1{font-size:1.5rem;font-weight:700;margin:0}
-.page-title p{margin:4px 0 0;color:var(--muted)}
-.btn-new{background:var(--brand);color:#fff;font-weight:600;border-radius:10px;padding:10px 18px;display:inline-flex;align-items:center;gap:8px;border:0;transition:0.15s; cursor:pointer}
-.btn-new:hover{background:var(--brand-dark);color:#fff}
-.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:20px;}
-.chip{display:inline-block; white-space:nowrap;font-size:12px;font-weight:600;border-radius:20px;padding:3px 10px}
-.chip.warn{background:var(--warn-soft);color:var(--warn)}
-.chip.danger{background:var(--danger-soft);color:var(--danger)}
-.chip.ok{background:var(--ok-soft);color:var(--ok)}
-.tbl{width:100%;border-collapse:collapse}
-.tbl th{font-weight:600;color:var(--muted);font-size:12px;text-align:left;padding:12px 10px;border-bottom:1px solid var(--line); background:#f8fbfa}
-.tbl td{padding:14px 10px;border-bottom:1px solid var(--line); vertical-align:middle}
-.tbl tbody tr:hover{background:#f8fbfa}
-.tbl .r{text-align:right}
-.drug-name{font-weight:600; color:var(--ink); display:block; margin-bottom:2px}
-.drug-meta{font-size:12px; color:var(--muted)}
-.table-toolbar{display:flex; gap:12px; margin-bottom:16px}
-.filter-select{border:1px solid var(--line); padding:8px 12px; border-radius:8px; outline:none; font-size:13px; color:var(--ink); background:var(--surface)}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PharmaPro v2.0 – Kho FEFO & TT 20/2017</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/theme.css">
+    <style>
+        .fefo-badge-near {
+            background: var(--danger-soft, #fdeceb);
+            color: var(--danger, #b42318);
+            font-size: 11px;
+            font-weight: 600;
+            padding: 3px 9px;
+            border-radius: 20px;
+        }
 
-/* Sửa lỗi Modal chạm trần màn hình */
-.modal-overlay {
-    display: none;
-    position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
-    z-index: 1000;
-    align-items: center;
-    justify-content: center;
-    padding: 20px; /* Tạo khoảng cách an toàn với viền màn hình */
-}
-.modal-content {
-    background: #fff;
-    padding: 24px;
-    border-radius: 8px;
-    width: 100%;
-    max-width: 540px;
-    max-height: 85vh; /* Không bao giờ bị tràn trần */
-    overflow-y: auto;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-    margin: auto;
-}
+        .fefo-badge-warn {
+            background: var(--warn-soft, #fef3e2);
+            color: var(--warn, #b45309);
+            font-size: 11px;
+            font-weight: 600;
+            padding: 3px 9px;
+            border-radius: 20px;
+        }
 
-/* CSS cho Ô chọn Tìm kiếm Thông minh (Combobox) */
-.combobox-container {
-    position: relative;
-    width: 100%;
-}
-.combobox-list {
-    position: absolute;
-    top: calc(100% + 4px);
-    left: 0; right: 0;
-    max-height: 200px;
-    overflow-y: auto;
-    background: #ffffff;
-    border: 1px solid #0d6efd;
-    border-radius: 6px;
-    z-index: 1100;
-    display: none;
-    box-shadow: 0 6px 16px rgba(0,0,0,0.15);
-}
-.combobox-item {
-    padding: 10px 12px;
-    cursor: pointer;
-    font-size: 0.9rem;
-    border-bottom: 1px solid #f0f0f0;
-    display: flex;
-    justify-content: space-between;
-}
-.combobox-item:last-child { border-bottom: none; }
-.combobox-item:hover, .combobox-item.active {
-    background-color: #0d6efd;
-    color: #ffffff;
-}
-.combobox-item:hover .text-muted, .combobox-item.active .text-muted {
-    color: #e0e0e0 !important;
-}
-</style>
+        .fefo-badge-ok {
+            background: var(--ok-soft, #e5f5ea);
+            color: var(--ok, #15803d);
+            font-size: 11px;
+            font-weight: 600;
+            padding: 3px 9px;
+            border-radius: 20px;
+        }
+
+        .ctrl-pill {
+            background: var(--danger-soft, #fdeceb);
+            color: var(--danger, #b42318);
+            font-size: 11px;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 20px;
+        }
+
+        .field-invalid {
+            border-color: var(--danger, #dc2626) !important;
+        }
+
+        .field-err-msg {
+            color: var(--danger, #dc2626);
+            font-size: 12px;
+            margin-top: 4px;
+        }
+    </style>
 </head>
-<body>
 
-<!-- SIDEBAR -->
-<aside class="sidebar">
-  <div class="brand"><span class="brand-mark"><i class="fa-solid fa-staff-snake"></i></span>PharmaPro</div>
-  <div class="nav-group">Bán hàng</div>
-  <a href="index.html" class="nav-item"><i class="fa-solid fa-chart-pie"></i>Tổng quan</a>
-  <a href="pos.html" class="nav-item"><i class="fa-solid fa-desktop"></i>Bán hàng (POS)</a>
-  <a href="orders.html" class="nav-item"><i class="fa-solid fa-file-invoice-dollar"></i>Đơn hàng</a>
-  <div class="nav-group">Hàng hóa</div>
-  <a href="products.html" class="nav-item"><i class="fa-solid fa-pills"></i>Danh mục thuốc</a>
-  <a href="inventory.html" class="nav-item active"><i class="fa-solid fa-boxes-stacked"></i>Quản lý kho<span class="badge-count" id="alertCount">0</span></a>
-  <div class="nav-group">Quản lý</div>
-  <a href="customers.html" class="nav-item"><i class="fa-solid fa-users"></i>Khách hàng</a>
-  <a href="users.html" class="nav-item"><i class="fa-solid fa-gear"></i>Cài đặt</a>
-</aside>
+<body data-page-roles="ADMIN,PHARMACIST,WAREHOUSE">
+    <div class="app-shell d-flex min-vh-100">
+        <!-- SIDEBAR DÙNG CHUNG -->
+        <aside class="sidebar">
+            <div class="brand">
+                <span class="brand-mark"><i class="fa-solid fa-staff-snake"></i></span>
+                <span>PharmaPro <small class="text-muted">v2</small></span>
+            </div>
 
-<!-- MAIN -->
-<main class="main">
-  <header class="topbar">
-    <div class="search">
-      <i class="fa-solid fa-magnifying-glass"></i>
-      <input type="search" id="inpTimKiemKho" placeholder="Tìm theo số lô, mã thuốc, tên thuốc..." aria-label="Tìm kiếm" onkeyup="xuLyLocKho()">
-      <kbd>Ctrl K</kbd>
-    </div>
-    <div class="user">
-      <div class="avatar">TS</div>
-      <div><b>Phạm Trường Sơn</b><span>Dược sĩ</span></div>
-    </div>
-  </header>
+            <div class="nav-group">
+                <div class="nav-label">Điều hành</div>
+                <a class="nav-item" href="index.html"><i class="fa-solid fa-chart-pie"></i> Tổng quan</a>
+            </div>
 
-  <div class="page-title">
-    <div>
-        <h1>Quản lý Kho & Lô Thuốc</h1>
-        <p>Theo dõi hạn sử dụng và số lượng tồn theo từng lô sản xuất</p>
-    </div>
-    <button class="btn-new" onclick="hienThiModalNhapKho()"><i class="fa-solid fa-truck-ramp-box"></i>Nhập hàng mới</button>
-  </div>
+            <div class="nav-group">
+                <div class="nav-label">Dược lâm sàng & Bán hàng</div>
+                <a class="nav-item" href="pos.html" data-roles="ADMIN,DOCTOR,PHARMACIST"><i
+                        class="fa-solid fa-cash-register"></i> Kê đơn & POS</a>
+                <a class="nav-item" href="prescriptions.html" data-roles="ADMIN,DOCTOR,PHARMACIST,CASHIER"><i
+                        class="fa-solid fa-file-prescription"></i> Đơn thuốc GPP</a>
+                <a class="nav-item" href="patients.html" data-roles="ADMIN,DOCTOR,PHARMACIST"><i
+                        class="fa-solid fa-user-injured"></i> Hồ sơ Dược bạ 360°</a>
+            </div>
 
-  <div class="panel">
-    <div class="table-toolbar">
-      <select class="filter-select" id="selLocDate" onchange="xuLyLocKho()">
-        <option value="ALL">Tất cả các lô</option>
-        <option value="SAP_HET_HAN">Sắp hết hạn (< 6 tháng)</option>
-        <option value="DA_HET_HAN">Đã hết hạn</option>
-      </select>
-  </div>
-    <div class="table-responsive">
-      <table class="tbl" id="inventoryTable">
-        <thead>
-            <tr>
-                <th>Số Lô (Batch)</th>
-                <th>Sản phẩm</th>
-                <th>Ngày SX</th>
-                <th>Hạn Sử Dụng</th>
-                <th class="r">Tồn kho</th>
-                <th>Trạng thái Date</th>
-            </tr>
-        </thead>
-        <tbody>
-          <tr><td colspan="6" class="text-center py-4 text-muted">Đang tải dữ liệu...</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-<!-- MODAL NHẬP LÔ HÀNG MỚI -->
-<!-- MODAL NHẬP LÔ HÀNG MỚI -->
-<div class="modal-overlay" id="modalNhapKho">
-    <div class="modal-content">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; border-bottom:1px solid #eee; padding-bottom:8px;">
-            <h3 style="margin:0; font-size:1.2rem;">Nhập Lô Thuốc Mới</h3>
-            <button type="button" onclick="dongModalNhapKho()" style="background:none; border:none; font-size:1.5rem; cursor:pointer;">&times;</button>
-        </div>
-        <form id="formNhapKho" onsubmit="submitNhapKho(event)">
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
-                
-                <!-- Ô CHỌN THUỐC TÌM KIẾM THÔNG MINH -->
-                <div style="grid-column: span 2;">
-                    <label style="font-weight:500; font-size:0.9rem;">Chọn Thuốc Nhập Kho</label>
-                    <div class="combobox-container" style="margin-top:4px;">
-                        <!-- Input gõ tìm kiếm -->
-                        <input type="text" id="inpMaThuocSearch" placeholder="Gõ tên hoặc mã thuốc (Dùng phím ↑ ↓ Enter để chọn)..." autocomplete="off" required style="width:100%; padding:8px 12px; border:1px solid #ccc; border-radius:4px;">
-                        <!-- Input hidden lưu MaThuoc thực tế để gửi về DB -->
-                        <input type="hidden" id="inpMaThuocKho" required>
-                        <!-- Bảng danh sách kết quả xổ xuống -->
-                        <div class="combobox-list" id="listThuocSuggest"></div>
+            <div class="nav-group">
+                <div class="nav-label">Kho dược & Pháp lý</div>
+                <a class="nav-item" href="products.html"><i class="fa-solid fa-pills"></i> Danh mục & DDI</a>
+                <a class="nav-item" href="inventory.html" data-roles="ADMIN,PHARMACIST,WAREHOUSE"><i
+                        class="fa-solid fa-boxes-stacked"></i> Kho FEFO & TT 20/2017</a>
+                <a class="nav-item" href="audit.html" data-roles="ADMIN,PHARMACIST,WAREHOUSE"><i
+                        class="fa-solid fa-clock-rotate-left"></i> Thanh tra Temporal</a>
+            </div>
+
+            <div class="store-box mt-auto">
+                <div class="fw-semibold">Nhà thuốc GPP #79001</div>
+                <div class="small text-muted">Chuẩn Thông tư 02/2018</div>
+            </div>
+        </aside>
+
+        <!-- KHU VỰC CHÍNH -->
+        <div class="main flex-grow-1 d-flex flex-column">
+            <header class="topbar d-flex align-items-center justify-content-between">
+                <div class="page-title" id="pageTitle">Kho FEFO, Lô cận date & Sổ TT 20/2017</div>
+                <div class="user d-flex align-items-center gap-3">
+                    <div class="text-end">
+                        <div class="fw-semibold" id="userFullName">Đang tải...</div>
+                        <div class="small text-muted" id="userRoleBadge">ROLE</div>
+                    </div>
+                    <div class="avatar" id="userAvatar">PP</div>
+                    <button class="btn-ghost btn-sm" id="btnLogout" title="Đăng xuất"><i
+                            class="fa-solid fa-right-from-bracket"></i></button>
+                </div>
+            </header>
+
+            <main class="content p-4" id="mainContent">
+                <!-- Thống kê kho -->
+                <div class="row g-3 mb-4">
+                    <div class="col-sm-6 col-xl-3">
+                        <div class="panel">
+                            <div class="small text-muted">Tổng số lô tồn kho</div>
+                            <div class="fs-4 fw-bold mt-1" id="statTotalBatches">0</div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-xl-3">
+                        <div class="panel">
+                            <div class="small text-muted">Lô cận date (&le; 90 ngày)</div>
+                            <div class="fs-4 fw-bold mt-1 text-danger" id="statNearExpiry">0</div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-xl-3">
+                        <div class="panel">
+                            <div class="small text-muted">Tổng số lượng tồn</div>
+                            <div class="fs-4 fw-bold mt-1 text-success" id="statTotalQty">0</div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-xl-3">
+                        <div class="panel">
+                            <div class="small text-muted">Lô kiểm soát đặc biệt (TT 20)</div>
+                            <div class="fs-4 fw-bold mt-1 text-warning" id="statCtrlBatches">0</div>
+                        </div>
                     </div>
                 </div>
 
-                <div>
-                    <label style="font-weight:500; font-size:0.9rem;">Số Lô (Bao bì)</label>
-                    <input type="text" id="inpSoLo" placeholder="VD: SL-2026-03" required style="width:100%; padding:8px 12px; border:1px solid #ccc; border-radius:4px; margin-top:4px;">
+                <!-- Chuyển tab chức năng -->
+                <ul class="nav nav-tabs mb-3" id="invTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active fw-semibold" id="tab-fefo-btn" data-bs-toggle="tab"
+                            data-bs-target="#pane-fefo" type="button" role="tab">
+                            <i class="fa-solid fa-arrow-down-short-wide me-1"></i> Kho FEFO & Lô cận date
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link fw-semibold" id="tab-import-btn" data-bs-toggle="tab"
+                            data-bs-target="#pane-import" type="button" role="tab">
+                            <i class="fa-solid fa-truck-ramp-box me-1"></i> Nhập lô mới
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link fw-semibold" id="tab-tt20-btn" data-bs-toggle="tab"
+                            data-bs-target="#pane-tt20" type="button" role="tab">
+                            <i class="fa-solid fa-shield-halved me-1"></i> Sổ kiểm soát đặc biệt (TT 20/2017)
+                        </button>
+                    </li>
+                </ul>
+
+                <div class="tab-content">
+                    <!-- TAB 1: KHO FEFO & LÔ CẬN DATE -->
+                    <div class="tab-pane fade show active" id="pane-fefo" role="tabpanel">
+                        <div class="panel">
+                            <div class="row g-2 align-items-end mb-3">
+                                <div class="col-md-5">
+                                    <label class="form-label small fw-semibold" for="inpFilterBatch">Tìm theo tên thuốc
+                                        / số lô</label>
+                                    <input type="text" class="form-control form-control-sm" id="inpFilterBatch"
+                                        placeholder="Ví dụ: Hapacol, LOT2026...">
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label small fw-semibold" for="selExpiryFilter">Trạng thái hạn
+                                        dùng</label>
+                                    <select class="form-select form-select-sm" id="selExpiryFilter">
+                                        <option value="ALL">Tất cả lô (ưu tiên FEFO)</option>
+                                        <option value="NEAR">Cận date (&le; 90 ngày)</option>
+                                        <option value="WARN">Sắp lưu ý (91 – 180 ngày)</option>
+                                        <option value="OK">Hạn xa (&gt; 180 ngày)</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3 text-md-end">
+                                    <button type="button" class="btn btn-sm btn-primary" id="btnQuickGoImport">
+                                        <i class="fa-solid fa-plus me-1"></i> Nhập lô mới
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="table-responsive">
+                                <table class="table table-sm align-middle mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th>Ưu tiên FEFO</th>
+                                            <th>Tên thuốc</th>
+                                            <th>Số lô</th>
+                                            <th>Hạn dùng</th>
+                                            <th>Cảnh báo hạn</th>
+                                            <th class="text-end">Số lượng tồn</th>
+                                            <th class="text-end">Giá vốn</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tblFefoBody">
+                                        <tr>
+                                            <td colspan="7" class="text-center text-muted py-4">Đang tải dữ liệu lô...
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TAB 2: NHẬP LÔ MỚI -->
+                    <div class="tab-pane fade" id="pane-import" role="tabpanel">
+                        <div class="panel">
+                            <h2 class="h6 fw-bold mb-3">Phiếu nhập lô hàng mới</h2>
+                            <form id="frmImportBatch" novalidate>
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label small fw-semibold" for="selBatchDrug">Thuốc <span
+                                                class="text-danger">*</span></label>
+                                        <select class="form-select" id="selBatchDrug" required>
+                                            <option value="">-- Chọn thuốc --</option>
+                                        </select>
+                                        <div class="field-err-msg" id="errBatchDrug"></div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label small fw-semibold" for="inpBatchNumber">Số lô
+                                            (BatchNumber) <span class="text-danger">*</span></label>
+                                        <input type="text" class="form-control" id="inpBatchNumber"
+                                            placeholder="Ví dụ: LOT202611A" required>
+                                        <div class="field-err-msg" id="errBatchNumber"></div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label small fw-semibold" for="inpExpiryDate">Hạn dùng
+                                            (ExpiryDate) <span class="text-danger">*</span></label>
+                                        <input type="date" class="form-control" id="inpExpiryDate" required>
+                                        <div class="field-err-msg" id="errExpiryDate"></div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label small fw-semibold" for="inpBatchQty">Số lượng nhập
+                                            <span class="text-danger">*</span></label>
+                                        <input type="number" min="1" step="1" class="form-control" id="inpBatchQty"
+                                            placeholder="50" required>
+                                        <div class="field-err-msg" id="errBatchQty"></div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label small fw-semibold" for="inpUnitCost">Giá nhập / đơn vị
+                                            (VNĐ) <span class="text-danger">*</span></label>
+                                        <input type="number" min="1" step="1" class="form-control" id="inpUnitCost"
+                                            placeholder="32000" required>
+                                        <div class="field-err-msg" id="errUnitCost"></div>
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label small fw-semibold" for="inpBatchNote">Ghi chú lô / nhà
+                                            cung cấp</label>
+                                        <input type="text" class="form-control" id="inpBatchNote"
+                                            placeholder="Ví dụ: Hóa đơn VAT #00123, kho đạt chuẩn GPP">
+                                    </div>
+                                    <div class="col-12 d-flex justify-content-end gap-2">
+                                        <button type="reset" class="btn btn-outline-secondary">Làm mới</button>
+                                        <button type="submit" class="btn btn-primary" id="btnSubmitBatch">
+                                            <i class="fa-solid fa-floppy-disk me-1"></i> Lưu nhập lô
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- TAB 3: SỔ THUỐC KIỂM SOÁT ĐẶC BIỆT (TT 20/2017) -->
+                    <div class="tab-pane fade" id="pane-tt20" role="tabpanel">
+                        <div class="panel">
+                            <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
+                                <div>
+                                    <h2 class="h6 fw-bold mb-0">Sổ theo dõi thuốc kiểm soát đặc biệt (Thông tư
+                                        20/2017/TT-BYT)</h2>
+                                    <div class="small text-muted">Danh sách các lô thuốc thuộc diện kiểm soát đặc biệt
+                                        (gây nghiện / hướng thần / kiểm soát)</div>
+                                </div>
+                                <select class="form-select form-select-sm" id="selTt20Type" style="width:200px">
+                                    <option value="ALL">Tất cả nhóm kiểm soát</option>
+                                    <option value="N">Gây nghiện (N)</option>
+                                    <option value="H">Hướng thần (H)</option>
+                                    <option value="CTRL">Kiểm soát đặc biệt khác</option>
+                                </select>
+                            </div>
+
+                            <div class="table-responsive">
+                                <table class="table table-sm align-middle mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th>Mã thuốc</th>
+                                            <th>Tên thuốc</th>
+                                            <th>Nhóm TT 20</th>
+                                            <th>Số lô</th>
+                                            <th>Hạn dùng</th>
+                                            <th class="text-end">Tồn kho</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tblTt20Body">
+                                        <tr>
+                                            <td colspan="6" class="text-center text-muted py-4">Đang tải sổ TT
+                                                20/2017...</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div>
-                    <label style="font-weight:500; font-size:0.9rem;">Số Lượng Nhập</label>
-                    <input type="number" id="inpSoLuongTon" placeholder="VD: 50" min="1" required style="width:100%; padding:8px 12px; border:1px solid #ccc; border-radius:4px; margin-top:4px;">
-                </div>
-                <div>
-                    <label style="font-weight:500; font-size:0.9rem;">Ngày Sản Xuất</label>
-                    <input type="date" id="inpNgaySanXuat" required style="width:100%; padding:8px 12px; border:1px solid #ccc; border-radius:4px; margin-top:4px;">
-                </div>
-                <div>
-                    <label style="font-weight:500; font-size:0.9rem;">Hạn Sử Dụng</label>
-                    <input type="date" id="inpHanSuDung" required style="width:100%; padding:8px 12px; border:1px solid #ccc; border-radius:4px; margin-top:4px;">
-                </div>
-            </div>
-            <div style="margin-top:20px; display:flex; gap:8px; justify-content:flex-end;">
-                <button type="button" onclick="dongModalNhapKho()" style="padding:8px 16px; background:#f1f1f1; border:1px solid #ccc; border-radius:4px; cursor:pointer;">Hủy</button>
-                <button type="submit" style="padding:8px 16px; background:#0d6efd; color:#fff; border:none; border-radius:4px; cursor:pointer;">Lưu Nhập Kho</button>
-            </div>
-        </form>
+            </main>
+        </div>
     </div>
-</div>
-</main>
 
-<script>
-  let danhSachKhoTam = [];
+    <!-- TOAST THÔNG BÁO -->
+    <div class="toast-x" id="toastBox" style="display:none; position:fixed; bottom:20px; right:20px; z-index:9999;">
+    </div>
 
-  // 1. Render dữ liệu ra bảng
-  function renderBangKho(mangDuLieu) {
-    const tbody = document.querySelector('#inventoryTable tbody');
-    let alertCount = 0;
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const API_BASE = 'http://localhost:3001/api/v2';
+        const USE_MOCK = false; // Đổi thành false khi chạy API thật
 
-    if (!mangDuLieu || mangDuLieu.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-muted">Không tìm thấy dữ liệu lô thuốc.</td></tr>';
-        return;
-    }
+        let PP_TOKEN = sessionStorage.getItem('pp_token');
+        let PP_USER = (() => {
+            try { return JSON.parse(sessionStorage.getItem('pp_user') || 'null'); } catch (e) { return null; }
+        })();
 
-    tbody.innerHTML = mangDuLieu.map(lo => {
-        const hanSD = new Date(lo.HanSuDung);
-        const homNay = new Date();
-        const diffTime = hanSD - homNay;
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-        
-        let dateClass = 'ok';
-        let dateText = 'An toàn';
-        
-        if (diffDays <= 0) {
-            dateClass = 'danger';
-            dateText = 'Đã hết hạn';
-            alertCount++;
-        } else if (diffDays <= 180) { // Cảnh báo dưới 6 tháng
-            dateClass = 'warn';
-            dateText = `Còn ${diffDays} ngày`;
-            alertCount++;
+        if (USE_MOCK && (!PP_TOKEN || !PP_USER)) {
+            PP_TOKEN = 'mock-jwt-token';
+            PP_USER = { UserID: '3', EmployeeCode: 'NV003', FullName: 'Lê Minh Khoa', RoleCode: 'WAREHOUSE' };
         }
 
-        const ngaySXFmt = new Date(lo.NgaySanXuat).toLocaleDateString('vi-VN');
-        const hanSDFmt = hanSD.toLocaleDateString('vi-VN');
-
-        return `
-        <tr>
-          <td><b class="text-secondary">${lo.SoLo}</b></td>
-          <td>
-              <span class="drug-name">${lo.TenThuoc}</span>
-              <span class="drug-meta">Mã: ${lo.MaThuoc} | ĐK: ${lo.SoDangKy || 'N/A'}</span>
-          </td>
-          <td>${ngaySXFmt}</td>
-          <td class="fw-bold">${hanSDFmt}</td>
-          <td class="r fw-bold ${lo.SoLuongTon < 20 ? 'text-danger' : ''}">${lo.SoLuongTon}</td>
-          <td><span class="chip ${dateClass}">${dateText}</span></td>
-        </tr>
-        `;
-    }).join('');
-
-    // Cập nhật Badge cảnh báo ở Sidebar (nếu có element)
-    const alertBadge = document.getElementById('alertCount');
-    if(alertBadge) {
-        if(alertCount > 0) {
-            alertBadge.innerText = alertCount;
-            alertBadge.style.display = 'inline-block';
-        } else {
-            alertBadge.style.display = 'none';
+        if (!PP_TOKEN || !PP_USER) {
+            const cur = location.pathname.split('/').pop() || 'index.html';
+            location.replace('login.html?next=' + encodeURIComponent(cur));
         }
-    }
-  }
 
-  // 2. Tải danh sách lô từ Backend
-  async function loadKho() {
-    const tbody = document.querySelector('#inventoryTable tbody');
-    tbody.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-muted">Đang tải dữ liệu...</td></tr>';
-    
-    try {
-      const response = await fetch('http://localhost:3001/api/kho/danhsach');
-      danhSachKhoTam = await response.json();
-      renderBangKho(danhSachKhoTam);
-    } catch (error) {
-      console.error('Lỗi API:', error);
-      tbody.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-danger">Lỗi kết nối CSDL.</td></tr>';
-    }
-  }
+        const num = v => { const n = Number(v); return Number.isFinite(n) ? n : 0; };
+        const flag = v => Number(v) === 1;
+        const esc = s => String(s ?? '').replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
+        const money = v => Math.round(num(v)).toLocaleString('vi-VN') + 'đ';
 
-  // 3. Lọc Real-time (Tìm kiếm & Dropdown Date)
-  function xuLyLocKho() {
-    const tuKhoa = (document.getElementById('inpTimKiemKho')?.value || '').toLowerCase().trim();
-    const locDate = document.getElementById('selLocDate')?.value || 'ALL';
+        function fmtDate(iso) {
+            if (!iso) return '—';
+            const d = new Date(iso);
+            if (isNaN(d)) return esc(iso);
+            return String(d.getDate()).padStart(2, '0') + '/' + String(d.getMonth() + 1).padStart(2, '0') + '/' + d.getFullYear();
+        }
 
-    const ketQua = danhSachKhoTam.filter(lo => {
-        const soLo = lo.SoLo ? lo.SoLo.toLowerCase() : '';
-        const tenThuoc = lo.TenThuoc ? lo.TenThuoc.toLowerCase() : '';
-        const maThuoc = lo.MaThuoc ? lo.MaThuoc.toLowerCase() : '';
+        function toast(msg, isError = false) {
+            const box = document.getElementById('toastBox');
+            if (!box) return;
+            box.textContent = msg;
+            box.style.display = 'block';
+            box.style.background = isError ? 'var(--danger, #dc2626)' : 'var(--brand, #0d9488)';
+            box.style.color = '#fff';
+            box.style.padding = '12px 18px';
+            box.style.borderRadius = '10px';
+            box.style.boxShadow = '0 8px 24px rgba(0,0,0,0.15)';
+            clearTimeout(window._toastTimer);
+            window._toastTimer = setTimeout(() => { box.style.display = 'none'; }, 4000);
+        }
 
-        const khopTuKhoa = soLo.includes(tuKhoa) || tenThuoc.includes(tuKhoa) || maThuoc.includes(tuKhoa);
+        function hasRole(rolesCsv) {
+            if (!rolesCsv) return true;
+            const allow = String(rolesCsv).split(',').map(s => s.trim().toUpperCase()).filter(Boolean);
+            return allow.length === 0 || allow.includes(String(PP_USER?.RoleCode || '').toUpperCase());
+        }
 
-        const diffDays = Math.ceil((new Date(lo.HanSuDung) - new Date()) / (1000 * 60 * 60 * 24));
-        let khopDate = true;
-        
-        if (locDate === 'SAP_HET_HAN') khopDate = (diffDays > 0 && diffDays <= 180);
-        if (locDate === 'DA_HET_HAN') khopDate = (diffDays <= 0);
+        function applyRoles(root = document) {
+            root.querySelectorAll('[data-roles]').forEach(el => {
+                if (!hasRole(el.getAttribute('data-roles'))) el.style.display = 'none';
+            });
+        }
 
-        return khopTuKhoa && khopDate;
-    });
-
-    renderBangKho(ketQua);
-  }
-
-  // 4. Quản lý Modal Nhập Kho
-  function hienThiModalNhapKho() {
-    document.getElementById('modalNhapKho').style.display = 'flex';
-    loadSelectThuoc();
-  }
-  function dongModalNhapKho() {
-    document.getElementById('modalNhapKho').style.display = 'none';
-    document.getElementById('formNhapKho').reset();
-  }
-
-  async function submitNhapKho(e) {
-    e.preventDefault();
-    const duLieu = {
-        MaLo: 'LO' + Date.now(),
-        MaThuoc: document.getElementById('inpMaThuocKho').value.trim(),
-        SoLo: document.getElementById('inpSoLo').value.trim(),
-        SoLuongTon: parseInt(document.getElementById('inpSoLuongTon').value),
-        NgaySanXuat: document.getElementById('inpNgaySanXuat').value,
-        HanSuDung: document.getElementById('inpHanSuDung').value
-    };
-
-    try {
-        const res = await fetch('http://localhost:3001/api/kho/nhaplo', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(duLieu)
-        });
-        const result = await res.json();
-        
-        if (result.success) {
-            alert('Nhập lô mới thành công!');
-            dongModalNhapKho();
-            loadKho();
-        } else {
-            // In toàn bộ object lỗi chi tiết ra Console F12
-            console.error("LỖI SQL SERVER CHI TIẾT:", result);
-            
-            // Lấy thông điệp lỗi cụ thể từ SQL Server
-            let msg = result.error;
-            if (result.details && result.details[0]) {
-                msg += "\n" + result.details[0].message;
+        async function api(method, path, body = null) {
+            const headers = { 'Authorization': 'Bearer ' + PP_TOKEN };
+            const opts = { method: method.toUpperCase(), headers };
+            if (body !== null && opts.method !== 'GET') {
+                headers['Content-Type'] = 'application/json';
+                opts.body = JSON.stringify(body);
             }
-            alert("Lỗi nhập kho:\n" + msg);
+            const res = await fetch(API_BASE + path, opts);
+            let data = null;
+            try { data = await res.json(); } catch (e) { }
+
+            if (res.status === 401) {
+                sessionStorage.removeItem('pp_token');
+                sessionStorage.removeItem('pp_user');
+                location.replace('login.html?expired=1');
+                throw new Error('Phiên đăng nhập hết hạn.');
+            }
+
+            if (!res.ok) {
+                const errMsg = res.status === 403
+                    ? 'Bạn không có quyền thực hiện chức năng này!'
+                    : ((data && data.error) || ('Lỗi máy chủ (' + res.status + ')'));
+                const err = new Error(errMsg);
+                err.status = res.status;
+                err.data = data;
+                throw err;
+            }
+            return data;
         }
-    } catch(err) {
-        console.error('Lỗi kết nối API:', err);
-        alert('Không thể kết nối đến máy chủ.');
-    }
-  }
-  // Hàm tải danh sách thuốc đắp vào Dropdown Modal Nhập Kho
-  async function loadSelectThuoc() {
-      const select = document.getElementById('inpMaThuocKho');
-      try {
-          const res = await fetch('http://localhost:3001/api/thuoc/danhsach');
-          const listThuoc = await res.json();
-          
-          if(listThuoc.length === 0) {
-              select.innerHTML = '<option value="">Chưa có dữ liệu thuốc</option>';
-              return;
-          }
 
-          select.innerHTML = '<option value="">-- Chọn thuốc cần nhập --</option>' + 
-              listThuoc.map(t => `<option value="${t.MaThuoc}">${t.MaThuoc} - ${t.TenThuoc}</option>`).join('');
-      } catch (err) {
-          console.error("Lỗi load danh sách thuốc:", err);
-          select.innerHTML = '<option value="">Lỗi tải danh sách thuốc</option>';
-      }
-  }
-  let danhSachThuocFull = []; 
-  let currentFocusIndex = -1; // Vị trí item đang được chọn bằng phím phím mũi tên
+        const MOCK_INV_DRUGS = [
+            { DrugID: '1', DrugCode: 'PARA500', DrugName: 'Paracetamol 500mg', IsControlled: '0', ControlledType: 'C' },
+            { DrugID: '2', DrugCode: 'HAPACOL500', DrugName: 'Hapacol 500mg DHG', IsControlled: '0', ControlledType: 'C' },
+            { DrugID: '3', DrugCode: 'KLACID500', DrugName: 'Klacid 500mg', IsControlled: '0', ControlledType: 'C' },
+            { DrugID: '5', DrugCode: 'MORPHIN10', DrugName: 'Morphin Hydroclorid 10mg/1ml', IsControlled: '1', ControlledType: 'N' }
+        ];
 
-  // 1. Tải dữ liệu thuốc từ Backend
-  async function loadSelectThuoc() {
-      try {
-          const res = await fetch('http://localhost:3001/api/thuoc/danhsach');
-          danhSachThuocFull = await res.json();
-      } catch (err) {
-          console.error("Lỗi load danh sách thuốc:", err);
-      }
-  }
+        const MOCK_BATCHES = [
+            { BatchID: '1', DrugID: '2', DrugCode: 'HAPACOL500', DrugName: 'Hapacol 500mg DHG', BatchNumber: 'LOT202601A', ExpiryDate: '2027-01-25', Quantity: '25', UnitCost: '32000', IsControlled: '0', ControlledType: 'C' },
+            { BatchID: '2', DrugID: '1', DrugCode: 'PARA500', DrugName: 'Paracetamol 500mg', BatchNumber: 'LOT202604B', ExpiryDate: '2027-05-10', Quantity: '120', UnitCost: '28000', IsControlled: '0', ControlledType: 'C' },
+            { BatchID: '3', DrugID: '5', DrugCode: 'MORPHIN10', DrugName: 'Morphin Hydroclorid 10mg/1ml', BatchNumber: 'TT20-N-09', ExpiryDate: '2028-03-15', Quantity: '18', UnitCost: '52000', IsControlled: '1', ControlledType: 'N' },
+            { BatchID: '4', DrugID: '2', DrugCode: 'HAPACOL500', DrugName: 'Hapacol 500mg DHG', BatchNumber: 'LOT202611C', ExpiryDate: '2028-11-08', Quantity: '45', UnitCost: '33000', IsControlled: '0', ControlledType: 'C' }
+        ];
 
-  // 2. Hàm vẽ danh sách gợi ý xổ xuống
-  function renderComboboxList(filterText = '') {
-      const listContainer = document.getElementById('listThuocSuggest');
-      const keyword = filterText.toLowerCase().trim();
-      
-      const filtered = danhSachThuocFull.filter(t => 
-          (t.TenThuoc && t.TenThuoc.toLowerCase().includes(keyword)) ||
-          (t.MaThuoc && t.MaThuoc.toLowerCase().includes(keyword)) ||
-          (t.HoatChat && t.HoatChat.toLowerCase().includes(keyword))
-      );
+        let invDrugs = [];
+        let batches = [];
 
-      if (filtered.length === 0) {
-          listContainer.innerHTML = '<div class="combobox-item text-muted">Không tìm thấy thuốc...</div>';
-          listContainer.style.display = 'block';
-          return;
-      }
+        function daysUntil(iso) {
+            const target = new Date(iso);
+            if (isNaN(target)) return 9999;
+            const now = new Date();
+            now.setHours(0, 0, 0, 0);
+            target.setHours(0, 0, 0, 0);
+            return Math.ceil((target - now) / (1000 * 60 * 60 * 24));
+        }
 
-      listContainer.innerHTML = filtered.map((t, index) => `
-          <div class="combobox-item" data-index="${index}" onclick="chonThuocCombobox('${t.MaThuoc}', '${t.TenThuoc}')">
-              <span><b>${t.TenThuoc}</b></span>
-              <span class="text-muted" style="font-size:0.85rem;">[${t.MaThuoc}]</span>
-          </div>
-      `).join('');
+        function getExpiryTag(iso) {
+            const d = daysUntil(iso);
+            if (d <= 90) {
+                return { key: 'NEAR', html: `<span class="fefo-badge-near">Cận date (${d} ngày)</span>` };
+            }
+            if (d <= 180) {
+                return { key: 'WARN', html: `<span class="fefo-badge-warn">Lưu ý (${d} ngày)</span>` };
+            }
+            return { key: 'OK', html: `<span class="fefo-badge-ok">An toàn (${d} ngày)</span>` };
+        }
 
-      listContainer.style.display = 'block';
-      currentFocusIndex = -1;
-  }
+        function renderInvStats() {
+            document.getElementById('statTotalBatches').textContent = String(batches.length);
+            const nearCount = batches.filter(b => daysUntil(b.ExpiryDate) <= 90).length;
+            document.getElementById('statNearExpiry').textContent = String(nearCount);
+            const totalQty = batches.reduce((acc, b) => acc + num(b.CurrentStock ?? (b.CurrentStock ?? b.Quantity)), 0);
+            document.getElementById('statTotalQty').textContent = String(totalQty);
+            const ctrlCount = batches.filter(b => flag(b.IsControlled) || ['N', 'H'].includes(String(b.ControlledType || '').toUpperCase())).length;
+            document.getElementById('statCtrlBatches').textContent = String(ctrlCount);
+        }
 
-  // 3. Xử lý sự kiện khi gõ phím & điều hướng phím mũi tên (↑ ↓ Enter Esc)
-  const inpSearch = document.getElementById('inpMaThuocSearch');
-  
-  if (inpSearch) {
-      // Khi gõ phím để tìm kiếm
-      inpSearch.addEventListener('input', function() {
-          document.getElementById('inpMaThuocKho').value = ''; // Reset mã hidden
-          renderComboboxList(this.value);
-      });
+        function renderFefo() {
+            const kw = document.getElementById('inpFilterBatch').value.trim().toLowerCase();
+            const expFilter = document.getElementById('selExpiryFilter').value;
 
-      // Khi nhấp chuột vào ô input
-      inpSearch.addEventListener('focus', function() {
-          renderComboboxList(this.value);
-      });
+            const sorted = [...batches].sort((a, b) => new Date(a.ExpiryDate) - new Date(b.ExpiryDate));
+            const filtered = sorted.filter(b => {
+                const matchKw = !kw ||
+                    String(b.DrugName || '').toLowerCase().includes(kw) ||
+                    String((b.BatchCode || b.BatchNumber) || '').toLowerCase().includes(kw);
+                const tag = getExpiryTag(b.ExpiryDate).key;
+                const matchExp = expFilter === 'ALL' || tag === expFilter;
+                return matchKw && matchExp;
+            });
 
-      // Bắt sự kiện phím điều hướng
-      inpSearch.addEventListener('keydown', function(e) {
-          const listContainer = document.getElementById('listThuocSuggest');
-          const items = listContainer.getElementsByClassName('combobox-item');
-          
-          if (!items || items.length === 0) return;
+            const tbody = document.getElementById('tblFefoBody');
+            if (!filtered.length) {
+                tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted py-4">Không có lô hàng phù hợp.</td></tr>';
+                return;
+            }
 
-          if (e.key === 'ArrowDown') { // Nút mũi tên xuống
-              currentFocusIndex++;
-              if (currentFocusIndex >= items.length) currentFocusIndex = 0;
-              addActiveCombobox(items);
-          } else if (e.key === 'ArrowUp') { // Nút mũi tên lên
-              currentFocusIndex--;
-              if (currentFocusIndex < 0) currentFocusIndex = items.length - 1;
-              addActiveCombobox(items);
-          } else if (e.key === 'Enter') { // Nút Enter để chọn
-              if (currentFocusIndex > -1 && items[currentFocusIndex]) {
-                  e.preventDefault(); // Ngăn submit form
-                  items[currentFocusIndex].click();
-              }
-          } else if (e.key === 'Escape') { // Nút Esc để đóng
-              listContainer.style.display = 'none';
-          }
-      });
-  }
+            tbody.innerHTML = filtered.map((b, idx) => {
+                const tag = getExpiryTag(b.ExpiryDate);
+                return `
+      <tr>
+        <td><span class="badge bg-light text-dark border">#${idx + 1} FEFO</span></td>
+        <td class="fw-semibold">${esc(b.DrugName)}</td>
+        <td><code>${esc((b.BatchCode || b.BatchNumber))}</code></td>
+        <td>${fmtDate(b.ExpiryDate)}</td>
+        <td>${tag.html}</td>
+        <td class="text-end fw-semibold">${esc(num(b.CurrentStock ?? (b.CurrentStock ?? b.Quantity)))}</td>
+        <td class="text-end">${money(b.ImportPrice ?? (b.ImportPrice ?? b.UnitCost))}</td>
+      </tr>
+    `;
+            }).join('');
+        }
 
-  // Highlight item khi dùng phím mũi tên
-  function addActiveCombobox(items) {
-      for (let item of items) item.classList.remove('active');
-      if (currentFocusIndex >= 0 && currentFocusIndex < items.length) {
-          items[currentFocusIndex].classList.add('active');
-          items[currentFocusIndex].scrollIntoView({ block: 'nearest' }); // Tự cuộn scroll theo phím
-      }
-  }
+        function renderTt20() {
+            const typeFilter = document.getElementById('selTt20Type').value;
+            const ctrlBatches = batches.filter(b => {
+                const cType = String(b.ControlledType || '').toUpperCase();
+                const isCtrl = flag(b.IsControlled) || ['N', 'H'].includes(cType);
+                if (!isCtrl) return false;
+                if (typeFilter === 'ALL') return true;
+                if (typeFilter === 'N' || typeFilter === 'H') return cType === typeFilter;
+                return !['N', 'H'].includes(cType);
+            });
 
-  // 4. Chọn 1 thuốc từ danh sách
-  function chonThuocCombobox(maThuoc, tenThuoc) {
-      document.getElementById('inpMaThuocSearch').value = `${tenThuoc} (${maThuoc})`;
-      document.getElementById('inpMaThuocKho').value = maThuoc; // Lưu giá trị MaThuoc thực sự vào hidden input
-      document.getElementById('listThuocSuggest').style.display = 'none';
-  }
+            const tbody = document.getElementById('tblTt20Body');
+            if (!ctrlBatches.length) {
+                tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted py-4">Không có lô thuốc kiểm soát đặc biệt phù hợp.</td></tr>';
+                return;
+            }
 
-  // Đóng danh sách khi click ra ngoài vùng Combobox
-  document.addEventListener('click', function(e) {
-      if (!e.target.closest('.combobox-container')) {
-          const listContainer = document.getElementById('listThuocSuggest');
-          if(listContainer) listContainer.style.display = 'none';
-      }
-  });
+            tbody.innerHTML = ctrlBatches.map(b => {
+                const cType = String(b.ControlledType || 'CTRL').toUpperCase();
+                return `
+      <tr>
+        <td class="fw-semibold">${esc(b.DrugCode || b.DrugID)}</td>
+        <td class="fw-semibold">${esc(b.DrugName)}</td>
+        <td><span class="ctrl-pill">${esc(cType)}</span></td>
+        <td><code>${esc((b.BatchCode || b.BatchNumber))}</code></td>
+        <td>${fmtDate(b.ExpiryDate)}</td>
+        <td class="text-end fw-semibold">${esc(num(b.CurrentStock ?? (b.CurrentStock ?? b.Quantity)))}</td>
+      </tr>
+    `;
+            }).join('');
+        }
 
-  // Cập nhật hàm mở Modal Nhập Kho
-  function hienThiModalNhapKho() {
-      document.getElementById('modalNhapKho').style.display = 'flex';
-      document.getElementById('inpMaThuocSearch').value = '';
-      document.getElementById('inpMaThuocKho').value = '';
-      loadSelectThuoc();
-  }
-  
-  window.onload = loadKho;
-</script>
+        function populateDrugSelect() {
+            const sel = document.getElementById('selBatchDrug');
+            sel.innerHTML = '<option value="">-- Chọn thuốc --</option>' +
+                invDrugs.map(d => `<option value="${esc(d.DrugID)}">${esc(d.DrugName)} (${esc(d.DrugCode)})</option>`).join('');
+        }
+
+        function clearBatchErrors() {
+            ['selBatchDrug', 'inpBatchNumber', 'inpExpiryDate', 'inpBatchQty', 'inpUnitCost'].forEach(id => {
+                document.getElementById(id)?.classList.remove('field-invalid');
+            });
+            ['errBatchDrug', 'errBatchNumber', 'errExpiryDate', 'errBatchQty', 'errUnitCost'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.textContent = '';
+            });
+        }
+
+        function setBatchErr(inputId, errId, msg) {
+            document.getElementById(inputId)?.classList.add('field-invalid');
+            const el = document.getElementById(errId);
+            if (el) el.textContent = msg;
+        }
+
+        document.getElementById('frmImportBatch').addEventListener('submit', async e => {
+            e.preventDefault();
+            clearBatchErrors();
+
+            const drugId = document.getElementById('selBatchDrug').value;
+            const BatchNumber = document.getElementById('inpBatchNumber').value.trim();
+            const ExpiryDate = document.getElementById('inpExpiryDate').value;
+            const Quantity = num(document.getElementById('inpBatchQty').value);
+            const UnitCost = num(document.getElementById('inpUnitCost').value);
+            const Note = document.getElementById('inpBatchNote').value.trim();
+
+            let ok = true;
+            if (!drugId) { setBatchErr('selBatchDrug', 'errBatchDrug', 'Vui lòng chọn thuốc.'); ok = false; }
+            if (!BatchNumber) { setBatchErr('inpBatchNumber', 'errBatchNumber', 'Vui lòng nhập số lô.'); ok = false; }
+            if (!ExpiryDate) { setBatchErr('inpExpiryDate', 'errExpiryDate', 'Vui lòng chọn hạn dùng.'); ok = false; }
+            if (Quantity <= 0) { setBatchErr('inpBatchQty', 'errBatchQty', 'Số lượng phải lớn hơn 0.'); ok = false; }
+            if (UnitCost <= 0) { setBatchErr('inpUnitCost', 'errUnitCost', 'Giá nhập phải lớn hơn 0.'); ok = false; }
+            if (!ok) return;
+
+            const payload = {
+                DrugID: Number(drugId),
+                BatchNumber,
+                ExpiryDate,
+                InitialQty: Quantity,
+                ImportPrice: UnitCost,
+                HandoverReportCode: Note || null
+            };
+
+            const btn = document.getElementById('btnSubmitBatch');
+            btn.disabled = true;
+            try {
+                if (USE_MOCK) {
+                    const dObj = invDrugs.find(x => String(x.DrugID) === String(drugId)) || {};
+                    batches.push({
+                        BatchID: String(batches.length + 10),
+                        DrugID: String(drugId),
+                        DrugCode: dObj.DrugCode || '',
+                        DrugName: dObj.DrugName || ('Drug #' + drugId),
+                        BatchNumber,
+                        ExpiryDate,
+                        Quantity: String(Quantity),
+                        UnitCost: String(UnitCost),
+                        IsControlled: String(dObj.IsControlled ?? '0'),
+                        ControlledType: dObj.ControlledType || 'C'
+                    });
+                } else {
+                    await api('POST', '/inventory/batches', payload);
+                    const res = await api('GET', '/inventory/expiring-batches?days=3650');
+                    batches = Array.isArray(res?.batches) ? res.batches : (Array.isArray((res?.batches || res?.drugs || res?.data)) ? res.data : batches);
+                }
+
+                renderInvStats();
+                renderFefo();
+                renderTt20();
+                document.getElementById('frmImportBatch').reset();
+                toast('Đã nhập lô ' + BatchNumber + ' vào kho FEFO.');
+                bootstrap.Tab.getOrCreateInstance(document.getElementById('tab-fefo-btn')).show();
+            } catch (err) {
+                toast(err.message, true);
+            } finally {
+                btn.disabled = false;
+            }
+        });
+
+        async function initInventory() {
+            try {
+                if (USE_MOCK) {
+                    invDrugs = MOCK_INV_DRUGS;
+                    batches = MOCK_BATCHES;
+                } else {
+                    const dRes = await api('GET', '/inventory/drugs');
+                    const dArr = dRes?.data || dRes?.drugs || []; invDrugs = Array.isArray(dArr) ? dArr : [];
+                    const bRes = await api('GET', '/inventory/expiring-batches?days=3650');
+                    const bArr = bRes?.batches || bRes?.expiring_batches || bRes?.data || []; batches = Array.isArray(bArr) ? bArr : [];
+                }
+                populateDrugSelect();
+                renderInvStats();
+                renderFefo();
+                renderTt20();
+            } catch (e) {
+                toast(e.message, true);
+            }
+        }
+
+        document.getElementById('inpFilterBatch').addEventListener('input', renderFefo);
+        document.getElementById('selExpiryFilter').addEventListener('change', renderFefo);
+        document.getElementById('selTt20Type').addEventListener('change', renderTt20);
+        document.getElementById('btnQuickGoImport').addEventListener('click', () => {
+            bootstrap.Tab.getOrCreateInstance(document.getElementById('tab-import-btn')).show();
+        });
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            if (PP_USER) {
+                document.getElementById('userFullName').textContent = PP_USER.FullName || PP_USER.Username;
+                document.getElementById('userRoleBadge').textContent = PP_USER.RoleCode;
+                document.getElementById('userAvatar').textContent = (PP_USER.FullName || 'PP').trim().slice(0, 2).toUpperCase();
+            }
+            const pageRoles = document.body.getAttribute('data-page-roles');
+            if (pageRoles && !hasRole(pageRoles)) {
+                document.getElementById('mainContent').innerHTML = '<div class="panel p-4 text-danger fw-semibold">Bạn không có quyền truy cập trang này (403 Forbidden).</div>';
+                return;
+            }
+            applyRoles(document);
+
+            const curFile = location.pathname.split('/').pop() || 'index.html';
+            document.querySelectorAll('.sidebar .nav-item').forEach(a => {
+                if (a.getAttribute('href') === curFile) a.classList.add('active');
+            });
+
+            document.getElementById('btnLogout')?.addEventListener('click', () => {
+                sessionStorage.removeItem('pp_token');
+                sessionStorage.removeItem('pp_user');
+                location.replace('login.html');
+            });
+
+            await initInventory();
+        });
+    </script>
 </body>
-</html>
 
+</html>
