@@ -1,49 +1,82 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="vi">
 
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PharmaPro v2.0 – Tổng quan điều hành</title>
+  <title>PharmaPro v2.0 – Trung tâm điều hành GPP</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap"
-    rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="css/theme.css">
   <style>
-    .st-pending {
-      background: var(--warn-soft, #fef3e2);
-      color: var(--warn, #b45309);
-      font-size: 11px;
-      font-weight: 700;
-      padding: 3px 9px;
-      border-radius: 20px;
+    .kpi-strip {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-bottom: 18px;
     }
 
-    .st-completed {
-      background: var(--ok-soft, #e5f5ea);
-      color: var(--ok, #15803d);
-      font-size: 11px;
-      font-weight: 700;
-      padding: 3px 9px;
-      border-radius: 20px;
+    @media (max-width: 1199px) {
+      .kpi-strip { grid-template-columns: repeat(2, 1fr); }
     }
 
-    .quick-card {
-      border: 1px solid var(--line, #e6ebe8);
-      border-radius: 12px;
-      padding: 14px;
-      transition: all 0.15s ease;
-      text-decoration: none;
-      color: inherit;
-      display: block;
+    @media (max-width: 575px) {
+      .kpi-strip { grid-template-columns: 1fr; }
+    }
+
+    .kpi-compact {
       background: var(--surface, #fff);
+      border: 1px solid var(--line, #e6ebe8);
+      border-radius: 10px;
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
     }
 
-    .quick-card:hover {
-      border-color: var(--brand, #0d9488);
-      transform: translateY(-1px);
+    .kpi-compact-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12px;
+      color: var(--muted, #64748b);
+      font-weight: 600;
+    }
+
+    .kpi-compact-val {
+      font-size: 1.35rem;
+      font-weight: 700;
+      margin: 4px 0 2px;
+      line-height: 1.2;
+    }
+
+    .kpi-compact-sub {
+      font-size: 11px;
+      color: var(--muted, #64748b);
+    }
+
+    .st-pending, .st-validated, .st-dispensed, .st-completed, .st-rejected {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 20px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .st-pending { background: var(--warn-soft, #fef3e2); color: var(--warn, #b45309); }
+    .st-validated { background: #e0f2fe; color: #0369a1; }
+    .st-dispensed { background: #ede9fe; color: #6d28d9; }
+    .st-completed { background: var(--ok-soft, #e5f5ea); color: var(--ok, #15803d); }
+    .st-rejected { background: var(--danger-soft, #fdeceb); color: var(--danger, #b42318); }
+
+    .chart-box {
+      position: relative;
+      height: 260px;
+      width: 100%;
     }
   </style>
 </head>
@@ -51,35 +84,29 @@
 <body>
   <div class="app-shell d-flex min-vh-100">
     <!-- SIDEBAR DÙNG CHUNG -->
-    <aside class="sidebar">
+    <aside class="sidebar" aria-label="Điều hướng chính">
       <div class="brand">
-        <span class="brand-mark"><i class="fa-solid fa-staff-snake"></i></span>
+        <span class="brand-mark"><i class="fa-solid fa-staff-snake" aria-hidden="true"></i></span>
         <span>PharmaPro <small class="text-muted">v2</small></span>
       </div>
 
-      <div class="nav-group">
-        <div class="nav-label">Điều hành</div>
-        <a class="nav-item" href="index.html"><i class="fa-solid fa-chart-pie"></i> Tổng quan</a>
-      </div>
+      <div class="nav-group">Điều hành</div>
+      <a class="nav-item" href="index.html"><i class="fa-solid fa-chart-pie" aria-hidden="true"></i> Tổng quan</a>
 
-      <div class="nav-group">
-        <div class="nav-label">Dược lâm sàng & Bán hàng</div>
-        <a class="nav-item" href="pos.html" data-roles="ADMIN,DOCTOR,PHARMACIST"><i
-            class="fa-solid fa-cash-register"></i> Kê đơn & POS</a>
-        <a class="nav-item" href="prescriptions.html" data-roles="ADMIN,DOCTOR,PHARMACIST,CASHIER"><i
-            class="fa-solid fa-file-prescription"></i> Đơn thuốc GPP</a>
-        <a class="nav-item" href="patients.html" data-roles="ADMIN,DOCTOR,PHARMACIST"><i
-            class="fa-solid fa-user-injured"></i> Hồ sơ Dược bạ 360°</a>
-      </div>
+      <div class="nav-group">Dược lâm sàng &amp; Bán hàng</div>
+      <a class="nav-item" href="pos.html" data-roles="ADMIN,DOCTOR,PHARMACIST"><i
+          class="fa-solid fa-cash-register" aria-hidden="true"></i> Kê đơn &amp; POS</a>
+      <a class="nav-item" href="prescriptions.html" data-roles="ADMIN,DOCTOR,PHARMACIST,CASHIER"><i
+          class="fa-solid fa-file-prescription" aria-hidden="true"></i> Đơn thuốc GPP</a>
+      <a class="nav-item" href="patients.html" data-roles="ADMIN,DOCTOR,PHARMACIST"><i
+          class="fa-solid fa-user-injured" aria-hidden="true"></i> Hồ sơ Dược bạ 360°</a>
 
-      <div class="nav-group">
-        <div class="nav-label">Kho dược & Pháp lý</div>
-        <a class="nav-item" href="products.html"><i class="fa-solid fa-pills"></i> Danh mục & DDI</a>
-        <a class="nav-item" href="inventory.html" data-roles="ADMIN,PHARMACIST,WAREHOUSE"><i
-            class="fa-solid fa-boxes-stacked"></i> Kho FEFO & TT 20/2017</a>
-        <a class="nav-item" href="audit.html" data-roles="ADMIN,PHARMACIST,WAREHOUSE"><i
-            class="fa-solid fa-clock-rotate-left"></i> Thanh tra Temporal</a>
-      </div>
+      <div class="nav-group">Kho dược &amp; Pháp lý</div>
+      <a class="nav-item" href="products.html"><i class="fa-solid fa-pills" aria-hidden="true"></i> Danh mục &amp; DDI</a>
+      <a class="nav-item" href="inventory.html" data-roles="ADMIN,PHARMACIST,WAREHOUSE"><i
+          class="fa-solid fa-boxes-stacked" aria-hidden="true"></i> Kho FEFO &amp; TT 20/2017</a>
+      <a class="nav-item" href="audit.html" data-roles="ADMIN,PHARMACIST,WAREHOUSE"><i
+          class="fa-solid fa-clock-rotate-left" aria-hidden="true"></i> Thanh tra Temporal</a>
 
       <div class="store-box mt-auto">
         <div class="fw-semibold">Nhà thuốc GPP #79001</div>
@@ -90,100 +117,142 @@
     <!-- KHU VỰC CHÍNH -->
     <div class="main flex-grow-1 d-flex flex-column">
       <header class="topbar d-flex align-items-center justify-content-between">
-        <div class="page-title" id="pageTitle">Tổng quan điều hành nhà thuốc</div>
+        <div class="page-title" id="pageTitle">Trung tâm điều hành &amp; Phân tích GPP</div>
         <div class="user d-flex align-items-center gap-3">
           <div class="text-end">
             <div class="fw-semibold" id="userFullName">Đang tải...</div>
             <div class="small text-muted" id="userRoleBadge">ROLE</div>
           </div>
           <div class="avatar" id="userAvatar">PP</div>
-          <button class="btn-ghost btn-sm" id="btnLogout" title="Đăng xuất"><i
-              class="fa-solid fa-right-from-bracket"></i></button>
+          <button type="button" class="btn-ghost btn-sm" id="btnLogout" title="Đăng xuất" aria-label="Đăng xuất"><i
+              class="fa-solid fa-right-from-bracket" aria-hidden="true"></i></button>
         </div>
       </header>
 
       <main class="content p-4" id="mainContent">
-        <!-- 4 thẻ KPI -->
-        <div class="row g-3 mb-4">
-          <div class="col-sm-6 col-xl-3">
-            <div class="panel">
-              <div class="small text-muted">Doanh thu đơn hoàn tất</div>
-              <div class="fs-4 fw-bold mt-1 text-success" id="kpiRevenue">0đ</div>
+        <!-- Dải chỉ số vận hành gọn -->
+        <div class="kpi-strip">
+          <div class="kpi-compact">
+            <div class="kpi-compact-top">
+              <span>Doanh thu hoàn tất</span>
+              <i class="fa-solid fa-sack-dollar text-success"></i>
+            </div>
+            <div class="kpi-compact-val text-success" id="kpiRevenue">0đ</div>
+            <div class="kpi-compact-sub" id="kpiRevenueSub">0 đơn hoàn tất · TB 0đ/đơn</div>
+          </div>
+
+          <div class="kpi-compact">
+            <div class="kpi-compact-top">
+              <span>Hàng đợi xử lý đơn GPP</span>
+              <i class="fa-solid fa-list-check text-warning"></i>
+            </div>
+            <div class="kpi-compact-val text-warning" id="kpiQueueTotal">0</div>
+            <div class="kpi-compact-sub" id="kpiQueueBreakdown">0 Pending · 0 Validated · 0 Dispensed</div>
+          </div>
+
+          <div class="kpi-compact">
+            <div class="kpi-compact-top">
+              <span>Sức khỏe tồn kho FEFO</span>
+              <i class="fa-solid fa-boxes-stacked text-danger"></i>
+            </div>
+            <div class="kpi-compact-val text-danger" id="kpiStockHealth">0 lô cận date</div>
+            <div class="kpi-compact-sub" id="kpiStockSub">0 biệt dược hết tồn kho</div>
+          </div>
+
+          <div class="kpi-compact">
+            <div class="kpi-compact-top">
+              <span>Dược lâm sàng &amp; TT 20/2017</span>
+              <i class="fa-solid fa-shield-halved text-primary"></i>
+            </div>
+            <div class="kpi-compact-val text-primary" id="kpiClinicalStat">0 BN</div>
+            <div class="kpi-compact-sub" id="kpiClinicalSub">0 thuốc KSĐB · 0 lượt xuất nhập TT 20</div>
+          </div>
+        </div>
+
+        <!-- Hàng 1: Biểu đồ doanh thu theo thời gian + Cơ cấu theo chuyên khoa -->
+        <div class="row g-3 mb-3">
+          <div class="col-lg-8">
+            <div class="panel h-100">
+              <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
+                <div>
+                  <h2 class="h6 fw-bold mb-0">Biểu đồ Doanh thu &amp; Lưu lượng đơn theo thời gian</h2>
+                  <div class="small text-muted" id="chartTimeSubtitle">Theo dõi doanh thu thực thu và số đơn phát sinh</div>
+                </div>
+                <div class="btn-group btn-group-sm" role="group" aria-label="Chọn khung thời gian">
+                  <button type="button" class="btn btn-primary chart-range-btn" data-range="7d">7 ngày qua</button>
+                  <button type="button" class="btn btn-outline-secondary chart-range-btn" data-range="30d">30 ngày qua</button>
+                  <button type="button" class="btn btn-outline-secondary chart-range-btn" data-range="month">Theo tháng</button>
+                </div>
+              </div>
+              <div class="chart-box">
+                <canvas id="canvasRevenueTimeline"></canvas>
+              </div>
             </div>
           </div>
-          <div class="col-sm-6 col-xl-3">
-            <div class="panel">
-              <div class="small text-muted">Đơn chờ cấp phát (Pending)</div>
-              <div class="fs-4 fw-bold mt-1 text-warning" id="kpiPendingRx">0</div>
-            </div>
-          </div>
-          <div class="col-sm-6 col-xl-3">
-            <div class="panel">
-              <div class="small text-muted">Lô cận date (&le; 90 ngày)</div>
-              <div class="fs-4 fw-bold mt-1 text-danger" id="kpiNearExpiry">0</div>
-            </div>
-          </div>
-          <div class="col-sm-6 col-xl-3">
-            <div class="panel">
-              <div class="small text-muted">Thuốc kiểm soát đặc biệt</div>
-              <div class="fs-4 fw-bold mt-1 text-primary" id="kpiCtrlDrugs">0</div>
+
+          <div class="col-lg-4">
+            <div class="panel h-100">
+              <div class="d-flex align-items-center justify-content-between mb-3">
+                <div>
+                  <h2 class="h6 fw-bold mb-0">Doanh thu theo chuyên khoa</h2>
+                  <div class="small text-muted">Tỷ trọng xuất kho thực tế</div>
+                </div>
+              </div>
+              <div class="chart-box">
+                <canvas id="canvasDeptDoughnut"></canvas>
+              </div>
             </div>
           </div>
         </div>
 
-        <div class="row g-4">
-          <!-- Bảng đơn gần đây -->
+        <!-- Hàng 2: Đơn thuốc cần xử lý ngay + Cảnh báo lô cận date FEFO -->
+        <div class="row g-3">
           <div class="col-lg-7">
-            <div class="panel">
-              <div class="d-flex align-items-center justify-content-between mb-3">
-                <h2 class="h6 fw-bold mb-0">Đơn thuốc gần đây</h2>
-                <a href="prescriptions.html" class="small text-decoration-underline">Xem tất cả</a>
+            <div class="panel h-100">
+              <div class="d-flex align-items-center justify-content-between mb-2">
+                <h2 class="h6 fw-bold mb-0">Đơn thuốc GPP gần đây &amp; Hàng đợi xử lý</h2>
+                <a href="prescriptions.html" class="small text-decoration-underline">Mở danh sách đơn</a>
               </div>
               <div class="table-responsive">
                 <table class="table table-sm align-middle mb-0">
                   <thead>
                     <tr>
-                      <th>Mã đơn</th>
+                      <th>Mã đơn 14 ký tự</th>
                       <th>Bệnh nhân</th>
+                      <th>Chẩn đoán</th>
                       <th>Trạng thái</th>
-                      <th class="text-end">Tổng tiền</th>
+                      <th class="text-end">Giá trị</th>
                     </tr>
                   </thead>
                   <tbody id="tblRecentRx">
-                    <tr>
-                      <td colspan="4" class="text-center text-muted py-3">Đang tải...</td>
-                    </tr>
+                    <tr><td colspan="5" class="text-center text-muted py-3">Đang tải dữ liệu...</td></tr>
                   </tbody>
                 </table>
               </div>
             </div>
           </div>
 
-          <!-- Lối tắt phân hệ -->
           <div class="col-lg-5">
-            <div class="panel">
-              <h2 class="h6 fw-bold mb-3">Truy cập nhanh phân hệ</h2>
-              <div class="d-flex flex-column gap-2">
-                <a href="pos.html" class="quick-card" data-roles="ADMIN,DOCTOR,PHARMACIST">
-                  <div class="fw-semibold"><i class="fa-solid fa-cash-register text-primary me-2"></i>Kê đơn & POS
-                    (F1/F3/F4)</div>
-                  <div class="small text-muted">Tìm thuốc, thuốc thay thế, kiểm tra CDSS & nhập OCR</div>
-                </a>
-                <a href="patients.html" class="quick-card" data-roles="ADMIN,DOCTOR,PHARMACIST">
-                  <div class="fw-semibold"><i class="fa-solid fa-user-injured text-success me-2"></i>Hồ sơ Dược bạ 360°
-                  </div>
-                  <div class="small text-muted">Tra cứu CrCl, dị ứng thuốc và lịch sử kê đơn</div>
-                </a>
-                <a href="inventory.html" class="quick-card" data-roles="ADMIN,PHARMACIST,WAREHOUSE">
-                  <div class="fw-semibold"><i class="fa-solid fa-boxes-stacked text-warning me-2"></i>Kho FEFO & Sổ TT
-                    20/2017</div>
-                  <div class="small text-muted">Ưu tiên lô hạn gần, nhập lô mới & kiểm soát đặc biệt</div>
-                </a>
-                <a href="audit.html" class="quick-card" data-roles="ADMIN,PHARMACIST,WAREHOUSE">
-                  <div class="fw-semibold"><i class="fa-solid fa-clock-rotate-left text-danger me-2"></i>Thanh tra
-                    Temporal</div>
-                  <div class="small text-muted">Đối chiếu lịch sử biến động dữ liệu theo thời gian</div>
-                </a>
+            <div class="panel h-100">
+              <div class="d-flex align-items-center justify-content-between mb-2">
+                <h2 class="h6 fw-bold mb-0 text-danger">
+                  <i class="fa-solid fa-hourglass-half me-1"></i>Lô cận date (&le; 90 ngày) &amp; Thuốc hết hàng
+                </h2>
+                <a href="inventory.html" class="small text-decoration-underline">Điều phối FEFO</a>
+              </div>
+              <div class="table-responsive">
+                <table class="table table-sm align-middle mb-0">
+                  <thead>
+                    <tr>
+                      <th>Mã lô / Thuốc</th>
+                      <th class="text-end">Tồn</th>
+                      <th class="text-end">Cảnh báo</th>
+                    </tr>
+                  </thead>
+                  <tbody id="tblNearExpiryOverview">
+                    <tr><td colspan="3" class="text-center text-muted py-3">Đang kiểm tra kho...</td></tr>
+                  </tbody>
+                </table>
               </div>
             </div>
           </div>
@@ -193,22 +262,18 @@
   </div>
 
   <!-- TOAST THÔNG BÁO -->
-  <div class="toast-x" id="toastBox" style="display:none; position:fixed; bottom:20px; right:20px; z-index:9999;"></div>
+  <div class="toast-x" id="toastBox" role="status" aria-live="polite" style="display:none; position:fixed; bottom:20px; right:20px; z-index:9999;"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
   <script>
     const API_BASE = 'http://localhost:3001/api/v2';
-    const USE_MOCK = true; // Đổi thành false khi chạy API thật
+    const USE_MOCK = false;
 
     let PP_TOKEN = sessionStorage.getItem('pp_token');
     let PP_USER = (() => {
       try { return JSON.parse(sessionStorage.getItem('pp_user') || 'null'); } catch (e) { return null; }
     })();
-
-    if (USE_MOCK && (!PP_TOKEN || !PP_USER)) {
-      PP_TOKEN = 'mock-jwt-token';
-      PP_USER = { UserID: '1', EmployeeCode: 'NV001', FullName: 'Nguyễn Minh Quân', RoleCode: 'ADMIN' };
-    }
 
     if (!PP_TOKEN || !PP_USER) {
       const cur = location.pathname.split('/').pop() || 'index.html';
@@ -225,11 +290,10 @@
       if (!box) return;
       box.textContent = msg;
       box.style.display = 'block';
-      box.style.background = isError ? 'var(--danger, #dc2626)' : 'var(--brand, #0d9488)';
+      box.style.background = isError ? 'var(--danger, #b42318)' : 'var(--brand, #0f766e)';
       box.style.color = '#fff';
       box.style.padding = '12px 18px';
       box.style.borderRadius = '10px';
-      box.style.boxShadow = '0 8px 24px rgba(0,0,0,0.15)';
       clearTimeout(window._toastTimer);
       window._toastTimer = setTimeout(() => { box.style.display = 'none'; }, 4000);
     }
@@ -276,62 +340,294 @@
       return data;
     }
 
-    const MOCK_OVERVIEW = {
-      revenue: '125000.00',
-      pendingRx: '2',
-      nearExpiryBatches: '1',
-      controlledDrugs: '1',
-      recentPrescriptions: [
-        { PrescriptionID: '901', NationalCode: '79001RX90100-C', PatientName: 'Nguyễn Thị Lan', Status: 'Pending', TotalAmount: '76000.00' },
-        { PrescriptionID: '895', NationalCode: '79001A1B2C3D-C', PatientName: 'Nguyễn Thị Lan', Status: 'Completed', TotalAmount: '125000.00' },
-        { PrescriptionID: '888', NationalCode: '79001RX88800-N', PatientName: 'Phạm Quốc Bảo', Status: 'Pending', TotalAmount: '130000.00' }
-      ]
-    };
+    function renderOverviewStatusBadge(st) {
+      const s = String(st || 'Pending');
+      const low = s.toLowerCase();
+      if (low === 'completed') return `<span class="st-completed">Completed</span>`;
+      if (low === 'validated') return `<span class="st-validated">Validated</span>`;
+      if (low === 'dispensed') return `<span class="st-dispensed">Dispensed</span>`;
+      if (low === 'rejected' || low === 'cancelled') return `<span class="st-rejected">${esc(s)}</span>`;
+      return `<span class="st-pending">Pending</span>`;
+    }
+
+    let cachedRxList = [];
+    let cachedDeptList = [];
+    let timelineChartInstance = null;
+    let deptChartInstance = null;
+
+    function buildTimelineSeries(rxList, rangeMode) {
+      const now = new Date();
+      const buckets = [];
+
+      if (rangeMode === 'month') {
+        for (let i = 5; i >= 0; i--) {
+          const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+          const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+          const label = `T${d.getMonth() + 1}/${String(d.getFullYear()).slice(-2)}`;
+          buckets.push({ key, label, completedRev: 0, pipelineRev: 0, orderCount: 0 });
+        }
+        rxList.forEach(rx => {
+          const rawDate = rx.CreatedAt || rx.SysStartTime || '';
+          const d = rawDate ? new Date(rawDate) : now;
+          if (isNaN(d)) return;
+          const k = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+          const b = buckets.find(x => x.key === k);
+          if (!b) return;
+          const amt = num(rx.TotalAmount);
+          b.orderCount += 1;
+          if (String(rx.Status).toLowerCase() === 'completed') b.completedRev += amt;
+          else if (String(rx.Status).toLowerCase() !== 'rejected') b.pipelineRev += amt;
+        });
+      } else {
+        const daysCount = rangeMode === '30d' ? 30 : 7;
+        for (let i = daysCount - 1; i >= 0; i--) {
+          const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() - i);
+          const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+          const label = `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}`;
+          buckets.push({ key, label, completedRev: 0, pipelineRev: 0, orderCount: 0 });
+        }
+        rxList.forEach(rx => {
+          const rawDate = rx.CreatedAt || rx.SysStartTime || '';
+          const d = rawDate ? new Date(rawDate) : now;
+          if (isNaN(d)) return;
+          const k = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+          const b = buckets.find(x => x.key === k);
+          if (!b) return;
+          const amt = num(rx.TotalAmount);
+          b.orderCount += 1;
+          if (String(rx.Status).toLowerCase() === 'completed') b.completedRev += amt;
+          else if (String(rx.Status).toLowerCase() !== 'rejected') b.pipelineRev += amt;
+        });
+      }
+
+      return buckets;
+    }
+
+    function renderTimelineChart(rangeMode = '7d') {
+      const canvas = document.getElementById('canvasRevenueTimeline');
+      if (!canvas || typeof Chart === 'undefined') return;
+      const series = buildTimelineSeries(cachedRxList, rangeMode);
+
+      if (timelineChartInstance) timelineChartInstance.destroy();
+      timelineChartInstance = new Chart(canvas, {
+        type: 'bar',
+        data: {
+          labels: series.map(s => s.label),
+          datasets: [
+            {
+              label: 'Doanh thu hoàn tất (đ)',
+              data: series.map(s => s.completedRev),
+              backgroundColor: '#0f766e',
+              borderRadius: 5,
+              yAxisID: 'y'
+            },
+            {
+              label: 'Giá trị đơn đang xử lý (đ)',
+              data: series.map(s => s.pipelineRev),
+              backgroundColor: '#99f6e4',
+              borderRadius: 5,
+              yAxisID: 'y'
+            },
+            {
+              label: 'Số lượng đơn',
+              data: series.map(s => s.orderCount),
+              type: 'line',
+              borderColor: '#d97706',
+              backgroundColor: '#d97706',
+              tension: 0.3,
+              yAxisID: 'y1'
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: { mode: 'index', intersect: false },
+          plugins: {
+            legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } },
+            tooltip: {
+              callbacks: {
+                label: ctx => ctx.dataset.yAxisID === 'y'
+                  ? `${ctx.dataset.label}: ${money(ctx.parsed.y)}`
+                  : `${ctx.dataset.label}: ${ctx.parsed.y} đơn`
+              }
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: { font: { size: 11 }, callback: v => (v >= 1000 ? (v / 1000) + 'k' : v) }
+            },
+            y1: {
+              beginAtZero: true,
+              position: 'right',
+              grid: { drawOnChartArea: false },
+              ticks: { stepSize: 1, font: { size: 11 } }
+            },
+            x: { ticks: { font: { size: 11 } } }
+          }
+        }
+      });
+    }
+
+    function renderDeptChart() {
+      const canvas = document.getElementById('canvasDeptDoughnut');
+      if (!canvas || typeof Chart === 'undefined') return;
+
+      const validRows = cachedDeptList.filter(d => num(d.TotalRevenue) > 0);
+      const labels = validRows.length ? validRows.map(d => d.DeptName || d.DeptCode || 'Chuyên khoa') : ['Chưa phát sinh xuất kho'];
+      const values = validRows.length ? validRows.map(d => num(d.TotalRevenue)) : [1];
+      const colors = validRows.length
+        ? ['#0f766e', '#0284c7', '#7c3aed', '#d97706', '#dc2626', '#059669']
+        : ['#e2e8f0'];
+
+      if (deptChartInstance) deptChartInstance.destroy();
+      deptChartInstance = new Chart(canvas, {
+        type: 'doughnut',
+        data: {
+          labels,
+          datasets: [{ data: values, backgroundColor: colors, borderWidth: 1 }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          cutout: '62%',
+          plugins: {
+            legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } },
+            tooltip: {
+              callbacks: {
+                label: ctx => validRows.length ? `${ctx.label}: ${money(ctx.parsed)}` : 'Chưa có doanh thu xuất kho'
+              }
+            }
+          }
+        }
+      });
+    }
 
     async function initOverview() {
       try {
-        const data = USE_MOCK ? MOCK_OVERVIEW : (await api('GET', '/dashboard/overview'));
-        document.getElementById('kpiRevenue').textContent = money(data?.revenue);
-        document.getElementById('kpiPendingRx').textContent = String(num(data?.pendingRx));
-        document.getElementById('kpiNearExpiry').textContent = String(num(data?.nearExpiryBatches));
-        document.getElementById('kpiCtrlDrugs').textContent = String(num(data?.controlledDrugs));
+        const [rxRes, nearRes, drugRes, deptRes, ptRes, tt20Res] = await Promise.allSettled([
+          api('GET', '/prescriptions'),
+          api('GET', '/inventory/expiring-batches?days=90'),
+          api('GET', '/inventory/drugs'),
+          api('GET', '/inventory/reports/revenue-by-dept'),
+          api('GET', '/clinical/patients'),
+          api('GET', '/inventory/controlled-logs')
+        ]);
 
-        const rxList = Array.isArray(data?.recentPrescriptions) ? data.recentPrescriptions : [];
+        const rxList = rxRes.status === 'fulfilled' ? (rxRes.value?.prescriptions || rxRes.value?.data || []) : [];
+        const nearList = nearRes.status === 'fulfilled' ? (nearRes.value?.batches || nearRes.value?.data || []) : [];
+        const drugList = drugRes.status === 'fulfilled' ? (drugRes.value?.drugs || drugRes.value?.data || []) : [];
+        const deptList = deptRes.status === 'fulfilled' ? (deptRes.value?.report || deptRes.value?.data || []) : [];
+        const ptList = ptRes.status === 'fulfilled' ? (ptRes.value?.patients || ptRes.value?.data || []) : [];
+        const tt20List = tt20Res.status === 'fulfilled' ? (tt20Res.value?.logs || tt20Res.value?.data || []) : [];
+
+        cachedRxList = rxList;
+        cachedDeptList = deptList;
+
+        const completedList = rxList.filter(x => String(x.Status).toLowerCase() === 'completed');
+        const rev = completedList.reduce((a, b) => a + num(b.TotalAmount), 0);
+        const avgOrder = completedList.length ? (rev / completedList.length) : 0;
+        document.getElementById('kpiRevenue').textContent = money(rev);
+        document.getElementById('kpiRevenueSub').textContent = `${completedList.length} đơn hoàn tất · TB ${money(avgOrder)}/đơn`;
+
+        const cntPend = rxList.filter(x => String(x.Status).toLowerCase() === 'pending').length;
+        const cntVal = rxList.filter(x => String(x.Status).toLowerCase() === 'validated').length;
+        const cntDisp = rxList.filter(x => String(x.Status).toLowerCase() === 'dispensed').length;
+        document.getElementById('kpiQueueTotal').textContent = `${cntPend + cntVal + cntDisp} đơn`;
+        document.getElementById('kpiQueueBreakdown').textContent = `${cntPend} Pending · ${cntVal} Validated · ${cntDisp} Dispensed`;
+
+        const outOfStockDrugs = drugList.filter(d => num(d.CurrentStock) <= 0);
+        document.getElementById('kpiStockHealth').textContent = nearRes.status === 'fulfilled'
+          ? `${nearList.length} lô cận date`
+          : 'Theo dõi kho';
+        document.getElementById('kpiStockSub').textContent = drugRes.status === 'fulfilled'
+          ? `${outOfStockDrugs.length} biệt dược hết tồn kho / ${drugList.length} danh mục`
+          : 'Kiểm soát hạn dùng FEFO';
+
+        const ctrlDrugsCount = drugList.filter(d => flag(d.IsControlled)).length;
+        document.getElementById('kpiClinicalStat').textContent = ptRes.status === 'fulfilled'
+          ? `${ptList.length} hồ sơ BN`
+          : `${ctrlDrugsCount} thuốc KSĐB`;
+        document.getElementById('kpiClinicalSub').textContent = `${ctrlDrugsCount} thuốc KSĐB · ${tt20List.length} bút toán sổ TT 20/2017`;
+
+        renderTimelineChart('7d');
+        renderDeptChart();
+
         const tbody = document.getElementById('tblRecentRx');
-        if (!rxList.length) {
-          tbody.innerHTML = '<tr><td colspan="4" class="text-center text-muted py-3">Chưa có đơn thuốc.</td></tr>';
-          return;
+        if (tbody) {
+          if (!rxList.length) {
+            tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted py-3">Chưa có đơn thuốc.</td></tr>';
+          } else {
+            tbody.innerHTML = rxList.slice(0, 7).map(rx => `
+              <tr>
+                <td><a href="prescriptions.html?id=${encodeURIComponent(rx.PrescriptionID || '')}" class="fw-semibold"><code>${esc(rx.NationalCode)}</code></a></td>
+                <td class="fw-semibold">${esc(rx.PatientName || ('BN #' + rx.PatientID))}</td>
+                <td class="small text-muted text-truncate" style="max-width:160px;">${esc(rx.Diagnosis || '—')}</td>
+                <td>${renderOverviewStatusBadge(rx.Status)}</td>
+                <td class="text-end fw-semibold">${money(rx.TotalAmount)}</td>
+              </tr>
+            `).join('');
+          }
         }
 
-        tbody.innerHTML = rxList.map(rx => {
-          const st = String(rx.Status || 'Pending');
-          const badge = st.toLowerCase() === 'completed'
-            ? `<span class="st-completed">${esc(st)}</span>`
-            : `<span class="st-pending">${esc(st)}</span>`;
-          return `
-        <tr>
-          <td><a href="prescriptions.html?id=${encodeURIComponent(rx.PrescriptionID || '')}"><code>${esc(rx.NationalCode)}</code></a></td>
-          <td class="fw-semibold">${esc(rx.PatientName || '')}</td>
-          <td>${badge}</td>
-          <td class="text-end fw-semibold">${money(rx.TotalAmount)}</td>
-        </tr>
-      `;
-        }).join('');
+        const nearBody = document.getElementById('tblNearExpiryOverview');
+        if (nearBody) {
+          const alertRows = [
+            ...nearList.slice(0, 4).map(b => ({
+              title: b.BatchCode,
+              sub: b.DrugName,
+              stock: b.CurrentStock,
+              badge: `<span class="badge ${num(b.DaysRemaining) <= 30 ? 'bg-danger' : 'bg-warning text-dark'}">Còn ${num(b.DaysRemaining)} ngày</span>`
+            })),
+            ...outOfStockDrugs.slice(0, 3).map(d => ({
+              title: d.DrugCode,
+              sub: d.DrugName,
+              stock: 0,
+              badge: `<span class="badge bg-secondary">Hết tồn kho</span>`
+            }))
+          ];
+
+          if (!alertRows.length) {
+            nearBody.innerHTML = '<tr><td colspan="3" class="text-center text-muted py-3">Tồn kho ổn định, chưa có cảnh báo cận date.</td></tr>';
+          } else {
+            nearBody.innerHTML = alertRows.map(r => `
+              <tr>
+                <td>
+                  <div class="fw-semibold small"><code>${esc(r.title)}</code></div>
+                  <div class="small text-muted">${esc(r.sub)}</div>
+                </td>
+                <td class="text-end fw-semibold">${esc(r.stock)}</td>
+                <td class="text-end">${r.badge}</td>
+              </tr>
+            `).join('');
+          }
+        }
       } catch (e) {
         toast(e.message, true);
       }
     }
 
+    document.querySelectorAll('.chart-range-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.chart-range-btn').forEach(b => {
+          b.classList.remove('btn-primary');
+          b.classList.add('btn-outline-secondary');
+        });
+        btn.classList.remove('btn-outline-secondary');
+        btn.classList.add('btn-primary');
+        renderTimelineChart(btn.getAttribute('data-range') || '7d');
+      });
+    });
+
     document.addEventListener('DOMContentLoaded', async () => {
       if (PP_USER) {
-        document.getElementById('userFullName').textContent = PP_USER.FullName || PP_USER.Username;
-        document.getElementById('userRoleBadge').textContent = PP_USER.RoleCode;
-        document.getElementById('userAvatar').textContent = (PP_USER.FullName || 'PP').trim().slice(0, 2).toUpperCase();
-      }
-      const pageRoles = document.body.getAttribute('data-page-roles');
-      if (pageRoles && !hasRole(pageRoles)) {
-        document.getElementById('mainContent').innerHTML = '<div class="panel p-4 text-danger fw-semibold">Bạn không có quyền truy cập trang này (403 Forbidden).</div>';
-        return;
+        const elName = document.getElementById('userFullName');
+        const elRole = document.getElementById('userRoleBadge');
+        const elAvatar = document.getElementById('userAvatar');
+        if (elName) elName.textContent = PP_USER.FullName || PP_USER.Username || '';
+        if (elRole) elRole.textContent = PP_USER.RoleCode || '';
+        if (elAvatar) elAvatar.textContent = (PP_USER.FullName || 'PP').trim().slice(0, 2).toUpperCase();
       }
       applyRoles(document);
 
