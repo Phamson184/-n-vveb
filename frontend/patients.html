@@ -75,7 +75,7 @@
     </style>
 </head>
 
-<body data-page-roles="ADMIN,DOCTOR,PHARMACIST">
+<body data-page-roles="ADMIN,DOCTOR,PHARMACIST,CASHIER">
     <div class="app-shell d-flex min-vh-100">
         <!-- SIDEBAR DÙNG CHUNG -->
         <aside class="sidebar">
@@ -91,11 +91,11 @@
 
             <div class="nav-group">
                 <div class="nav-label">Dược lâm sàng & Bán hàng</div>
-                <a class="nav-item" href="pos.html" data-roles="ADMIN,DOCTOR,PHARMACIST"><i
+                <a class="nav-item" href="pos.html" data-roles="ADMIN,DOCTOR,PHARMACIST,CASHIER"><i
                         class="fa-solid fa-cash-register"></i> Kê đơn & POS</a>
                 <a class="nav-item" href="prescriptions.html" data-roles="ADMIN,DOCTOR,PHARMACIST,CASHIER"><i
                         class="fa-solid fa-file-prescription"></i> Đơn thuốc GPP</a>
-                <a class="nav-item" href="patients.html" data-roles="ADMIN,DOCTOR,PHARMACIST"><i
+                <a class="nav-item" href="patients.html" data-roles="ADMIN,DOCTOR,PHARMACIST,CASHIER"><i
                         class="fa-solid fa-user-injured"></i> Hồ sơ Dược bạ 360°</a>
             </div>
 
@@ -157,7 +157,7 @@
                         <div class="d-flex align-items-center gap-2">
                             <span class="badge bg-light text-dark border" id="patientListCountBadge">0 bệnh nhân</span>
                             <button type="button" class="btn btn-primary btn-sm" id="btnOpenAddPatient"
-                                data-roles="ADMIN,DOCTOR,PHARMACIST">
+                                data-roles="ADMIN,DOCTOR,PHARMACIST,CASHIER">
                                 <i class="fa-solid fa-user-plus me-1"></i> Thêm bệnh nhân
                             </button>
                         </div>
@@ -285,7 +285,7 @@
                                         </div>
                                         <div class="col-12 text-end mt-2">
                                             <button type="submit" class="btn btn-sm btn-primary" id="btnSaveAllergy"
-                                                data-roles="ADMIN,DOCTOR,PHARMACIST">
+                                                data-roles="ADMIN,DOCTOR,PHARMACIST,CASHIER">
                                                 <i class="fa-solid fa-plus me-1"></i> Lưu dị ứng
                                             </button>
                                         </div>

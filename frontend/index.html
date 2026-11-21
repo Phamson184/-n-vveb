@@ -94,11 +94,11 @@
       <a class="nav-item" href="index.html"><i class="fa-solid fa-chart-pie" aria-hidden="true"></i> Tổng quan</a>
 
       <div class="nav-group">Dược lâm sàng &amp; Bán hàng</div>
-      <a class="nav-item" href="pos.html" data-roles="ADMIN,DOCTOR,PHARMACIST"><i
+      <a class="nav-item" href="pos.html" data-roles="ADMIN,DOCTOR,PHARMACIST,CASHIER"><i
           class="fa-solid fa-cash-register" aria-hidden="true"></i> Kê đơn &amp; POS</a>
       <a class="nav-item" href="prescriptions.html" data-roles="ADMIN,DOCTOR,PHARMACIST,CASHIER"><i
           class="fa-solid fa-file-prescription" aria-hidden="true"></i> Đơn thuốc GPP</a>
-      <a class="nav-item" href="patients.html" data-roles="ADMIN,DOCTOR,PHARMACIST"><i
+      <a class="nav-item" href="patients.html" data-roles="ADMIN,DOCTOR,PHARMACIST,CASHIER"><i
           class="fa-solid fa-user-injured" aria-hidden="true"></i> Hồ sơ Dược bạ 360°</a>
 
       <div class="nav-group">Kho dược &amp; Pháp lý</div>
@@ -194,8 +194,8 @@
             <div class="panel h-100">
               <div class="d-flex align-items-center justify-content-between mb-3">
                 <div>
-                  <h2 class="h6 fw-bold mb-0">Doanh thu theo chuyên khoa</h2>
-                  <div class="small text-muted">Tỷ trọng xuất kho thực tế</div>
+                  <h2 class="h6 fw-bold mb-0">Cơ cấu Danh mục &amp; Nhóm thuốc GPP</h2>
+                  <div class="small text-muted">Phân bổ OTC · Kê đơn (Rx) · KSĐB TT 20</div>
                 </div>
               </div>
               <div class="chart-box">
@@ -470,16 +470,20 @@
       });
     }
 
-    function renderDeptChart() {
+    function renderDeptChart(drugList = []) {
       const canvas = document.getElementById('canvasDeptDoughnut');
       if (!canvas || typeof Chart === 'undefined') return;
 
-      const validRows = cachedDeptList.filter(d => num(d.TotalRevenue) > 0);
-      const labels = validRows.length ? validRows.map(d => d.DeptName || d.DeptCode || 'Chuyên khoa') : ['Chưa phát sinh xuất kho'];
-      const values = validRows.length ? validRows.map(d => num(d.TotalRevenue)) : [1];
-      const colors = validRows.length
-        ? ['#0f766e', '#0284c7', '#7c3aed', '#d97706', '#dc2626', '#059669']
-        : ['#e2e8f0'];
+      const ctrlCnt = drugList.filter(d => flag(d.IsControlled)).length;
+      const rxCnt = drugList.filter(d => !flag(d.IsControlled) && flag(d.IsPrescriptionOnly)).length;
+      const otcCnt = drugList.filter(d => !flag(d.IsControlled) && !flag(d.IsPrescriptionOnly)).length;
+      const total = ctrlCnt + rxCnt + otcCnt;
+
+      const labels = total > 0
+        ? ['Thuốc không kê đơn (OTC)', 'Thuốc kê đơn (Rx)', 'Kiểm soát đặc biệt (TT 20)']
+        : ['Chưa có dữ liệu danh mục'];
+      const values = total > 0 ? [otcCnt, rxCnt, ctrlCnt] : [1];
+      const colors = total > 0 ? ['#0f766e', '#0284c7', '#dc2626'] : ['#e2e8f0'];
 
       if (deptChartInstance) deptChartInstance.destroy();
       deptChartInstance = new Chart(canvas, {
@@ -496,7 +500,7 @@
             legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } },
             tooltip: {
               callbacks: {
-                label: ctx => validRows.length ? `${ctx.label}: ${money(ctx.parsed)}` : 'Chưa có doanh thu xuất kho'
+                label: ctx => total > 0 ? `${ctx.label}: ${ctx.parsed} biệt dược` : 'Chưa có dữ liệu'
               }
             }
           }
@@ -557,7 +561,7 @@
 
         // Render Bieu do
         renderTimelineChart('7d');
-        renderDeptChart();
+        renderDeptChart(drugList);
 
         // Render Bang don thuoc gan day
         const tbody = document.getElementById('tblRecentRx');
