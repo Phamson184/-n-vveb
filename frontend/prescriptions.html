@@ -30,24 +30,6 @@
             border-radius: 20px;
         }
 
-        .st-validated {
-            background: #e0f2fe;
-            color: #0369a1;
-            font-size: 11px;
-            font-weight: 700;
-            padding: 3px 9px;
-            border-radius: 20px;
-        }
-
-        .st-dispensed {
-            background: #ede9fe;
-            color: #6d28d9;
-            font-size: 11px;
-            font-weight: 700;
-            padding: 3px 9px;
-            border-radius: 20px;
-        }
-
         .st-cancelled {
             background: var(--danger-soft, #fdeceb);
             color: var(--danger, #b42318);
@@ -64,60 +46,6 @@
             font-weight: 700;
             padding: 2px 8px;
             border-radius: 20px;
-        }
-
-        .rx-stepper {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 8px;
-            margin-bottom: 14px;
-        }
-
-        .rx-step-box {
-            border: 1px solid var(--line, #e6ebe8);
-            border-radius: 8px;
-            padding: 8px 10px;
-            background: #f8fafc;
-            font-size: 12px;
-        }
-
-        .rx-step-box.done {
-            background: var(--ok-soft, #e5f5ea);
-            border-color: #86efac;
-            color: var(--ok, #15803d);
-        }
-
-        .rx-step-box.active {
-            background: #eff6ff;
-            border-color: #3b82f6;
-            color: #1d4ed8;
-            font-weight: 600;
-        }
-
-        .k80-paper {
-            width: 76mm;
-            max-width: 100%;
-            margin: 0 auto;
-            font-family: 'Courier New', Consolas, monospace;
-            font-size: 12px;
-            line-height: 1.4;
-            color: #000;
-        }
-
-        @media print {
-            @page { size: 80mm auto; margin: 2mm; }
-            body * { visibility: hidden !important; }
-            #modalRxK80, #modalRxK80 * { visibility: visible !important; }
-            #modalRxK80 {
-                position: fixed !important; left: 0 !important; top: 0 !important;
-                width: 80mm !important; margin: 0 !important; padding: 0 !important;
-                background: #fff !important; z-index: 99999 !important;
-            }
-            #modalRxK80 .modal-dialog, #modalRxK80 .modal-content, #modalRxK80 .modal-body {
-                width: 80mm !important; max-width: 80mm !important;
-                margin: 0 !important; padding: 2mm !important; border: 0 !important; box-shadow: none !important;
-            }
-            #modalRxK80 .no-print { display: none !important; }
         }
     </style>
 </head>
@@ -209,33 +137,25 @@
                 <div class="panel mb-4">
                     <div class="row g-2 align-items-end">
                         <div class="col-md-4">
-                            <label class="form-label small fw-semibold" for="inpSearchRx">Tìm mã đơn / tên BN / SĐT / chẩn đoán</label>
+                            <label class="form-label small fw-semibold" for="inpSearchRx">Tìm mã đơn / tên BN / chẩn
+                                đoán</label>
                             <input type="text" class="form-control form-control-sm" id="inpSearchRx"
-                                placeholder="Ví dụ: 79001, nguyen thi lan, viem hong...">
+                                placeholder="Ví dụ: 79001A1B2C3D-C, Nguyễn Thị Lan...">
                         </div>
-                        <div class="col-sm-6 col-md-3">
-                            <label class="form-label small fw-semibold" for="selStatusRx">Trạng thái xử lý</label>
+                        <div class="col-md-3">
+                            <label class="form-label small fw-semibold" for="selStatusRx">Trạng thái</label>
                             <select class="form-select form-select-sm" id="selStatusRx">
                                 <option value="ALL">Tất cả trạng thái</option>
-                                <option value="Pending">Pending (Chờ thẩm định)</option>
-                                <option value="Validated">Validated (Đã duyệt - Chờ xuất FEFO)</option>
-                                <option value="Dispensed">Dispensed (Đã xuất kho - Chờ thu tiền)</option>
-                                <option value="Completed">Completed (Hoàn tất)</option>
-                                <option value="Rejected">Rejected (Đã từ chối)</option>
+                                <option value="Pending">Pending (Chờ cấp phát)</option>
+                                <option value="Completed">Completed (Đã hoàn tất)</option>
+                                <option value="Cancelled">Cancelled (Đã hủy)</option>
                             </select>
                         </div>
-                        <div class="col-sm-6 col-md-2">
-                            <label class="form-label small fw-semibold" for="selCtrlRx">Phân loại đơn</label>
-                            <select class="form-select form-select-sm" id="selCtrlRx">
-                                <option value="ALL">Tất cả đơn</option>
-                                <option value="CTRL">Có thuốc KSĐB (TT 20)</option>
-                                <option value="NORM">Đơn thông thường</option>
-                            </select>
-                        </div>
-                        <div class="col-md-3 d-flex gap-2 justify-content-md-end">
-                            <button type="button" class="btn btn-sm btn-outline-secondary" id="btnResetRxFilter">Đặt lại</button>
+                        <div class="col-md-5 d-flex gap-2 justify-content-md-end">
+                            <button type="button" class="btn btn-sm btn-outline-secondary" id="btnResetRxFilter">Đặt
+                                lại</button>
                             <a href="pos.html" class="btn btn-sm btn-primary" data-roles="ADMIN,DOCTOR,PHARMACIST">
-                                <i class="fa-solid fa-plus me-1"></i> Kê đơn POS
+                                <i class="fa-solid fa-plus me-1"></i> Kê đơn mới tại POS
                             </a>
                         </div>
                     </div>
@@ -290,25 +210,6 @@
         </div>
     </div>
 
-    <!-- MODAL IN PHIẾU K80 (80MM) -->
-    <div class="modal fade" id="modalRxK80" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-sm modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header no-print">
-                    <h5 class="modal-title fw-bold">Phiếu đơn thuốc GPP (K80 - 80mm)</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
-                </div>
-                <div class="modal-body" id="rxK80Content"></div>
-                <div class="modal-footer no-print">
-                    <button type="button" class="btn btn-primary btn-sm" onclick="window.print()">
-                        <i class="fa-solid fa-print me-1"></i> In hóa đơn K80
-                    </button>
-                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Đóng</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <!-- TOAST THÔNG BÁO -->
     <div class="toast-x" id="toastBox" style="display:none; position:fixed; bottom:20px; right:20px; z-index:9999;">
     </div>
@@ -316,7 +217,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         const API_BASE = 'http://localhost:3001/api/v2';
-        const USE_MOCK = false; // Đổi thành false khi chạy API thật
+        const USE_MOCK = true; // Đổi thành false khi chạy API thật
 
         let PP_TOKEN = sessionStorage.getItem('pp_token');
         let PP_USER = (() => {
@@ -455,39 +356,19 @@
             }
         ];
 
-        function normVi(str) {
-            return String(str ?? '')
-                .normalize('NFD')
-                .replace(/[\u0300-\u036f]/g, '')
-                .replace(/đ/g, 'd')
-                .replace(/Đ/g, 'D')
-                .toLowerCase()
-                .trim();
-        }
-
         let prescriptions = [];
         const rxModal = new bootstrap.Modal(document.getElementById('modalRxDetail'));
 
         function statusBadge(st) {
-            const s = String(st || 'Pending');
-            const low = s.toLowerCase();
-            if (low === 'completed') return `<span class="st-completed">Completed</span>`;
-            if (low === 'validated') return `<span class="st-validated">Validated</span>`;
-            if (low === 'dispensed') return `<span class="st-dispensed">Dispensed</span>`;
-            if (low === 'rejected' || low === 'cancelled') return `<span class="st-cancelled">${esc(s)}</span>`;
-            return `<span class="st-pending">Pending</span>`;
-        }
-
-        function isRxControlled(rx) {
-            if (flag(rx.HasControlledDrug) || flag(rx.IsControlled)) return true;
-            const c = String(rx.ControlledType || '').toUpperCase();
-            return ['N', 'H', 'KSDB'].includes(c);
+            const s = String(st || '');
+            if (s.toLowerCase() === 'completed') return `<span class="st-completed">${esc(s)}</span>`;
+            if (s.toLowerCase() === 'cancelled') return `<span class="st-cancelled">${esc(s)}</span>`;
+            return `<span class="st-pending">${esc(s || 'Pending')}</span>`;
         }
 
         function renderStats() {
             document.getElementById('statRxAll').textContent = String(prescriptions.length);
-            const activeQueue = prescriptions.filter(x => ['pending', 'validated', 'dispensed'].includes(String(x.Status).toLowerCase())).length;
-            document.getElementById('statRxPending').textContent = String(activeQueue);
+            document.getElementById('statRxPending').textContent = String(prescriptions.filter(x => String(x.Status).toLowerCase() === 'pending').length);
             document.getElementById('statRxCompleted').textContent = String(prescriptions.filter(x => String(x.Status).toLowerCase() === 'completed').length);
             const rev = prescriptions
                 .filter(x => String(x.Status).toLowerCase() === 'completed')
@@ -495,310 +376,89 @@
             document.getElementById('statRxRevenue').textContent = money(rev);
         }
 
-        async function openRxDetail(rxSummary) {
-            if (!rxSummary) return;
-            let rx = rxSummary;
-            if (!USE_MOCK && rxSummary.PrescriptionID) {
-                try {
-                    const detailRes = await api('GET', '/prescriptions?PrescriptionID=' + encodeURIComponent(rxSummary.PrescriptionID));
-                    if (detailRes?.prescription) {
-                        rx = { ...rxSummary, ...detailRes.prescription, items: detailRes.items || [] };
-                    } else if (detailRes?.PrescriptionID) {
-                        rx = { ...rxSummary, ...detailRes };
-                    }
-                } catch (e) {
-                    toast(e.message, true);
-                }
-            }
-
-            const items = Array.isArray(rx.items) ? rx.items : [];
-            const hasCtrlItem = isRxControlled(rx) || items.some(it => flag(it.IsControlled));
-            const stLow = String(rx.Status || 'Pending').toLowerCase();
-
+        function openRxDetail(rx) {
+            if (!rx) return;
             document.getElementById('rxDetailTitle').textContent = `Đơn thuốc ${rx.NationalCode || ('#' + rx.PrescriptionID)}`;
-
-            const actionFormHtml = (() => {
-                if (stLow === 'pending' && hasRole('ADMIN,PHARMACIST')) {
-                    const defaultSig = `SIG-${PP_USER?.EmployeeCode || 'DS'}-${new Date().toISOString().slice(0,10).replace(/-/g,'')}`;
-                    return `
-                        <div class="border rounded p-3 mt-3 bg-light">
-                            <div class="fw-semibold small mb-2 text-primary">Bước 1: Thẩm định Dược lâm sàng (Dược sĩ)</div>
-                            <div class="row g-2">
-                                <div class="col-md-5">
-                                    <label class="form-label small fw-semibold" for="inpRxSig">Chữ ký số Dược sĩ *</label>
-                                    <input type="text" class="form-control form-control-sm" id="inpRxSig" value="${esc(defaultSig)}">
-                                </div>
-                                <div class="col-md-7">
-                                    <label class="form-label small fw-semibold" for="inpRxNote">Ghi chú can thiệp / Lý do từ chối</label>
-                                    <input type="text" class="form-control form-control-sm" id="inpRxNote"
-                                        value="${esc(rx.ClinicalInterventionNote || '')}"
-                                        placeholder="Ghi chú hướng dẫn sử dụng hoặc lý do từ chối đơn...">
-                                </div>
-                            </div>
-                        </div>`;
-                }
-                if (stLow === 'validated' && hasRole('ADMIN,PHARMACIST,CASHIER')) {
-                    const defaultBb = hasCtrlItem ? `BBGN-TT20-${new Date().toISOString().slice(0,10).replace(/-/g,'')}` : '';
-                    return `
-                        <div class="border rounded p-3 mt-3 bg-light">
-                            <div class="fw-semibold small mb-2 text-primary">Bước 2: Xuất kho FEFO &amp; Bàn giao thuốc</div>
-                            <div class="row g-2">
-                                <div class="col-12">
-                                    <label class="form-label small fw-semibold" for="inpRxHandover">
-                                        Mã Biên bản giao nhận Phụ lục IX ${hasCtrlItem ? '<span class="text-danger">* (Bắt buộc cho đơn thuốc KSĐB)</span>' : '(Tùy chọn)'}
-                                    </label>
-                                    <input type="text" class="form-control form-control-sm" id="inpRxHandover"
-                                        value="${esc(defaultBb)}" placeholder="VD: BBGN-TT20-20261121">
-                                </div>
-                            </div>
-                        </div>`;
-                }
-                if (stLow === 'dispensed' && hasRole('ADMIN,PHARMACIST,CASHIER')) {
-                    const pts = Math.floor(num(rx.TotalAmount) / 10000);
-                    return `
-                        <div class="border rounded p-3 mt-3 bg-light">
-                            <div class="fw-semibold small mb-2 text-success">Bước 3: Thu tiền &amp; Hoàn tất đơn hàng</div>
-                            <div class="row g-2 align-items-end">
-                                <div class="col-md-5">
-                                    <label class="form-label small fw-semibold" for="selPayMethod">Hình thức thanh toán</label>
-                                    <select class="form-select form-select-sm" id="selPayMethod">
-                                        <option value="CASH">Tiền mặt tại quầy</option>
-                                        <option value="TRANSFER">Chuyển khoản ngân hàng / VietQR</option>
-                                        <option value="CARD">Quẹt thẻ POS</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-7 small">
-                                    Số tiền cần thu: <strong class="fs-6 text-danger">${money(rx.TotalAmount)}</strong> · Cộng <strong>+${pts} điểm</strong> tích lũy cho bệnh nhân.
-                                </div>
-                            </div>
-                        </div>`;
-                }
-                return '';
-            })();
-
-            const stepIdx = stLow === 'pending' ? 1 : (stLow === 'validated' ? 2 : (stLow === 'dispensed' ? 3 : (stLow === 'completed' ? 4 : 0)));
-            const stepCls = (n) => stepIdx === 0 ? '' : (n < stepIdx ? 'done' : (n === stepIdx ? 'active' : ''));
-            const stepperHtml = `
-                <div class="rx-stepper">
-                    <div class="rx-step-box ${stepCls(1)}"><div class="fw-bold">1. Tiếp nhận đơn</div><div>Tạo mã 14 ký tự</div></div>
-                    <div class="rx-step-box ${stepCls(2)}"><div class="fw-bold">2. Thẩm định GPP</div><div>Dược sĩ ký duyệt</div></div>
-                    <div class="rx-step-box ${stepCls(3)}"><div class="fw-bold">3. Xuất kho FEFO</div><div>Trừ lô cận date</div></div>
-                    <div class="rx-step-box ${stepCls(4)}"><div class="fw-bold">4. Thanh toán</div><div>Hoàn tất &amp; tích điểm</div></div>
-                </div>
-            `;
-
+            const items = Array.isArray(rx.items) ? rx.items : [];
             document.getElementById('rxDetailBody').innerHTML = `
-                ${stepperHtml}
-                <div id="rxModalAlert" class="alert alert-danger py-2 px-3 small d-none mb-3"></div>
-                <div class="row g-2 mb-3 small">
-                    <div class="col-md-6"><strong>Bệnh nhân:</strong> ${esc(rx.PatientName || ('BN #' + rx.PatientID))} (${esc(rx.PatientCode || '')})</div>
-                    <div class="col-md-6"><strong>Thời gian tạo:</strong> ${fmtDateTime(rx.CreatedAt || rx.SysStartTime)}</div>
-                    <div class="col-md-6"><strong>Chẩn đoán:</strong> ${esc(rx.Diagnosis || '—')}</div>
-                    <div class="col-md-6"><strong>Trạng thái:</strong> ${statusBadge(rx.Status)} ${hasCtrlItem ? '<span class="ctrl-tag ms-1">KSĐB TT 20</span>' : ''}</div>
-                    ${rx.DigitalSignature ? `<div class="col-md-6"><strong>Chữ ký thẩm định:</strong> <code>${esc(rx.DigitalSignature)}</code></div>` : ''}
-                    ${rx.ClinicalInterventionNote ? `<div class="col-md-6"><strong>Ghi chú lâm sàng:</strong> ${esc(rx.ClinicalInterventionNote)}</div>` : ''}
-                </div>
-                <div class="table-responsive">
-                    <table class="table table-sm align-middle mb-0">
-                        <thead>
-                            <tr>
-                                <th>Thuốc</th>
-                                <th class="text-end">SL</th>
-                                <th>Cách dùng &amp; Lô FEFO đã xuất</th>
-                                <th class="text-end">Đơn giá</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${items.length ? items.map(it => {
-                                const batches = Array.isArray(it.dispensed_batches) ? it.dispensed_batches : [];
-                                const batchText = batches.length
-                                    ? `<div class="small text-success mt-1">Lô FEFO: ${batches.map(b => `${esc(b.BatchCode)} (SL: ${num(b.DispensedQty)})`).join(', ')}</div>`
-                                    : '';
-                                return `
-                                    <tr>
-                                        <td>
-                                            <div class="fw-semibold">${esc(it.DrugName)} ${flag(it.IsControlled) ? '<span class="ctrl-tag ms-1">KSĐB</span>' : ''}</div>
-                                            <div class="small text-muted">${esc(it.Concentration || '')}</div>
-                                        </td>
-                                        <td class="text-end fw-semibold">${esc(num(it.PrescribedQty))}</td>
-                                        <td>
-                                            <div>${esc(it.DosageInstruction || '—')}</div>
-                                            ${it.OverrideReason ? `<div class="small text-warning">Override: ${esc(it.OverrideReason)}</div>` : ''}
-                                            ${batchText}
-                                        </td>
-                                        <td class="text-end">${money(it.UnitPrice)}</td>
-                                    </tr>`;
-                            }).join('') : '<tr><td colspan="4" class="text-center text-muted">Không có chi tiết thuốc.</td></tr>'}
-                        </tbody>
-                    </table>
-                </div>
-                <div class="text-end fw-bold fs-6 mt-3">Tổng tiền: ${money(rx.TotalAmount)}</div>
-                ${actionFormHtml}
-            `;
+    <div class="row g-2 mb-3 small">
+      <div class="col-md-6"><strong>Bệnh nhân:</strong> ${esc(rx.PatientName || ('BN #' + rx.PatientID))} (${esc(rx.PatientCode || '')})</div>
+      <div class="col-md-6"><strong>Thời gian tạo:</strong> ${fmtDateTime(rx.CreatedAt)}</div>
+      <div class="col-md-6"><strong>Chẩn đoán:</strong> ${esc(rx.Diagnosis || '—')}</div>
+      <div class="col-md-6"><strong>Loại kiểm soát:</strong> ${esc(rx.ControlledType || 'C')} · <strong>Trạng thái:</strong> ${esc(rx.Status)}</div>
+    </div>
+    <div class="table-responsive">
+      <table class="table table-sm align-middle mb-0">
+        <thead>
+          <tr>
+            <th>Thuốc</th>
+            <th class="text-end">SL</th>
+            <th>Cách dùng</th>
+            <th class="text-end">Đơn giá</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${items.length ? items.map(it => `
+            <tr>
+              <td class="fw-semibold">${esc(it.DrugName)}</td>
+              <td class="text-end">${esc(num(it.PrescribedQty))}</td>
+              <td>${esc(it.DosageInstruction || '—')}</td>
+              <td class="text-end">${money(it.UnitPrice)}</td>
+            </tr>
+          `).join('') : '<tr><td colspan="4" class="text-center text-muted">Không có chi tiết thuốc.</td></tr>'}
+        </tbody>
+      </table>
+    </div>
+    <div class="text-end fw-bold fs-6 mt-3">Tổng tiền: ${money(rx.TotalAmount)}</div>
+  `;
 
             const footer = document.getElementById('rxDetailFooter');
-            let actionBtns = '';
-            if (stLow === 'pending' && hasRole('ADMIN,PHARMACIST')) {
-                actionBtns = `
-                    <button type="button" class="btn btn-outline-danger btn-sm" id="btnRejectRx">Từ chối đơn</button>
-                    <button type="button" class="btn btn-primary btn-sm" id="btnValidateRx">Duyệt thẩm định (Validated)</button>`;
-            } else if (stLow === 'validated' && hasRole('ADMIN,PHARMACIST,CASHIER')) {
-                actionBtns = `<button type="button" class="btn btn-warning btn-sm" id="btnDispenseRx">Xuất kho FEFO (Dispensed)</button>`;
-            } else if (stLow === 'dispensed' && hasRole('ADMIN,PHARMACIST,CASHIER')) {
-                actionBtns = `<button type="button" class="btn btn-success btn-sm" id="btnCompleteRx">Thu tiền &amp; Hoàn tất (Completed)</button>`;
-            }
-
+            const canProcess = hasRole('ADMIN,PHARMACIST,CASHIER') && String(rx.Status).toLowerCase() === 'pending';
             footer.innerHTML = `
-                <a href="patients.html?id=${encodeURIComponent(rx.PatientID || '')}" class="btn btn-outline-primary btn-sm me-auto">Hồ sơ BN 360°</a>
-                <button type="button" class="btn btn-outline-dark btn-sm" id="btnPrintRxK80">
-                    <i class="fa-solid fa-print me-1"></i> In phiếu K80 (80mm)
-                </button>
-                ${actionBtns}
-                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Đóng</button>
-            `;
+    <a href="patients.html?id=${encodeURIComponent(rx.PatientID || '')}" class="btn btn-outline-primary btn-sm me-auto">Hồ sơ BN 360°</a>
+    ${canProcess ? `
+      <button type="button" class="btn btn-danger btn-sm" id="btnCancelRx">Hủy đơn</button>
+      <button type="button" class="btn btn-success btn-sm" id="btnCompleteRx">Cấp phát & Hoàn tất</button>
+    ` : ''}
+    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Đóng</button>
+  `;
 
-            document.getElementById('btnPrintRxK80')?.addEventListener('click', () => openRxK80Print(rx, items));
-            document.getElementById('btnValidateRx')?.addEventListener('click', () => handleRxStep(rx, 'Validated'));
-            document.getElementById('btnRejectRx')?.addEventListener('click', () => handleRxStep(rx, 'Rejected'));
-            document.getElementById('btnDispenseRx')?.addEventListener('click', () => handleRxStep(rx, 'Dispensed'));
-            document.getElementById('btnCompleteRx')?.addEventListener('click', () => handleRxStep(rx, 'Completed'));
-
+            if (canProcess) {
+                document.getElementById('btnCompleteRx')?.addEventListener('click', () => updateRxStatus(rx, 'Completed'));
+                document.getElementById('btnCancelRx')?.addEventListener('click', () => updateRxStatus(rx, 'Cancelled'));
+            }
             rxModal.show();
         }
 
-        function openRxK80Print(rx, items) {
-            let frame = document.getElementById('k80HiddenPrintFrame');
-            if (!frame) {
-                frame = document.createElement('iframe');
-                frame.id = 'k80HiddenPrintFrame';
-                frame.style.position = 'fixed';
-                frame.style.right = '0';
-                frame.style.bottom = '0';
-                frame.style.width = '0';
-                frame.style.height = '0';
-                frame.style.border = '0';
-                document.body.appendChild(frame);
-            }
-            const bodyHtml = `
-                <div class="c">
-                    <div class="b">NHÀ THUỐC ĐẠT CHUẨN GPP #79001</div>
-                    <div>PHARMAPRO v2.0 · TP. HỒ CHÍ MINH</div>
-                    <div class="b" style="margin-top:4px;">HÓA ĐƠN &amp; ĐƠN THUỐC QUỐC GIA</div>
-                    <div>Mã 14 ký tự: <span class="b">${esc(rx.NationalCode)}</span></div>
-                    <div>Trạng thái: <span class="b">${esc(rx.Status)}</span></div>
-                </div>
-                <div class="sep"></div>
-                <div>Bệnh nhân: <span class="b">${esc(rx.PatientName || ('BN #' + rx.PatientID))}</span></div>
-                <div>Chẩn đoán: ${esc(rx.Diagnosis || '—')}</div>
-                ${rx.DigitalSignature ? `<div>Chữ ký DS: ${esc(rx.DigitalSignature)}</div>` : ''}
-                <div class="sep"></div>
-                ${items.map((it, idx) => {
-                    const batches = Array.isArray(it.dispensed_batches) ? it.dispensed_batches : [];
-                    const bLine = batches.length ? `<div>Lô FEFO: ${batches.map(b => `${esc(b.BatchCode)} (${num(b.DispensedQty)})`).join(', ')}</div>` : '';
-                    return `
-                        <div class="item">
-                            <div class="b">${idx + 1}. ${esc(it.DrugName)}</div>
-                            <div class="row">
-                                <span>SL: ${esc(num(it.PrescribedQty))} x ${money(it.UnitPrice)}</span>
-                                <span class="b">${money(num(it.UnitPrice) * num(it.PrescribedQty))}</span>
-                            </div>
-                            <div>Liều dùng: ${esc(it.DosageInstruction || 'Theo chỉ định')}</div>
-                            ${bLine}
-                        </div>`;
-                }).join('')}
-                <div class="sep"></div>
-                <div class="row b" style="font-size:14px;">
-                    <span>TỔNG THANH TOÁN:</span>
-                    <span>${money(rx.TotalAmount)}</span>
-                </div>
-                <div class="sep"></div>
-                <div class="c">
-                    <div>Người xuất phiếu: ${esc(PP_USER?.FullName || 'Dược sĩ GPP')}</div>
-                    <div>Cảm ơn Quý khách!</div>
-                </div>
-            `;
-            const doc = frame.contentWindow.document;
-            doc.open();
-            doc.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>K80 Receipt</title>
-                <style>
-                    @page { size: 80mm auto; margin: 0; }
-                    * { box-sizing: border-box; }
-                    body { margin: 0; padding: 0; background: #fff; font-family: 'Courier New', Consolas, monospace; font-size: 12px; line-height: 1.4; color: #000; }
-                    .ticket { width: 76mm; margin: 0 auto; padding: 3mm 2mm; border-left: 1px dashed #999; border-right: 1px dashed #999; }
-                    .c { text-align: center; } .b { font-weight: bold; }
-                    .row { display: flex; justify-content: space-between; gap: 6px; }
-                    .sep { border-top: 1px dashed #000; margin: 6px 0; }
-                    .item { margin-bottom: 6px; }
-                </style></head><body><div class="ticket">${bodyHtml}</div></body></html>`);
-            doc.close();
-            frame.contentWindow.focus();
-            setTimeout(() => { frame.contentWindow.print(); }, 180);
-        }
-
-        async function handleRxStep(rx, step) {
-            const alertBox = document.getElementById('rxModalAlert');
-            if (alertBox) { alertBox.textContent = ''; alertBox.classList.add('d-none'); }
-
+        async function updateRxStatus(rx, nextStatus) {
             try {
-                if (step === 'Validated' || step === 'Rejected') {
-                    const sig = document.getElementById('inpRxSig')?.value.trim() || '';
-                    const note = document.getElementById('inpRxNote')?.value.trim() || '';
-                    if (step === 'Validated' && !sig) {
-                        if (alertBox) { alertBox.textContent = 'Bắt buộc nhập Chữ ký số Dược sĩ khi duyệt đơn.'; alertBox.classList.remove('d-none'); }
-                        return;
-                    }
-                    const res = await api('POST', '/prescriptions/validate', {
-                        PrescriptionID: Number(rx.PrescriptionID),
-                        Decision: step,
-                        DigitalSignature: step === 'Validated' ? sig : null,
-                        ClinicalInterventionNote: note || (step === 'Rejected' ? 'Dược sĩ từ chối đơn' : null)
-                    });
-                    toast(res?.message || `Đã cập nhật trạng thái sang ${step}.`);
-                } else if (step === 'Dispensed') {
-                    const handover = document.getElementById('inpRxHandover')?.value.trim() || '';
-                    const res = await api('POST', '/prescriptions/dispense', {
-                        PrescriptionID: Number(rx.PrescriptionID),
-                        HandoverReportCode: handover
-                    });
-                    toast(res?.message || 'Đã xuất kho FEFO thành công.');
-                } else if (step === 'Completed') {
-                    const res = await api('POST', '/prescriptions/complete', {
-                        PrescriptionID: Number(rx.PrescriptionID)
-                    });
-                    toast(res?.message || 'Đơn thuốc đã hoàn tất!');
+                if (!USE_MOCK) {
+                    await api('PATCH', '/prescriptions/' + encodeURIComponent(rx.PrescriptionID) + '/status', { Status: nextStatus });
                 }
-
-                await initPrescriptions();
-                const updated = prescriptions.find(x => String(x.PrescriptionID) === String(rx.PrescriptionID));
-                if (updated && !['completed', 'rejected'].includes(String(updated.Status).toLowerCase())) {
-                    await openRxDetail(updated);
-                } else {
-                    rxModal.hide();
-                }
-            } catch (err) {
-                if (alertBox) { alertBox.textContent = err.message; alertBox.classList.remove('d-none'); }
-                toast(err.message, true);
+                rx.Status = nextStatus;
+                renderStats();
+                renderRxTable();
+                rxModal.hide();
+                toast(`Đã cập nhật đơn ${rx.NationalCode} sang ${nextStatus}.`);
+            } catch (e) {
+                toast(e.message, true);
             }
         }
 
         function renderRxTable() {
-            const qNorm = normVi(document.getElementById('inpSearchRx').value);
-            const tokens = qNorm ? qNorm.split(/\s+/).filter(Boolean) : [];
+            const kw = document.getElementById('inpSearchRx').value.trim().toLowerCase();
             const st = document.getElementById('selStatusRx').value;
-            const ctrlF = document.getElementById('selCtrlRx')?.value || 'ALL';
 
             const filtered = prescriptions.filter(rx => {
+                const matchKw = !kw ||
+                    String(rx.NationalCode || '').toLowerCase().includes(kw) ||
+                    String(rx.PatientName || '').toLowerCase().includes(kw) ||
+                    String(rx.Diagnosis || '').toLowerCase().includes(kw);
                 const matchSt = st === 'ALL' || String(rx.Status || '').toLowerCase() === st.toLowerCase();
-                if (!matchSt) return false;
-                const isCtrl = isRxControlled(rx);
-                if (ctrlF === 'CTRL' && !isCtrl) return false;
-                if (ctrlF === 'NORM' && isCtrl) return false;
-                if (!tokens.length) return true;
-                const hay = normVi([rx.NationalCode, rx.PatientName, rx.PatientCode, rx.PatientPhone, rx.Diagnosis, rx.Status].join(' '));
-                return tokens.every(tk => hay.includes(tk));
+                return matchKw && matchSt;
             });
 
-            document.getElementById('rxCountLabel').textContent = `${filtered.length} / ${prescriptions.length} đơn`;
+            document.getElementById('rxCountLabel').textContent = filtered.length + ' đơn';
             const tbody = document.getElementById('tblRxBody');
 
             if (!filtered.length) {
@@ -807,10 +467,10 @@
             }
 
             tbody.innerHTML = filtered.map((rx, idx) => {
-                const isCtrl = isRxControlled(rx);
-                const ctrlHtml = isCtrl
-                    ? `<span class="ctrl-tag">KSĐB (TT 20)</span>`
-                    : `<span class="badge bg-light text-dark border">Thông thường</span>`;
+                const cType = String(rx.ControlledType || 'C').toUpperCase();
+                const ctrlHtml = ['N', 'H'].includes(cType)
+                    ? `<span class="ctrl-tag">${esc(cType)}</span>`
+                    : `<span class="badge bg-light text-dark border">${esc(cType)}</span>`;
 
                 return `
       <tr>
@@ -824,7 +484,7 @@
         <td>${statusBadge(rx.Status)}</td>
         <td class="text-end fw-semibold">${money(rx.TotalAmount)}</td>
         <td class="text-end">
-          <button type="button" class="btn btn-sm btn-outline-primary btn-rx-view" data-rx-idx="${idx}">Xử lý / Chi tiết</button>
+          <button type="button" class="btn btn-sm btn-outline-primary btn-rx-view" data-rx-idx="${idx}">Chi tiết</button>
         </td>
       </tr>
     `;
@@ -841,8 +501,7 @@
                     prescriptions = MOCK_PRESCRIPTIONS;
                 } else {
                     const res = await api('GET', '/prescriptions');
-                    const rxArr = res?.prescriptions || res?.data || (Array.isArray(res) ? res : []);
-                    prescriptions = Array.isArray(rxArr) ? rxArr : [];
+                    prescriptions = Array.isArray(res?.data) ? res.data : (Array.isArray(res) ? res : []);
                 }
                 renderStats();
                 renderRxTable();
@@ -850,7 +509,7 @@
                 const focusId = getParam('id');
                 if (focusId) {
                     const found = prescriptions.find(x => String(x.PrescriptionID) === String(focusId));
-                    if (found) await openRxDetail(found);
+                    if (found) openRxDetail(found);
                 }
             } catch (e) {
                 toast(e.message, true);
@@ -859,11 +518,9 @@
 
         document.getElementById('inpSearchRx').addEventListener('input', renderRxTable);
         document.getElementById('selStatusRx').addEventListener('change', renderRxTable);
-        document.getElementById('selCtrlRx')?.addEventListener('change', renderRxTable);
         document.getElementById('btnResetRxFilter').addEventListener('click', () => {
             document.getElementById('inpSearchRx').value = '';
             document.getElementById('selStatusRx').value = 'ALL';
-            if (document.getElementById('selCtrlRx')) document.getElementById('selCtrlRx').value = 'ALL';
             renderRxTable();
         });
 

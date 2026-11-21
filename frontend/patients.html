@@ -147,94 +147,29 @@
                     </div>
                 </div>
 
-                <!-- Danh bạ & Tra cứu Bệnh nhân 360° -->
-                <div class="panel">
+                <!-- Thanh tìm / chọn bệnh nhân xem 360° + Nút thêm bệnh nhân -->
+                <div class="panel mb-4">
                     <div class="panel-head d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
-                        <div>
-                            <h2 class="h6 mb-0 fw-bold">Danh bạ &amp; Tra cứu Bệnh nhân 360°</h2>
-                            <div class="small text-muted">Tìm theo họ tên, số điện thoại, mã bệnh nhân hoặc bấm chọn trực tiếp</div>
+                        <h2 class="h6 mb-0 fw-bold">Tra cứu hồ sơ bệnh nhân 360°</h2>
+                        <button type="button" class="btn btn-primary btn-sm" id="btnOpenAddPatient"
+                            data-roles="ADMIN,DOCTOR,PHARMACIST">
+                            <i class="fa-solid fa-user-plus me-1"></i> Thêm bệnh nhân
+                        </button>
+                    </div>
+                    <form class="row g-2 align-items-end" id="frmLookupPatient">
+                        <div class="col-sm-5 col-md-4">
+                            <label class="form-label small fw-semibold" for="inpLookupPatientId">PatientID (số)</label>
+                            <input type="number" min="1" step="1" class="form-control" id="inpLookupPatientId"
+                                placeholder="Ví dụ: 7">
                         </div>
-                        <div class="d-flex align-items-center gap-2">
-                            <span class="badge bg-light text-dark border" id="patientListCountBadge">0 bệnh nhân</span>
-                            <button type="button" class="btn btn-primary btn-sm" id="btnOpenAddPatient"
-                                data-roles="ADMIN,DOCTOR,PHARMACIST">
-                                <i class="fa-solid fa-user-plus me-1"></i> Thêm bệnh nhân
+                        <div class="col-auto">
+                            <button type="submit" class="btn btn-outline-primary" id="btnLookupPatient">
+                                <i class="fa-solid fa-magnifying-glass me-1"></i> Xem hồ sơ 360°
                             </button>
                         </div>
-                    </div>
-
-                    <div class="row g-2 align-items-end mb-3">
-                        <div class="col-md-4">
-                            <label class="form-label small fw-semibold" for="inpSearchPatientText">Tìm kiếm bệnh nhân</label>
-                            <div class="input-group input-group-sm">
-                                <input type="text" class="form-control" id="inpSearchPatientText"
-                                    placeholder="Họ tên, SĐT, mã BN (BN2026...) hoặc ID...">
-                                <button type="button" class="btn btn-outline-secondary" id="btnClearPatientSearch" title="Xóa lọc">
-                                    <i class="fa-solid fa-xmark"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="col-sm-4 col-md-2">
-                            <label class="form-label small fw-semibold" for="selFilterPatientType">Loại bệnh nhân</label>
-                            <select class="form-select form-select-sm" id="selFilterPatientType">
-                                <option value="">Tất cả nhóm</option>
-                                <option value="Bệnh mạn tính">Bệnh mạn tính</option>
-                                <option value="VIP">VIP</option>
-                                <option value="Thường">Thường</option>
-                            </select>
-                        </div>
-                        <div class="col-sm-4 col-md-3">
-                            <label class="form-label small fw-semibold" for="selSortPatients">Sắp xếp theo</label>
-                            <select class="form-select form-select-sm" id="selSortPatients">
-                                <option value="id_desc">Mới nhất (ID giảm dần)</option>
-                                <option value="name_asc">Họ tên (A → Z)</option>
-                                <option value="name_desc">Họ tên (Z → A)</option>
-                                <option value="code_asc">Mã bệnh nhân (A → Z)</option>
-                                <option value="dob_asc">Tuổi cao nhất trước</option>
-                                <option value="addr_asc">Địa chỉ (A → Z)</option>
-                            </select>
-                        </div>
-                        <div class="col-sm-4 col-md-3">
-                            <form class="d-flex gap-1 align-items-end" id="frmLookupPatient">
-                                <div class="flex-grow-1">
-                                    <label class="form-label small fw-semibold" for="inpLookupPatientId">Mở nhanh ID</label>
-                                    <input type="number" min="1" step="1" class="form-control form-control-sm" id="inpLookupPatientId"
-                                        placeholder="ID số...">
-                                </div>
-                                <button type="submit" class="btn btn-sm btn-outline-primary text-nowrap" id="btnLookupPatient">
-                                    Mở 360°
-                                </button>
-                            </form>
-                        </div>
-                    </div>
-
-                    <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-2">
-                        <div class="small text-muted">Bấm vào một dòng bệnh nhân để xem chi tiết lâm sàng, dị ứng INN &amp; lịch sử đơn thuốc.</div>
-                        <div id="posShortcutWrap"></div>
-                    </div>
-
-                    <div class="table-responsive border rounded">
-                        <table class="table table-sm align-middle mb-0">
-                            <thead class="table-light">
-                                <tr>
-                                    <th style="width:68px;">ID</th>
-                                    <th>Mã BN</th>
-                                    <th>Họ và tên</th>
-                                    <th>Số điện thoại</th>
-                                    <th>Ngày sinh / Giới</th>
-                                    <th>Phân loại</th>
-                                    <th>Địa chỉ</th>
-                                    <th>Bệnh mạn tính</th>
-                                    <th class="text-end">Thao tác</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tblPatientsDirectoryBody">
-                                <tr><td colspan="9" class="text-muted text-center py-3">Đang tải danh sách bệnh nhân...</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <div class="mt-2 text-danger small d-none" id="profile360Error"></div>
+                        <div class="col-auto ms-auto" id="posShortcutWrap"></div>
+                    </form>
+                    <div class="mt-3 text-danger small d-none" id="profile360Error"></div>
                 </div>
 
                 <!-- Nội dung hồ sơ 360° -->
@@ -356,7 +291,6 @@
                 </div>
                 <form id="frmAddPatient" novalidate>
                     <div class="modal-body">
-                        <div id="addPatientModalAlert" class="alert alert-danger py-2 px-3 small d-none mb-3" role="alert"></div>
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <label class="form-label small fw-semibold" for="inpPatientCode">Mã bệnh nhân
@@ -426,11 +360,6 @@
                                     placeholder="Ví dụ: Tăng huyết áp hoặc Không" required>
                                 <div class="field-err-msg" id="errChronicCondition"></div>
                             </div>
-                            <div class="col-12">
-                                <label class="form-label small fw-semibold" for="inpAddress">Địa chỉ thường trú (Address)</label>
-                                <input type="text" class="form-control" id="inpAddress"
-                                    placeholder="Ví dụ: 120 Nguyễn Văn Đậu, P.7, Q.Bình Thạnh, TP.HCM">
-                            </div>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -451,7 +380,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         const API_BASE = 'http://localhost:3001/api/v2';
-        const USE_MOCK = false; // Đổi thành false khi chạy API thật
+        const USE_MOCK = true; // Đổi thành false khi chạy API thật
 
         // 1. KIỂM TRA ĐĂNG NHẬP JWT
         let PP_TOKEN = sessionStorage.getItem('pp_token');
@@ -549,7 +478,7 @@
         }
 
         /* =====================================================
-           DỮ LIỆU GIẢ CHUẨN KIỂU CHUỖI CHO V2 (KHI USE_MOCK = false)
+           DỮ LIỆU GIẢ CHUẨN KIỂU CHUỖI CHO V2 (KHI USE_MOCK = true)
         ===================================================== */
         const MOCK_CATALOGS = {
             success: true,
@@ -607,102 +536,6 @@
                 ]
             }
         };
-
-
-        function normVi(str) {
-            return String(str ?? '')
-                .normalize('NFD')
-                .replace(/[\u0300-\u036f]/g, '')
-                .replace(/đ/g, 'd')
-                .replace(/Đ/g, 'D')
-                .toLowerCase()
-                .trim();
-        }
-
-        let allPatientsList = [];
-
-        function renderPatientDirectory() {
-            const tbody = document.getElementById('tblPatientsDirectoryBody');
-            const badge = document.getElementById('patientListCountBadge');
-            if (!tbody) return;
-
-            const qNorm = normVi(document.getElementById('inpSearchPatientText')?.value || '');
-            const tokens = qNorm ? qNorm.split(/\s+/).filter(Boolean) : [];
-            const typeFilter = (document.getElementById('selFilterPatientType')?.value || '').trim();
-            const sortBy = document.getElementById('selSortPatients')?.value || 'id_desc';
-
-            let list = allPatientsList.filter(p => {
-                if (typeFilter && String(p.PatientType || '') !== typeFilter) return false;
-                if (!tokens.length) return true;
-                const hay = normVi([p.PatientID, p.PatientCode, p.FullName, p.Phone, p.Address, p.ChronicCondition, p.PatientType].join(' '));
-                return tokens.every(tk => hay.includes(tk));
-            });
-
-            list.sort((a, b) => {
-                if (sortBy === 'name_asc') return String(a.FullName || '').localeCompare(String(b.FullName || ''), 'vi');
-                if (sortBy === 'name_desc') return String(b.FullName || '').localeCompare(String(a.FullName || ''), 'vi');
-                if (sortBy === 'code_asc') return String(a.PatientCode || '').localeCompare(String(b.PatientCode || ''), 'vi');
-                if (sortBy === 'dob_asc') return String(a.DateOfBirth || '9999').localeCompare(String(b.DateOfBirth || '9999'));
-                if (sortBy === 'addr_asc') return String(a.Address || 'zzz').localeCompare(String(b.Address || 'zzz'), 'vi');
-                return num(b.PatientID) - num(a.PatientID);
-            });
-
-            if (badge) badge.textContent = `${list.length} / ${allPatientsList.length} bệnh nhân`;
-
-            if (!list.length) {
-                tbody.innerHTML = '<tr><td colspan="9" class="text-muted text-center py-3">Không có bệnh nhân phù hợp bộ lọc.</td></tr>';
-                return;
-            }
-
-            tbody.innerHTML = list.map(p => {
-                const pid = String(p.PatientID ?? '');
-                const isActive = currentPatientId && String(currentPatientId) === pid;
-                const genderText = p.Gender === 'M' ? 'Nam' : (p.Gender === 'F' ? 'Nữ' : esc(p.Gender || '—'));
-                return `
-                    <tr class="patient-row-clickable ${isActive ? 'patient-row-active' : ''}" data-pick-patient="${esc(pid)}">
-                        <td class="fw-semibold text-muted">#${esc(pid)}</td>
-                        <td><span class="badge bg-light text-dark border">${esc(p.PatientCode || '—')}</span></td>
-                        <td class="fw-semibold">${esc(p.FullName || '—')}</td>
-                        <td>${esc(p.Phone || '—')}</td>
-                        <td class="small">${fmtDate(p.DateOfBirth)} · ${genderText}</td>
-                        <td><span class="badge bg-light text-dark border">${esc(p.PatientType || 'Thường')}</span></td>
-                        <td class="small text-muted">${esc(p.Address || '—')}</td>
-                        <td class="small text-muted">${esc(p.ChronicCondition || 'Không')}</td>
-                        <td class="text-end text-nowrap" onclick="event.stopPropagation()">
-                            <button type="button" class="btn btn-sm btn-outline-primary py-0 px-2" data-pick-patient="${esc(pid)}">Hồ sơ 360°</button>
-                            <a href="pos.html?patientId=${encodeURIComponent(pid)}" class="btn btn-sm btn-outline-success py-0 px-2 ms-1">Kê POS</a>
-                        </td>
-                    </tr>
-                `;
-            }).join('');
-
-            tbody.querySelectorAll('[data-pick-patient]').forEach(el => {
-                el.addEventListener('click', () => {
-                    const pid = el.getAttribute('data-pick-patient');
-                    if (pid) {
-                        loadPatient360(pid).then(() => {
-                            renderPatientDirectory();
-                            document.getElementById('profile360Container')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-                        });
-                    }
-                });
-            });
-        }
-
-        async function loadPatientsDirectory() {
-            const tbody = document.getElementById('tblPatientsDirectoryBody');
-            try {
-                if (USE_MOCK) {
-                    allPatientsList = Object.values(MOCK_PROFILES).map(x => x.patient);
-                } else {
-                    const res = await api('GET', '/clinical/patients');
-                    allPatientsList = Array.isArray(res?.patients) ? res.patients : [];
-                }
-                renderPatientDirectory();
-            } catch (e) {
-                if (tbody) tbody.innerHTML = `<tr><td colspan="9" class="text-danger text-center py-3">Lỗi tải danh bạ: ${esc(e.message)}</td></tr>`;
-            }
-        }
 
         let activeIngredients = [];
         let currentPatientId = null;
@@ -765,7 +598,6 @@
     <div class="col-6"><span class="text-muted">Creatinin:</span> <strong>${esc(p.SerumCreatinine)}</strong></div>
     <div class="col-6"><span class="text-muted">Loại BN:</span> <strong>${esc(p.PatientType)}</strong></div>
     <div class="col-6"><span class="text-muted">Bệnh mạn tính:</span> <strong>${esc(p.ChronicCondition)}</strong></div>
-    <div class="col-12"><span class="text-muted">Địa chỉ:</span> <strong>${esc(p.Address || 'Chưa cập nhật')}</strong></div>
   `;
 
             const allergies = Array.isArray(data.allergies_INN) ? data.allergies_INN : [];
@@ -851,17 +683,6 @@
         // Xử lý form thêm bệnh nhân
         document.getElementById('btnOpenAddPatient').addEventListener('click', () => {
             document.getElementById('frmAddPatient').reset();
-            const alertBox = document.getElementById('addPatientModalAlert');
-            if (alertBox) { alertBox.textContent = ''; alertBox.classList.add('d-none'); }
-            const maxNum = allPatientsList.reduce((acc, p) => {
-                const m = String(p.PatientCode || '').match(/(\d+)$/);
-                const val = m ? parseInt(m[1], 10) : 0;
-                return val > acc ? val : acc;
-            }, 202600);
-            const codeInp = document.getElementById('inpPatientCode');
-            if (codeInp) codeInp.value = 'BN' + String(maxNum + 1);
-            const chronicInp = document.getElementById('inpChronicCondition');
-            if (chronicInp) chronicInp.value = 'Không';
             clearValidationErrors([
                 { inputId: 'inpPatientCode', errId: 'errPatientCode' },
                 { inputId: 'inpFullName', errId: 'errFullName' },
@@ -900,30 +721,11 @@
             const SerumCreatinine = num(document.getElementById('inpSerumCreatinine').value);
             const PatientType = document.getElementById('selPatientType').value;
             const ChronicCondition = document.getElementById('inpChronicCondition').value.trim();
-            const Address = document.getElementById('inpAddress')?.value.trim() || '';
 
             let valid = true;
-            const alertBox = document.getElementById('addPatientModalAlert');
-            if (alertBox) { alertBox.textContent = ''; alertBox.classList.add('d-none'); }
-
-            if (!PatientCode) {
-                setFieldError('inpPatientCode', 'errPatientCode', 'Bắt buộc nhập mã bệnh nhân.');
-                valid = false;
-            } else if (allPatientsList.some(p => String(p.PatientCode || '').trim().toLowerCase() === PatientCode.toLowerCase())) {
-                setFieldError('inpPatientCode', 'errPatientCode', `Mã bệnh nhân "${PatientCode}" đã tồn tại.`);
-                valid = false;
-            }
+            if (!PatientCode) { setFieldError('inpPatientCode', 'errPatientCode', 'Bắt buộc nhập mã bệnh nhân.'); valid = false; }
             if (!FullName) { setFieldError('inpFullName', 'errFullName', 'Bắt buộc nhập họ và tên.'); valid = false; }
-            if (!/^0\d{9}$/.test(Phone)) {
-                setFieldError('inpPhone', 'errPhone', 'Số điện thoại gồm 10 số, bắt đầu bằng 0.');
-                valid = false;
-            } else {
-                const dupP = allPatientsList.find(p => String(p.Phone || '').trim() === Phone);
-                if (dupP) {
-                    setFieldError('inpPhone', 'errPhone', `Số điện thoại "${Phone}" đã thuộc về BN ${dupP.FullName || ''}.`);
-                    valid = false;
-                }
-            }
+            if (!/^0\d{9}$/.test(Phone)) { setFieldError('inpPhone', 'errPhone', 'Số điện thoại gồm 10 số, bắt đầu bằng 0.'); valid = false; }
             if (!DateOfBirth) { setFieldError('inpDateOfBirth', 'errDateOfBirth', 'Bắt buộc chọn ngày sinh.'); valid = false; }
             if (!Gender) { setFieldError('selGender', 'errGender', 'Bắt buộc chọn giới tính.'); valid = false; }
             if (Weight_Kg <= 0) { setFieldError('inpWeightKg', 'errWeightKg', 'Cân nặng phải lớn hơn 0.'); valid = false; }
@@ -942,8 +744,7 @@
                 Weight_Kg,
                 SerumCreatinine,
                 PatientType,
-                ChronicCondition,
-                Address
+                ChronicCondition
             };
 
             const btn = document.getElementById('btnSubmitPatient');
@@ -985,23 +786,10 @@
                 document.getElementById('linkToPosWithPatient').href = 'pos.html?patientId=' + encodeURIComponent(createdId);
                 document.getElementById('btnViewCreated360').onclick = () => loadPatient360(createdId);
 
-                await loadPatientsDirectory();
                 if (createdId) {
                     await loadPatient360(createdId);
-                    renderPatientDirectory();
                 }
             } catch (err) {
-                const alertBox = document.getElementById('addPatientModalAlert');
-                if (alertBox) {
-                    alertBox.textContent = err.message;
-                    alertBox.classList.remove('d-none');
-                }
-                const field = err.data?.field;
-                if (field === 'PatientCode' || /mã bệnh nhân/i.test(err.message)) {
-                    setFieldError('inpPatientCode', 'errPatientCode', err.message);
-                } else if (field === 'Phone' || /số điện thoại/i.test(err.message)) {
-                    setFieldError('inpPhone', 'errPhone', err.message);
-                }
                 toast(err.message, true);
             } finally {
                 btn.disabled = false;
@@ -1097,16 +885,6 @@
             });
 
             await loadCatalogsInit();
-            await loadPatientsDirectory();
-
-            document.getElementById('inpSearchPatientText')?.addEventListener('input', renderPatientDirectory);
-            document.getElementById('selFilterPatientType')?.addEventListener('change', renderPatientDirectory);
-            document.getElementById('selSortPatients')?.addEventListener('change', renderPatientDirectory);
-            document.getElementById('btnClearPatientSearch')?.addEventListener('click', () => {
-                document.getElementById('inpSearchPatientText').value = '';
-                document.getElementById('selFilterPatientType').value = '';
-                renderPatientDirectory();
-            });
 
             const paramId = getParam('id');
             if (paramId) {

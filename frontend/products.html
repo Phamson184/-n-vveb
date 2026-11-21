@@ -57,7 +57,6 @@
             border-radius: 20px;
         }
 
-        .field-invalid { border-color: #dc2626 !important; }
         .ddi-minor {
             background: var(--brand-soft, #e3f3f0);
             color: var(--brand, #0f766e);
@@ -152,48 +151,29 @@
                     </div>
                 </div>
 
-                <!-- Bộ lọc danh mục thuốc & Thao tác nhanh -->
+                <!-- Bộ lọc danh mục thuốc -->
                 <div class="panel mb-4">
-                    <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
-                        <div>
-                            <h2 class="h6 fw-bold mb-0">Tra cứu &amp; Quản lý Danh mục Biệt dược</h2>
-                            <div class="small text-muted">Hỗ trợ tìm kiếm tiếng Việt không dấu theo tên thuốc, mã, hoạt chất INN hoặc nhà sản xuất</div>
-                        </div>
-                        <div class="d-flex gap-2">
-                            <a href="inventory.html" class="btn btn-sm btn-outline-primary"
-                                data-roles="ADMIN,PHARMACIST,WAREHOUSE"><i class="fa-solid fa-boxes-stacked me-1"></i> Xem tồn FEFO</a>
-                            <button type="button" class="btn btn-sm btn-primary" id="btnOpenAddDrug"
-                                data-roles="ADMIN,PHARMACIST,WAREHOUSE"><i class="fa-solid fa-plus me-1"></i> Thêm biệt dược</button>
-                        </div>
-                    </div>
                     <div class="row g-2 align-items-end">
                         <div class="col-md-5">
-                            <label class="form-label small fw-semibold" for="inpSearchCatalog">Tìm tên thuốc / mã / hoạt chất / NSX</label>
+                            <label class="form-label small fw-semibold" for="inpSearchCatalog">Tìm tên thuốc / mã / hoạt
+                                chất</label>
                             <input type="text" class="form-control form-control-sm" id="inpSearchCatalog"
-                                placeholder="Ví dụ: paracetamol, morphin, dhg, vien nen...">
+                                placeholder="Ví dụ: Paracetamol, Morphin, Warfarin...">
                         </div>
-                        <div class="col-sm-4 col-md-3">
-                            <label class="form-label small fw-semibold" for="selFilterType">Nhóm quản lý</label>
+                        <div class="col-md-3">
+                            <label class="form-label small fw-semibold" for="selFilterType">Nhóm thuốc</label>
                             <select class="form-select form-select-sm" id="selFilterType">
-                                <option value="ALL">Tất cả nhóm thuốc</option>
+                                <option value="ALL">Tất cả</option>
                                 <option value="OTC">Không kê đơn (OTC)</option>
                                 <option value="RX">Thuốc kê đơn (Rx)</option>
-                                <option value="CTRL">Kiểm soát đặc biệt (TT 20)</option>
+                                <option value="CTRL">Kiểm soát đặc biệt</option>
                             </select>
                         </div>
-                        <div class="col-sm-5 col-md-3">
-                            <label class="form-label small fw-semibold" for="selSortCatalog">Sắp xếp theo</label>
-                            <select class="form-select form-select-sm" id="selSortCatalog">
-                                <option value="id_desc">Mới thêm nhất</option>
-                                <option value="name_asc">Tên thuốc (A → Z)</option>
-                                <option value="stock_asc">Tồn kho thấp nhất trước</option>
-                                <option value="price_asc">Giá bán tăng dần</option>
-                                <option value="price_desc">Giá bán giảm dần</option>
-                            </select>
-                        </div>
-                        <div class="col-sm-3 col-md-1 d-grid">
+                        <div class="col-md-4 d-flex gap-2">
                             <button type="button" class="btn btn-sm btn-outline-secondary"
-                                id="btnResetCatalogFilter" title="Đặt lại bộ lọc">Đặt lại</button>
+                                id="btnResetCatalogFilter">Đặt lại</button>
+                            <a href="inventory.html" class="btn btn-sm btn-outline-primary"
+                                data-roles="ADMIN,PHARMACIST,WAREHOUSE">Xem tồn FEFO</a>
                         </div>
                     </div>
                 </div>
@@ -267,103 +247,6 @@
         </div>
     </div>
 
-    <!-- MODAL THÊM BIỆT DƯỢC MỚI -->
-    <div class="modal fade" id="modalAddDrug" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-lg modal-dialog-centered">
-            <div class="modal-content">
-                <form id="frmAddDrug" novalidate>
-                    <div class="modal-header">
-                        <h5 class="modal-title fw-bold">Thêm biệt dược mới vào danh mục</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div id="addDrugModalAlert" class="alert alert-danger py-2 px-3 small d-none mb-3" role="alert"></div>
-                        <div class="row g-3">
-                            <div class="col-md-4">
-                                <label class="form-label small fw-semibold" for="inpDrugCode">Mã thuốc (DrugCode) *</label>
-                                <input type="text" class="form-control form-control-sm text-uppercase" id="inpDrugCode"
-                                    placeholder="VD: AUGMENTIN1G" required>
-                                <div class="text-danger small mt-1" id="errDrugCode"></div>
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label small fw-semibold" for="inpNationalDrugCode">Số đăng ký (SĐK)</label>
-                                <input type="text" class="form-control form-control-sm" id="inpNationalDrugCode"
-                                    placeholder="VD: VD-28419-17">
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label small fw-semibold" for="inpCurrentPrice">Giá bán lẻ (VNĐ) *</label>
-                                <input type="number" min="0" step="500" class="form-control form-control-sm" id="inpCurrentPrice"
-                                    placeholder="VD: 85000" required>
-                                <div class="text-danger small mt-1" id="errCurrentPrice"></div>
-                            </div>
-                            <div class="col-md-8">
-                                <label class="form-label small fw-semibold" for="inpDrugName">Tên biệt dược *</label>
-                                <input type="text" class="form-control form-control-sm" id="inpDrugName"
-                                    placeholder="VD: Augmentin 1g GSK" required>
-                                <div class="text-danger small mt-1" id="errDrugName"></div>
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label small fw-semibold" for="inpConcentration">Hàm lượng / Nồng độ *</label>
-                                <input type="text" class="form-control form-control-sm" id="inpConcentration"
-                                    placeholder="VD: 875mg/125mg" required>
-                                <div class="text-danger small mt-1" id="errConcentration"></div>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label small fw-semibold" for="selIngredientId">Hoạt chất chuẩn (INN) *</label>
-                                <select class="form-select form-select-sm" id="selIngredientId" required>
-                                    <option value="">-- Chọn hoạt chất --</option>
-                                </select>
-                                <div class="text-danger small mt-1" id="errIngredientId"></div>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label small fw-semibold" for="selDosageFormId">Dạng bào chế *</label>
-                                <select class="form-select form-select-sm" id="selDosageFormId" required>
-                                    <option value="">-- Chọn dạng bào chế --</option>
-                                </select>
-                                <div class="text-danger small mt-1" id="errDosageFormId"></div>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label small fw-semibold" for="inpManufacturer">Nhà sản xuất *</label>
-                                <input type="text" class="form-control form-control-sm" id="inpManufacturer"
-                                    placeholder="VD: GlaxoSmithKline (GSK)" required>
-                                <div class="text-danger small mt-1" id="errManufacturer"></div>
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label small fw-semibold" for="selDepartmentId">Chuyên khoa</label>
-                                <select class="form-select form-select-sm" id="selDepartmentId">
-                                    <option value="">Dùng chung</option>
-                                </select>
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label small fw-semibold" for="inpMinSafeCrCl">Ngưỡng CrCl (ml/phút)</label>
-                                <input type="number" min="0" max="150" step="1" class="form-control form-control-sm" id="inpMinSafeCrCl"
-                                    value="30">
-                            </div>
-                            <div class="col-12 d-flex flex-wrap gap-4 pt-1">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="chkIsPrescriptionOnly">
-                                    <label class="form-check-label small fw-semibold" for="chkIsPrescriptionOnly">
-                                        Thuốc kê đơn (Rx)
-                                    </label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="chkIsControlled">
-                                    <label class="form-check-label small fw-semibold text-danger" for="chkIsControlled">
-                                        Thuốc kiểm soát đặc biệt (Phụ lục VIII - TT 20/2017)
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">Hủy</button>
-                        <button type="submit" class="btn btn-sm btn-primary" id="btnSaveDrug">Lưu biệt dược</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
     <!-- TOAST THÔNG BÁO -->
     <div class="toast-x" id="toastBox" style="display:none; position:fixed; bottom:20px; right:20px; z-index:9999;">
     </div>
@@ -371,7 +254,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         const API_BASE = 'http://localhost:3001/api/v2';
-        const USE_MOCK = false; // Đổi thành false khi chạy API thật
+        const USE_MOCK = true; // Đổi thành false khi chạy API thật
 
         let PP_TOKEN = sessionStorage.getItem('pp_token');
         let PP_USER = (() => {
@@ -463,19 +346,8 @@
             { IngredientA: 'Paracetamol', IngredientB: 'Morphin', Severity: 'Minor', Description: 'Hiệp đồng giảm đau, lưu ý tổng liều Paracetamol/ngày.' }
         ];
 
-        function normVi(str) {
-            return String(str ?? '')
-                .normalize('NFD')
-                .replace(/[\u0300-\u036f]/g, '')
-                .replace(/đ/g, 'd')
-                .replace(/Đ/g, 'D')
-                .toLowerCase()
-                .trim();
-        }
-
         let catalogDrugs = [];
         let ddiList = [];
-        let catalogMeta = { ingredients: [], forms: [], departments: [] };
 
         function renderStats() {
             document.getElementById('statTotalDrugs').textContent = String(catalogDrugs.length);
@@ -485,34 +357,26 @@
         }
 
         function renderCatalog() {
-            const qNorm = normVi(document.getElementById('inpSearchCatalog').value);
-            const tokens = qNorm ? qNorm.split(/\s+/).filter(Boolean) : [];
+            const kw = document.getElementById('inpSearchCatalog').value.trim().toLowerCase();
             const type = document.getElementById('selFilterType').value;
-            const sortBy = document.getElementById('selSortCatalog')?.value || 'id_desc';
 
             const filtered = catalogDrugs.filter(d => {
+                const matchKw = !kw ||
+                    String(d.DrugName || '').toLowerCase().includes(kw) ||
+                    String(d.DrugCode || '').toLowerCase().includes(kw) ||
+                    String(d.IngredientName || '').toLowerCase().includes(kw);
+
                 const isRx = flag(d.IsPrescriptionOnly);
                 const isCtrl = flag(d.IsControlled);
                 let matchType = true;
                 if (type === 'CTRL') matchType = isCtrl;
                 else if (type === 'RX') matchType = isRx && !isCtrl;
                 else if (type === 'OTC') matchType = !isRx && !isCtrl;
-                if (!matchType) return false;
 
-                if (!tokens.length) return true;
-                const hay = normVi([d.DrugCode, d.DrugName, d.Concentration, d.IngredientName, d.FormName, d.Manufacturer, d.DeptName].join(' '));
-                return tokens.every(tk => hay.includes(tk));
+                return matchKw && matchType;
             });
 
-            filtered.sort((a, b) => {
-                if (sortBy === 'name_asc') return String(a.DrugName || '').localeCompare(String(b.DrugName || ''), 'vi');
-                if (sortBy === 'stock_asc') return num(a.CurrentStock) - num(b.CurrentStock);
-                if (sortBy === 'price_asc') return num(a.CurrentPrice) - num(b.CurrentPrice);
-                if (sortBy === 'price_desc') return num(b.CurrentPrice) - num(a.CurrentPrice);
-                return num(b.DrugID) - num(a.DrugID);
-            });
-
-            document.getElementById('catalogCountLabel').textContent = `${filtered.length} / ${catalogDrugs.length} mặt hàng`;
+            document.getElementById('catalogCountLabel').textContent = filtered.length + ' mặt hàng';
             const tbody = document.getElementById('tblCatalogBody');
 
             if (!filtered.length) {
@@ -526,29 +390,17 @@
                 if (flag(d.IsPrescriptionOnly)) badges.push('<span class="pill-rx">Kê đơn (Rx)</span>');
                 if (!flag(d.IsPrescriptionOnly) && !flag(d.IsControlled)) badges.push('<span class="pill-otc">OTC</span>');
 
-                const stk = num(d.CurrentStock);
-                const stkHtml = stk === 0
-                    ? '<span class="badge bg-danger">Hết hàng (0)</span>'
-                    : (stk <= 10
-                        ? `<span class="badge bg-warning text-dark">Sắp hết (${stk})</span>`
-                        : `<span class="fw-semibold">${stk}</span>`);
-
-                const subMeta = [d.Concentration, d.FormName, d.Manufacturer].filter(Boolean).join(' · ');
-
                 return `
       <tr>
         <td class="fw-semibold">${esc(d.DrugCode)}</td>
         <td>
           <div class="fw-semibold">${esc(d.DrugName)}</div>
-          <div class="small text-muted">${esc(subMeta)}</div>
+          <div class="small text-muted">${esc(d.Concentration || '')}</div>
         </td>
-        <td>
-          <div>${esc(d.IngredientName || '—')}</div>
-          ${d.MinSafeCrCl ? `<div class="small text-muted">CrCl ≥ ${esc(d.MinSafeCrCl)} ml/p</div>` : ''}
-        </td>
+        <td>${esc(d.IngredientName || '—')}</td>
         <td><div class="d-flex flex-wrap gap-1">${badges.join('')}</div></td>
-        <td class="text-end">${stkHtml}</td>
-        <td class="text-end fw-semibold">${money(d.CurrentPrice)}</td>
+        <td class="text-end fw-semibold">${esc(num(d.CurrentStock))}</td>
+        <td class="text-end">${money(d.CurrentPrice)}</td>
         <td class="text-end">
           <button type="button" class="btn btn-sm btn-outline-primary btn-focus-ddi" data-ing="${esc(d.IngredientName || '')}">
             Xem DDI
@@ -569,14 +421,14 @@
         }
 
         function renderDdi() {
-            const qNorm = normVi(document.getElementById('inpFilterDdi').value);
+            const kw = document.getElementById('inpFilterDdi').value.trim().toLowerCase();
             const sev = document.getElementById('selFilterSeverity').value;
 
             const filtered = ddiList.filter(item => {
-                const a = normVi(item.IngredientA_Name || item.IngredientA);
-                const b = normVi(item.IngredientB_Name || item.IngredientB);
-                const matchKw = !qNorm || a.includes(qNorm) || b.includes(qNorm);
-                const matchSev = sev === 'ALL' || String((item.SeverityLevel || item.Severity) || '').toLowerCase() === sev.toLowerCase();
+                const a = String(item.IngredientA || '').toLowerCase();
+                const b = String(item.IngredientB || '').toLowerCase();
+                const matchKw = !kw || a.includes(kw) || b.includes(kw);
+                const matchSev = sev === 'ALL' || String(item.Severity || '').toLowerCase() === sev.toLowerCase();
                 return matchKw && matchSev;
             });
 
@@ -587,40 +439,19 @@
             }
 
             tbody.innerHTML = filtered.map(item => {
-                const s = String((item.SeverityLevel || item.Severity) || '');
+                const s = String(item.Severity || '');
                 const cls = s.toLowerCase() === 'major'
                     ? 'ddi-major'
                     : (s.toLowerCase() === 'moderate' ? 'ddi-moderate' : 'ddi-minor');
-                const desc = item.ClinicalEffect
-                    ? (item.ClinicalEffect + (item.ManagementAdvice ? ' — ' + item.ManagementAdvice : ''))
-                    : (item.Description || '—');
                 return `
       <tr>
-        <td class="fw-semibold">${esc((item.IngredientA_Name || item.IngredientA))}</td>
-        <td class="fw-semibold">${esc((item.IngredientB_Name || item.IngredientB))}</td>
+        <td class="fw-semibold">${esc(item.IngredientA)}</td>
+        <td class="fw-semibold">${esc(item.IngredientB)}</td>
         <td><span class="${cls}">${esc(s)}</span></td>
-        <td>${esc(desc)}</td>
+        <td>${esc(item.Description || '—')}</td>
       </tr>
     `;
             }).join('');
-        }
-
-        function populateDrugModalSelects() {
-            const selIng = document.getElementById('selIngredientId');
-            const selForm = document.getElementById('selDosageFormId');
-            const selDept = document.getElementById('selDepartmentId');
-            if (selIng) {
-                selIng.innerHTML = '<option value="">-- Chọn hoạt chất --</option>' +
-                    catalogMeta.ingredients.map(i => `<option value="${esc(i.IngredientID)}">${esc(i.IngredientName)}</option>`).join('');
-            }
-            if (selForm) {
-                selForm.innerHTML = '<option value="">-- Chọn dạng bào chế --</option>' +
-                    catalogMeta.forms.map(f => `<option value="${esc(f.DosageFormID)}">${esc(f.FormName)}</option>`).join('');
-            }
-            if (selDept) {
-                selDept.innerHTML = '<option value="">Dùng chung</option>' +
-                    catalogMeta.departments.map(d => `<option value="${esc(d.DepartmentID)}">${esc(d.DeptName)}</option>`).join('');
-            }
         }
 
         async function initProducts() {
@@ -632,13 +463,8 @@
                     const drugsRes = await api('GET', '/inventory/drugs');
                     catalogDrugs = Array.isArray(drugsRes?.data) ? drugsRes.data : [];
                     try {
-                        const catRes = await api('GET', '/catalogs/init');
-                        const ddiArr = catRes?.interactions || catRes?.ddi_pairs || [];
-                        ddiList = Array.isArray(ddiArr) ? ddiArr : [];
-                        catalogMeta.ingredients = Array.isArray(catRes?.active_ingredients) ? catRes.active_ingredients : [];
-                        catalogMeta.forms = Array.isArray(catRes?.dosage_forms) ? catRes.dosage_forms : [];
-                        catalogMeta.departments = Array.isArray(catRes?.departments) ? catRes.departments : [];
-                        populateDrugModalSelects();
+                        const ddiRes = await api('GET', '/clinical/ddi');
+                        ddiList = Array.isArray(ddiRes?.data) ? ddiRes.data : (Array.isArray(ddiRes) ? ddiRes : []);
                     } catch (e) {
                         ddiList = [];
                     }
@@ -651,106 +477,11 @@
             }
         }
 
-        function setDrugFieldErr(inpId, errId, msg) {
-            const inp = document.getElementById(inpId);
-            const err = document.getElementById(errId);
-            if (inp) inp.classList.toggle('field-invalid', Boolean(msg));
-            if (err) err.textContent = msg || '';
-        }
-
-        function clearDrugModalErrors() {
-            const alertBox = document.getElementById('addDrugModalAlert');
-            if (alertBox) { alertBox.textContent = ''; alertBox.classList.add('d-none'); }
-            [
-                ['inpDrugCode', 'errDrugCode'],
-                ['inpDrugName', 'errDrugName'],
-                ['inpConcentration', 'errConcentration'],
-                ['selIngredientId', 'errIngredientId'],
-                ['selDosageFormId', 'errDosageFormId'],
-                ['inpManufacturer', 'errManufacturer'],
-                ['inpCurrentPrice', 'errCurrentPrice']
-            ].forEach(([i, e]) => setDrugFieldErr(i, e, ''));
-        }
-
-        const addDrugModalEl = document.getElementById('modalAddDrug');
-        const addDrugModal = addDrugModalEl ? new bootstrap.Modal(addDrugModalEl) : null;
-
-        document.getElementById('btnOpenAddDrug')?.addEventListener('click', () => {
-            document.getElementById('frmAddDrug')?.reset();
-            clearDrugModalErrors();
-            addDrugModal?.show();
-        });
-
-        document.getElementById('chkIsControlled')?.addEventListener('change', (e) => {
-            if (e.target.checked) {
-                const rxChk = document.getElementById('chkIsPrescriptionOnly');
-                if (rxChk) rxChk.checked = true;
-            }
-        });
-
-        document.getElementById('frmAddDrug')?.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            clearDrugModalErrors();
-
-            const DrugCode = document.getElementById('inpDrugCode').value.trim().toUpperCase();
-            const NationalDrugCode = document.getElementById('inpNationalDrugCode').value.trim();
-            const DrugName = document.getElementById('inpDrugName').value.trim();
-            const Concentration = document.getElementById('inpConcentration').value.trim();
-            const IngredientID = Number(document.getElementById('selIngredientId').value || 0);
-            const DosageFormID = Number(document.getElementById('selDosageFormId').value || 0);
-            const Manufacturer = document.getElementById('inpManufacturer').value.trim();
-            const DepartmentID = document.getElementById('selDepartmentId').value ? Number(document.getElementById('selDepartmentId').value) : null;
-            const MinSafeCrCl = document.getElementById('inpMinSafeCrCl').value !== '' ? Number(document.getElementById('inpMinSafeCrCl').value) : 30;
-            const CurrentPrice = document.getElementById('inpCurrentPrice').value !== '' ? Number(document.getElementById('inpCurrentPrice').value) : -1;
-            const IsPrescriptionOnly = document.getElementById('chkIsPrescriptionOnly').checked ? 1 : 0;
-            const IsControlled = document.getElementById('chkIsControlled').checked ? 1 : 0;
-
-            let valid = true;
-            if (!DrugCode) {
-                setDrugFieldErr('inpDrugCode', 'errDrugCode', 'Bắt buộc nhập mã thuốc.');
-                valid = false;
-            } else if (catalogDrugs.some(d => String(d.DrugCode || '').trim().toUpperCase() === DrugCode)) {
-                setDrugFieldErr('inpDrugCode', 'errDrugCode', `Mã thuốc "${DrugCode}" đã tồn tại.`);
-                valid = false;
-            }
-            if (!DrugName) { setDrugFieldErr('inpDrugName', 'errDrugName', 'Bắt buộc nhập tên biệt dược.'); valid = false; }
-            if (!Concentration) { setDrugFieldErr('inpConcentration', 'errConcentration', 'Bắt buộc nhập hàm lượng.'); valid = false; }
-            if (!IngredientID) { setDrugFieldErr('selIngredientId', 'errIngredientId', 'Chọn hoạt chất chuẩn INN.'); valid = false; }
-            if (!DosageFormID) { setDrugFieldErr('selDosageFormId', 'errDosageFormId', 'Chọn dạng bào chế.'); valid = false; }
-            if (!Manufacturer) { setDrugFieldErr('inpManufacturer', 'errManufacturer', 'Bắt buộc nhập nhà sản xuất.'); valid = false; }
-            if (!Number.isFinite(CurrentPrice) || CurrentPrice < 0) { setDrugFieldErr('inpCurrentPrice', 'errCurrentPrice', 'Nhập đơn giá bán hợp lệ.'); valid = false; }
-            if (!valid) return;
-
-            const btn = document.getElementById('btnSaveDrug');
-            btn.disabled = true;
-            try {
-                const res = await api('POST', '/inventory/drugs', {
-                    DrugCode, NationalDrugCode, DrugName, IngredientID, DosageFormID,
-                    Concentration, Manufacturer, DepartmentID, IsPrescriptionOnly,
-                    IsControlled, MinSafeCrCl, CurrentPrice
-                });
-                toast(res?.message || 'Đã thêm biệt dược mới!');
-                addDrugModal?.hide();
-                await initProducts();
-            } catch (err) {
-                const alertBox = document.getElementById('addDrugModalAlert');
-                if (alertBox) { alertBox.textContent = err.message; alertBox.classList.remove('d-none'); }
-                if (err.data?.field === 'DrugCode' || /mã thuốc/i.test(err.message)) {
-                    setDrugFieldErr('inpDrugCode', 'errDrugCode', err.message);
-                }
-                toast(err.message, true);
-            } finally {
-                btn.disabled = false;
-            }
-        });
-
         document.getElementById('inpSearchCatalog').addEventListener('input', renderCatalog);
         document.getElementById('selFilterType').addEventListener('change', renderCatalog);
-        document.getElementById('selSortCatalog')?.addEventListener('change', renderCatalog);
         document.getElementById('btnResetCatalogFilter').addEventListener('click', () => {
             document.getElementById('inpSearchCatalog').value = '';
             document.getElementById('selFilterType').value = 'ALL';
-            if (document.getElementById('selSortCatalog')) document.getElementById('selSortCatalog').value = 'id_desc';
             renderCatalog();
         });
         document.getElementById('inpFilterDdi').addEventListener('input', renderDdi);

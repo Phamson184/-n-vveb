@@ -146,31 +146,32 @@
                 <div class="panel mb-4">
                     <div class="row g-2 align-items-end">
                         <div class="col-md-3">
-                            <label class="form-label small fw-semibold" for="selAuditTable">Bảng Temporal</label>
+                            <label class="form-label small fw-semibold" for="selAuditTable">Bảng / Thực thể</label>
                             <select class="form-select form-select-sm" id="selAuditTable">
-                                <option value="ALL">Tất cả 5 bảng Temporal</option>
-                                <option value="InventoryBatches">InventoryBatches (Lô kho FEFO)</option>
-                                <option value="Prescriptions">Prescriptions (Đơn thuốc GPP)</option>
+                                <option value="ALL">Tất cả bảng</option>
+                                <option value="Batches">Batches (Lô kho FEFO)</option>
+                                <option value="Drugs">Drugs (Danh mục thuốc)</option>
                                 <option value="Patients">Patients (Hồ sơ bệnh nhân)</option>
-                                <option value="PatientAllergies">PatientAllergies (Dị ứng INN)</option>
-                                <option value="ControlledDrugLogs">ControlledDrugLogs (Sổ TT 20/2017)</option>
+                                <option value="Prescriptions">Prescriptions (Đơn thuốc)</option>
                             </select>
                         </div>
                         <div class="col-md-2">
-                            <label class="form-label small fw-semibold" for="selAuditAction">Trạng thái / Thao tác</label>
+                            <label class="form-label small fw-semibold" for="selAuditAction">Thao tác</label>
                             <select class="form-select form-select-sm" id="selAuditAction">
                                 <option value="ALL">Tất cả</option>
-                                <option value="INSERT">Hiện hành (INSERT)</option>
-                                <option value="UPDATE">Lịch sử cũ (UPDATE)</option>
+                                <option value="INSERT">INSERT</option>
+                                <option value="UPDATE">UPDATE</option>
+                                <option value="DELETE">DELETE</option>
                             </select>
                         </div>
                         <div class="col-md-3">
-                            <label class="form-label small fw-semibold" for="inpAuditRecordId">Mã bản ghi / Người sửa / Từ khóa</label>
+                            <label class="form-label small fw-semibold" for="inpAuditRecordId">Mã bản ghi / Từ
+                                khóa</label>
                             <input type="text" class="form-control form-control-sm" id="inpAuditRecordId"
-                                placeholder="Ví dụ: LOT-HAPA, BN001, Thu Ha...">
+                                placeholder="Ví dụ: LOT202601A, #2, 7...">
                         </div>
                         <div class="col-md-2">
-                            <label class="form-label small fw-semibold" for="inpAsOfTime">Mốc thời gian (AS OF)</label>
+                            <label class="form-label small fw-semibold" for="inpAsOfTime">Mốc thời gian (AsOf)</label>
                             <input type="datetime-local" class="form-control form-control-sm" id="inpAsOfTime">
                         </div>
                         <div class="col-md-2 d-flex gap-2">
@@ -182,13 +183,6 @@
                                 <i class="fa-solid fa-rotate-left"></i>
                             </button>
                         </div>
-                    </div>
-                    <div class="d-flex flex-wrap align-items-center gap-2 mt-2 pt-2 border-top">
-                        <span class="small text-muted">Mốc AS OF nhanh:</span>
-                        <button type="button" class="btn btn-sm btn-outline-secondary py-0 px-2 quick-asof" data-mins="0">Hiện tại (ALL)</button>
-                        <button type="button" class="btn btn-sm btn-outline-secondary py-0 px-2 quick-asof" data-mins="15">15 phút trước</button>
-                        <button type="button" class="btn btn-sm btn-outline-secondary py-0 px-2 quick-asof" data-mins="60">1 giờ trước</button>
-                        <button type="button" class="btn btn-sm btn-outline-secondary py-0 px-2 quick-asof" data-mins="1440">24 giờ trước</button>
                     </div>
                 </div>
 
@@ -234,8 +228,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
                 </div>
                 <div class="modal-body">
-                    <div class="small text-muted mb-2" id="auditDiffMeta"></div>
-                    <div class="alert alert-info py-2 px-3 small mb-3 d-none" id="auditDiffSummary"></div>
+                    <div class="small text-muted mb-3" id="auditDiffMeta"></div>
                     <div class="row g-3">
                         <div class="col-md-6">
                             <div class="fw-semibold small text-danger mb-1">Dữ liệu trước thay đổi (OldValues)</div>
@@ -261,7 +254,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         const API_BASE = 'http://localhost:3001/api/v2';
-        const USE_MOCK = false; // Đổi thành false khi chạy API thật
+        const USE_MOCK = true; // Đổi thành false khi chạy API thật
 
         let PP_TOKEN = sessionStorage.getItem('pp_token');
         let PP_USER = (() => {
@@ -403,17 +396,6 @@
             }
         ];
 
-        function normVi(str) {
-            return String(str ?? '')
-                .normalize('NFD')
-                .replace(/[\u0300-\u036f]/g, '')
-                .replace(/đ/g, 'd')
-                .replace(/Đ/g, 'D')
-                .toLowerCase()
-                .trim();
-        }
-
-        const TEMPORAL_TABLES = ['InventoryBatches', 'Prescriptions', 'Patients', 'PatientAllergies', 'ControlledDrugLogs'];
         let auditLogs = [];
         const diffModal = new bootstrap.Modal(document.getElementById('modalAuditDiff'));
 
@@ -427,23 +409,33 @@
         function getFilteredAudit() {
             const tbl = document.getElementById('selAuditTable').value;
             const act = document.getElementById('selAuditAction').value;
-            const qNorm = normVi(document.getElementById('inpAuditRecordId').value);
-            const tokens = qNorm ? qNorm.split(/\s+/).filter(Boolean) : [];
+            const kw = document.getElementById('inpAuditRecordId').value.trim().toLowerCase();
+            const asOfRaw = document.getElementById('inpAsOfTime').value;
+            const asOfTime = asOfRaw ? new Date(asOfRaw).getTime() : null;
 
             return auditLogs.filter(row => {
                 const matchTbl = tbl === 'ALL' || String(row.TableName) === tbl;
                 const matchAct = act === 'ALL' || String(row.Action).toUpperCase() === act;
-                if (!matchTbl || !matchAct) return false;
-                if (!tokens.length) return true;
-                const hay = normVi([row.TableName, row.RecordKey, row.ChangedBy, JSON.stringify(row.NewValues || {})].join(' '));
-                return tokens.every(tk => hay.includes(tk));
+                const matchKw = !kw ||
+                    String(row.RecordKey || '').toLowerCase().includes(kw) ||
+                    String(row.ChangedBy || '').toLowerCase().includes(kw) ||
+                    String(row.TableName || '').toLowerCase().includes(kw);
+
+                let matchTime = true;
+                if (asOfTime && !isNaN(asOfTime)) {
+                    const startTs = row.SysStartTime ? new Date(row.SysStartTime).getTime() : 0;
+                    const endTs = row.SysEndTime ? new Date(row.SysEndTime).getTime() : Number.MAX_SAFE_INTEGER;
+                    matchTime = asOfTime >= startTs && asOfTime <= endTs;
+                }
+
+                return matchTbl && matchAct && matchKw && matchTime;
             });
         }
 
         function renderAuditTable() {
             const filtered = getFilteredAudit();
             renderAuditStats(filtered);
-            document.getElementById('auditCountLabel').textContent = `${filtered.length} / ${auditLogs.length} bản ghi`;
+            document.getElementById('auditCountLabel').textContent = filtered.length + ' bản ghi';
 
             const tbody = document.getElementById('tblAuditBody');
             if (!filtered.length) {
@@ -454,10 +446,10 @@
             tbody.innerHTML = filtered.map((row, idx) => {
                 const actUp = String(row.Action || '').toUpperCase();
                 const actBadge = actUp === 'INSERT'
-                    ? '<span class="act-insert">HIỆN HÀNH</span>'
+                    ? '<span class="act-insert">INSERT</span>'
                     : (actUp === 'DELETE'
                         ? '<span class="act-delete">DELETE</span>'
-                        : '<span class="act-update">LỊCH SỬ (UPDATE)</span>');
+                        : '<span class="act-update">UPDATE</span>');
 
                 return `
       <tr>
@@ -482,71 +474,12 @@
                     if (!item) return;
                     document.getElementById('auditDiffTitle').textContent = `Biến động ${item.TableName} — ${item.RecordKey}`;
                     document.getElementById('auditDiffMeta').textContent =
-                        `Trạng thái: ${item.Action} · Người thực hiện: ${item.ChangedBy || '—'} · Hiệu lực: ${fmtDateTime(item.SysStartTime)} → ${fmtDateTime(item.SysEndTime)}`;
-
-                    const sumBox = document.getElementById('auditDiffSummary');
-                    if (sumBox) {
-                        if (item.ChangedFields && item.ChangedFields.length) {
-                            sumBox.textContent = 'Các trường thay đổi: ' + item.ChangedFields.join(' | ');
-                            sumBox.classList.remove('d-none');
-                        } else {
-                            sumBox.textContent = '';
-                            sumBox.classList.add('d-none');
-                        }
-                    }
-
-                    document.getElementById('auditOldJson').textContent = item.OldValues
-                        ? JSON.stringify(item.OldValues, null, 2)
-                        : '(Phiên bản khởi tạo ban đầu — chưa có bản ghi trước đó)';
-                    document.getElementById('auditNewJson').textContent = item.NewValues
-                        ? JSON.stringify(item.NewValues, null, 2)
-                        : '(Không có dữ liệu)';
+                        `Thao tác: ${item.Action} · Người thực hiện: ${item.ChangedBy || '—'} · Thời điểm: ${fmtDateTime(item.ChangedAt || item.SysStartTime)}`;
+                    document.getElementById('auditOldJson').textContent = item.OldValues ? JSON.stringify(item.OldValues, null, 2) : '(Không có dữ liệu trước)';
+                    document.getElementById('auditNewJson').textContent = item.NewValues ? JSON.stringify(item.NewValues, null, 2) : '(Không có dữ liệu sau)';
                     diffModal.show();
                 });
             });
-        }
-
-        function mapTemporalRecords(tbl, rawList) {
-            const getEntityId = (r) => String(
-                r.BatchID ?? r.PrescriptionID ?? r.PatientID ?? r.AllergyID ?? r.LogID ?? r.BatchCode ?? r.PatientCode ?? '0'
-            );
-            const sortedAsc = [...rawList].sort((a, b) => String(a.SysStartTime || '').localeCompare(String(b.SysStartTime || '')));
-            const prevByEntity = new Map();
-
-            const mapped = sortedAsc.map(r => {
-                const eid = getEntityId(r);
-                const pkLabel = r.BatchCode || r.NationalCode || r.PatientCode || ('ID #' + eid);
-                const isHist = r.SysEndTime && !String(r.SysEndTime).startsWith('9999');
-                const prevRow = prevByEntity.get(eid) || null;
-                prevByEntity.set(eid, r);
-
-                const changedFields = [];
-                if (prevRow) {
-                    const skipKeys = new Set(['SysStartTime', 'SysEndTime', 'ModifiedByUserID', 'ModifiedByName', 'EmployeeCode']);
-                    Object.keys(r).forEach(k => {
-                        if (!skipKeys.has(k) && String(prevRow[k] ?? '') !== String(r[k] ?? '')) {
-                            changedFields.push(`${k}: "${prevRow[k] ?? 'NULL'}" → "${r[k] ?? 'NULL'}"`);
-                        }
-                    });
-                }
-
-                return {
-                    TableName: tbl,
-                    RecordKey: '#' + pkLabel,
-                    Action: isHist ? 'UPDATE' : (prevRow ? 'INSERT' : 'INSERT'),
-                    ChangedBy: r.ModifiedByName
-                        ? `${r.ModifiedByName}${r.EmployeeCode ? ' (' + r.EmployeeCode + ')' : ''}`
-                        : `UserID #${r.ModifiedByUserID || 'System'}`,
-                    ChangedAt: r.SysStartTime,
-                    SysStartTime: r.SysStartTime,
-                    SysEndTime: isHist ? r.SysEndTime : null,
-                    OldValues: prevRow,
-                    NewValues: r,
-                    ChangedFields: changedFields
-                };
-            });
-
-            return mapped.reverse();
         }
 
         async function initAudit() {
@@ -554,48 +487,16 @@
                 if (USE_MOCK) {
                     auditLogs = MOCK_AUDIT_LOGS;
                 } else {
-                    const tbl = document.getElementById('selAuditTable').value || 'ALL';
-                    const asOfVal = document.getElementById('inpAsOfTime').value;
-                    const asOfParam = asOfVal ? '&as_of=' + encodeURIComponent(asOfVal.replace('T', ' ') + ':00') : '';
-                    const targetTables = tbl === 'ALL' ? TEMPORAL_TABLES : [tbl];
-
-                    const results = await Promise.all(
-                        targetTables.map(async tName => {
-                            try {
-                                const res = await api('GET', `/audit/as-of?table=${encodeURIComponent(tName)}${asOfParam}`);
-                                const arr = Array.isArray(res?.records) ? res.records : [];
-                                return mapTemporalRecords(tName, arr);
-                            } catch (err) {
-                                return [];
-                            }
-                        })
-                    );
-
-                    auditLogs = results
-                        .flat()
-                        .sort((a, b) => String(b.SysStartTime || '').localeCompare(String(a.SysStartTime || '')));
+                    const tbl = document.getElementById('selAuditTable').value;
+                    const q = tbl !== 'ALL' ? ('?table=' + encodeURIComponent(tbl)) : '';
+                    const res = await api('GET', '/audit/temporal' + q);
+                    auditLogs = Array.isArray(res?.data) ? res.data : (Array.isArray(res) ? res : []);
                 }
                 renderAuditTable();
             } catch (e) {
                 toast(e.message, true);
             }
         }
-
-        document.querySelectorAll('.quick-asof').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const mins = Number(btn.getAttribute('data-mins') || 0);
-                const inp = document.getElementById('inpAsOfTime');
-                if (mins <= 0) {
-                    inp.value = '';
-                } else {
-                    const dt = new Date(Date.now() - mins * 60000);
-                    const pad = n => String(n).padStart(2, '0');
-                    inp.value = `${dt.getFullYear()}-${pad(dt.getMonth() + 1)}-${pad(dt.getDate())}T${pad(dt.getHours())}:${pad(dt.getMinutes())}`;
-                }
-                if (!USE_MOCK) initAudit();
-                else renderAuditTable();
-            });
-        });
 
         document.getElementById('btnRunAuditQuery').addEventListener('click', () => {
             if (!USE_MOCK) {
