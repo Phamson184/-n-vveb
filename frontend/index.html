@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="vi">
 
 <head>
@@ -525,18 +525,21 @@
         cachedRxList = rxList;
         cachedDeptList = deptList;
 
+        // 1. KPI Doanh thu
         const completedList = rxList.filter(x => String(x.Status).toLowerCase() === 'completed');
         const rev = completedList.reduce((a, b) => a + num(b.TotalAmount), 0);
         const avgOrder = completedList.length ? (rev / completedList.length) : 0;
         document.getElementById('kpiRevenue').textContent = money(rev);
         document.getElementById('kpiRevenueSub').textContent = `${completedList.length} đơn hoàn tất · TB ${money(avgOrder)}/đơn`;
 
+        // 2. KPI Hang doi don GPP
         const cntPend = rxList.filter(x => String(x.Status).toLowerCase() === 'pending').length;
         const cntVal = rxList.filter(x => String(x.Status).toLowerCase() === 'validated').length;
         const cntDisp = rxList.filter(x => String(x.Status).toLowerCase() === 'dispensed').length;
         document.getElementById('kpiQueueTotal').textContent = `${cntPend + cntVal + cntDisp} đơn`;
         document.getElementById('kpiQueueBreakdown').textContent = `${cntPend} Pending · ${cntVal} Validated · ${cntDisp} Dispensed`;
 
+        // 3. KPI Kho FEFO
         const outOfStockDrugs = drugList.filter(d => num(d.CurrentStock) <= 0);
         document.getElementById('kpiStockHealth').textContent = nearRes.status === 'fulfilled'
           ? `${nearList.length} lô cận date`
@@ -545,15 +548,18 @@
           ? `${outOfStockDrugs.length} biệt dược hết tồn kho / ${drugList.length} danh mục`
           : 'Kiểm soát hạn dùng FEFO';
 
+        // 4. KPI Duoc lam sang & TT20
         const ctrlDrugsCount = drugList.filter(d => flag(d.IsControlled)).length;
         document.getElementById('kpiClinicalStat').textContent = ptRes.status === 'fulfilled'
           ? `${ptList.length} hồ sơ BN`
           : `${ctrlDrugsCount} thuốc KSĐB`;
         document.getElementById('kpiClinicalSub').textContent = `${ctrlDrugsCount} thuốc KSĐB · ${tt20List.length} bút toán sổ TT 20/2017`;
 
+        // Render Bieu do
         renderTimelineChart('7d');
         renderDeptChart();
 
+        // Render Bang don thuoc gan day
         const tbody = document.getElementById('tblRecentRx');
         if (tbody) {
           if (!rxList.length) {
@@ -571,6 +577,7 @@
           }
         }
 
+        // Render Bang lo can date + thuoc het hang
         const nearBody = document.getElementById('tblNearExpiryOverview');
         if (nearBody) {
           const alertRows = [

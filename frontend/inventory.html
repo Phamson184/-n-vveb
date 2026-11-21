@@ -151,7 +151,7 @@
                             <i class="fa-solid fa-arrow-down-short-wide me-1"></i> Kho FEFO & Lô cận date
                         </button>
                     </li>
-                    <li class="nav-item" role="presentation">
+                    <li class="nav-item" role="presentation" data-roles="ADMIN,WAREHOUSE">
                         <button class="nav-link fw-semibold" id="tab-import-btn" data-bs-toggle="tab"
                             data-bs-target="#pane-import" type="button" role="tab">
                             <i class="fa-solid fa-truck-ramp-box me-1"></i> Nhập lô mới
@@ -187,7 +187,7 @@
                                     </select>
                                 </div>
                                 <div class="col-md-3 text-md-end">
-                                    <button type="button" class="btn btn-sm btn-primary" id="btnQuickGoImport">
+                                    <button type="button" class="btn btn-sm btn-primary" id="btnQuickGoImport" data-roles="ADMIN,WAREHOUSE">
                                         <i class="fa-solid fa-plus me-1"></i> Nhập lô mới
                                     </button>
                                 </div>
@@ -233,25 +233,31 @@
                                     </div>
                                     <div class="col-md-6">
                                         <label class="form-label small fw-semibold" for="inpBatchNumber">Số lô
-                                            (BatchNumber) <span class="text-danger">*</span></label>
-                                        <input type="text" class="form-control" id="inpBatchNumber"
+                                            (BatchCode) <span class="text-danger">*</span></label>
+                                        <input type="text" class="form-control text-uppercase" id="inpBatchNumber"
                                             placeholder="Ví dụ: LOT202611A" required>
                                         <div class="field-err-msg" id="errBatchNumber"></div>
                                     </div>
-                                    <div class="col-md-4">
+                                    <div class="col-md-3">
+                                        <label class="form-label small fw-semibold" for="inpManufactureDate">Ngày sản xuất
+                                            <span class="text-danger">*</span></label>
+                                        <input type="date" class="form-control" id="inpManufactureDate" required>
+                                        <div class="field-err-msg" id="errManufactureDate"></div>
+                                    </div>
+                                    <div class="col-md-3">
                                         <label class="form-label small fw-semibold" for="inpExpiryDate">Hạn dùng
                                             (ExpiryDate) <span class="text-danger">*</span></label>
                                         <input type="date" class="form-control" id="inpExpiryDate" required>
                                         <div class="field-err-msg" id="errExpiryDate"></div>
                                     </div>
-                                    <div class="col-md-4">
+                                    <div class="col-md-3">
                                         <label class="form-label small fw-semibold" for="inpBatchQty">Số lượng nhập
                                             <span class="text-danger">*</span></label>
                                         <input type="number" min="1" step="1" class="form-control" id="inpBatchQty"
                                             placeholder="50" required>
                                         <div class="field-err-msg" id="errBatchQty"></div>
                                     </div>
-                                    <div class="col-md-4">
+                                    <div class="col-md-3">
                                         <label class="form-label small fw-semibold" for="inpUnitCost">Giá nhập / đơn vị
                                             (VNĐ) <span class="text-danger">*</span></label>
                                         <input type="number" min="1" step="1" class="form-control" id="inpUnitCost"
@@ -259,10 +265,12 @@
                                         <div class="field-err-msg" id="errUnitCost"></div>
                                     </div>
                                     <div class="col-12">
-                                        <label class="form-label small fw-semibold" for="inpBatchNote">Ghi chú lô / nhà
-                                            cung cấp</label>
+                                        <label class="form-label small fw-semibold" for="inpBatchNote" id="lblBatchNote">
+                                            Mã Biên bản giao nhận Phụ lục IX / Chứng từ nhập kho
+                                        </label>
                                         <input type="text" class="form-control" id="inpBatchNote"
-                                            placeholder="Ví dụ: Hóa đơn VAT #00123, kho đạt chuẩn GPP">
+                                            placeholder="Bắt buộc nhập nếu là thuốc Kiểm soát đặc biệt (VD: BBGN-TT20-2026-01)">
+                                        <div class="field-err-msg" id="errBatchNote"></div>
                                     </div>
                                     <div class="col-12 d-flex justify-content-end gap-2">
                                         <button type="reset" class="btn btn-outline-secondary">Làm mới</button>
@@ -277,15 +285,13 @@
 
                     <!-- TAB 3: SỔ THUỐC KIỂM SOÁT ĐẶC BIỆT (TT 20/2017) -->
                     <div class="tab-pane fade" id="pane-tt20" role="tabpanel">
-                        <div class="panel">
+                        <div class="panel mb-4">
                             <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
                                 <div>
-                                    <h2 class="h6 fw-bold mb-0">Sổ theo dõi thuốc kiểm soát đặc biệt (Thông tư
-                                        20/2017/TT-BYT)</h2>
-                                    <div class="small text-muted">Danh sách các lô thuốc thuộc diện kiểm soát đặc biệt
-                                        (gây nghiện / hướng thần / kiểm soát)</div>
+                                    <h2 class="h6 fw-bold mb-0">Tồn kho thuốc kiểm soát đặc biệt (Thông tư 20/2017/TT-BYT)</h2>
+                                    <div class="small text-muted">Đối chiếu tồn tủ khóa kép thực tế và ghi nhận biên bản kiểm kê trực tiếp</div>
                                 </div>
-                                <select class="form-select form-select-sm" id="selTt20Type" style="width:200px">
+                                <select class="form-select form-select-sm" id="selTt20Type" style="width:210px">
                                     <option value="ALL">Tất cả nhóm kiểm soát</option>
                                     <option value="N">Gây nghiện (N)</option>
                                     <option value="H">Hướng thần (H)</option>
@@ -302,13 +308,45 @@
                                             <th>Nhóm TT 20</th>
                                             <th>Số lô</th>
                                             <th>Hạn dùng</th>
-                                            <th class="text-end">Tồn kho</th>
+                                            <th class="text-end">Tồn hệ thống</th>
+                                            <th class="text-end">Kiểm kê tủ trực</th>
                                         </tr>
                                     </thead>
                                     <tbody id="tblTt20Body">
                                         <tr>
-                                            <td colspan="6" class="text-center text-muted py-4">Đang tải sổ TT
-                                                20/2017...</td>
+                                            <td colspan="7" class="text-center text-muted py-4">Đang tải sổ TT 20/2017...</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="panel">
+                            <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
+                                <div>
+                                    <h2 class="h6 fw-bold mb-0">Nhật ký xuất – nhập – kiểm kê thuốc kiểm soát đặc biệt</h2>
+                                    <div class="small text-muted">Dữ liệu truy vết bất biến theo từng giao dịch &amp; biên bản giao nhận Phụ lục IX</div>
+                                </div>
+                                <button type="button" class="btn btn-sm btn-outline-secondary" id="btnReloadTt20Logs">
+                                    <i class="fa-solid fa-rotate-right me-1"></i> Tải lại nhật ký
+                                </button>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-sm align-middle mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th>Thời điểm</th>
+                                            <th>Nghiệp vụ</th>
+                                            <th>Thuốc &amp; Số lô</th>
+                                            <th class="text-end">Biến động</th>
+                                            <th class="text-end">Tồn tủ / Hệ thống</th>
+                                            <th>Chứng từ / Đơn</th>
+                                            <th>Người thực hiện</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tblTt20LogsBody">
+                                        <tr>
+                                            <td colspan="7" class="text-center text-muted py-4">Đang tải nhật ký TT 20/2017...</td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -320,6 +358,41 @@
         </div>
     </div>
 
+    <!-- MODAL KIỂM KÊ TỦ TRỰC TT 20/2017 -->
+    <div class="modal fade" id="modalTt20Audit" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <form id="frmTt20Audit" novalidate>
+                    <div class="modal-header">
+                        <h5 class="modal-title fw-bold">Kiểm kê tủ thuốc kiểm soát đặc biệt</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div id="tt20AuditAlert" class="alert alert-danger py-2 px-3 small d-none mb-3"></div>
+                        <input type="hidden" id="audDrugId">
+                        <input type="hidden" id="audBatchId">
+                        <div class="mb-2 small">
+                            <div>Thuốc: <strong id="audDrugLabel">—</strong></div>
+                            <div>Số lô: <code id="audBatchLabel">—</code> · Tồn hệ thống: <strong id="audSysStockLabel">0</strong></div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold" for="audPhysicalStock">Số lượng đếm thực tế trong tủ khóa kép *</label>
+                            <input type="number" min="0" step="1" class="form-control" id="audPhysicalStock" required>
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label small fw-semibold" for="audReportCode">Mã biên bản kiểm kê (tùy chọn)</label>
+                            <input type="text" class="form-control" id="audReportCode" placeholder="VD: BBKK-TT20-2026-11">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">Hủy</button>
+                        <button type="submit" class="btn btn-sm btn-primary" id="btnSaveTt20Audit">Ghi nhận kiểm kê</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <!-- TOAST THÔNG BÁO -->
     <div class="toast-x" id="toastBox" style="display:none; position:fixed; bottom:20px; right:20px; z-index:9999;">
     </div>
@@ -327,7 +400,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         const API_BASE = 'http://localhost:3001/api/v2';
-        const USE_MOCK = true; // Đổi thành false khi chạy API thật
+        const USE_MOCK = false; // Đổi thành false khi chạy API thật
 
         let PP_TOKEN = sessionStorage.getItem('pp_token');
         let PP_USER = (() => {
@@ -426,8 +499,19 @@
             { BatchID: '4', DrugID: '2', DrugCode: 'HAPACOL500', DrugName: 'Hapacol 500mg DHG', BatchNumber: 'LOT202611C', ExpiryDate: '2028-11-08', Quantity: '45', UnitCost: '33000', IsControlled: '0', ControlledType: 'C' }
         ];
 
+        function normVi(str) {
+            return String(str ?? '')
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '')
+                .replace(/đ/g, 'd')
+                .replace(/Đ/g, 'D')
+                .toLowerCase()
+                .trim();
+        }
+
         let invDrugs = [];
         let batches = [];
+        let controlledLogs = [];
 
         function daysUntil(iso) {
             const target = new Date(iso);
@@ -453,24 +537,25 @@
             document.getElementById('statTotalBatches').textContent = String(batches.length);
             const nearCount = batches.filter(b => daysUntil(b.ExpiryDate) <= 90).length;
             document.getElementById('statNearExpiry').textContent = String(nearCount);
-            const totalQty = batches.reduce((acc, b) => acc + num(b.Quantity), 0);
+            const totalQty = batches.reduce((acc, b) => acc + num(b.CurrentStock ?? (b.CurrentStock ?? b.Quantity)), 0);
             document.getElementById('statTotalQty').textContent = String(totalQty);
             const ctrlCount = batches.filter(b => flag(b.IsControlled) || ['N', 'H'].includes(String(b.ControlledType || '').toUpperCase())).length;
             document.getElementById('statCtrlBatches').textContent = String(ctrlCount);
         }
 
         function renderFefo() {
-            const kw = document.getElementById('inpFilterBatch').value.trim().toLowerCase();
+            const qNorm = normVi(document.getElementById('inpFilterBatch').value);
+            const tokens = qNorm ? qNorm.split(/\s+/).filter(Boolean) : [];
             const expFilter = document.getElementById('selExpiryFilter').value;
 
             const sorted = [...batches].sort((a, b) => new Date(a.ExpiryDate) - new Date(b.ExpiryDate));
             const filtered = sorted.filter(b => {
-                const matchKw = !kw ||
-                    String(b.DrugName || '').toLowerCase().includes(kw) ||
-                    String(b.BatchNumber || '').toLowerCase().includes(kw);
                 const tag = getExpiryTag(b.ExpiryDate).key;
                 const matchExp = expFilter === 'ALL' || tag === expFilter;
-                return matchKw && matchExp;
+                if (!matchExp) return false;
+                if (!tokens.length) return true;
+                const hay = normVi([b.DrugName, b.DrugCode, b.BatchCode, b.BatchNumber].join(' '));
+                return tokens.every(tk => hay.includes(tk));
             });
 
             const tbody = document.getElementById('tblFefoBody');
@@ -485,15 +570,18 @@
       <tr>
         <td><span class="badge bg-light text-dark border">#${idx + 1} FEFO</span></td>
         <td class="fw-semibold">${esc(b.DrugName)}</td>
-        <td><code>${esc(b.BatchNumber)}</code></td>
+        <td><code>${esc((b.BatchCode || b.BatchNumber))}</code></td>
         <td>${fmtDate(b.ExpiryDate)}</td>
         <td>${tag.html}</td>
-        <td class="text-end fw-semibold">${esc(num(b.Quantity))}</td>
-        <td class="text-end">${money(b.UnitCost)}</td>
+        <td class="text-end fw-semibold">${esc(num(b.CurrentStock ?? (b.CurrentStock ?? b.Quantity)))}</td>
+        <td class="text-end">${money(b.ImportPrice ?? (b.ImportPrice ?? b.UnitCost))}</td>
       </tr>
     `;
             }).join('');
         }
+
+        const tt20AuditModalEl = document.getElementById('modalTt20Audit');
+        const tt20AuditModal = tt20AuditModalEl ? new bootstrap.Modal(tt20AuditModalEl) : null;
 
         function renderTt20() {
             const typeFilter = document.getElementById('selTt20Type').value;
@@ -508,36 +596,145 @@
 
             const tbody = document.getElementById('tblTt20Body');
             if (!ctrlBatches.length) {
-                tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted py-4">Không có lô thuốc kiểm soát đặc biệt phù hợp.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted py-4">Không có lô thuốc kiểm soát đặc biệt phù hợp.</td></tr>';
                 return;
             }
 
             tbody.innerHTML = ctrlBatches.map(b => {
-                const cType = String(b.ControlledType || 'CTRL').toUpperCase();
+                const cType = String(b.ControlledType || 'KSĐB').toUpperCase();
+                const stk = num(b.CurrentStock ?? b.Quantity);
                 return `
       <tr>
         <td class="fw-semibold">${esc(b.DrugCode || b.DrugID)}</td>
         <td class="fw-semibold">${esc(b.DrugName)}</td>
         <td><span class="ctrl-pill">${esc(cType)}</span></td>
-        <td><code>${esc(b.BatchNumber)}</code></td>
+        <td><code>${esc((b.BatchCode || b.BatchNumber))}</code></td>
         <td>${fmtDate(b.ExpiryDate)}</td>
-        <td class="text-end fw-semibold">${esc(num(b.Quantity))}</td>
+        <td class="text-end fw-semibold">${esc(stk)}</td>
+        <td class="text-end">
+          <button type="button" class="btn btn-sm btn-outline-danger btn-open-tt20-audit"
+            data-drug-id="${esc(b.DrugID)}"
+            data-batch-id="${esc(b.BatchID)}"
+            data-drug-name="${esc(b.DrugName)}"
+            data-batch-code="${esc(b.BatchCode || b.BatchNumber)}"
+            data-sys-stock="${esc(stk)}">
+            Kiểm kê tủ trực
+          </button>
+        </td>
+      </tr>
+    `;
+            }).join('');
+
+            tbody.querySelectorAll('.btn-open-tt20-audit').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.getElementById('audDrugId').value = btn.getAttribute('data-drug-id') || '';
+                    document.getElementById('audBatchId').value = btn.getAttribute('data-batch-id') || '';
+                    document.getElementById('audDrugLabel').textContent = btn.getAttribute('data-drug-name') || '—';
+                    document.getElementById('audBatchLabel').textContent = btn.getAttribute('data-batch-code') || '—';
+                    const sysStk = btn.getAttribute('data-sys-stock') || '0';
+                    document.getElementById('audSysStockLabel').textContent = sysStk;
+                    document.getElementById('audPhysicalStock').value = sysStk;
+                    document.getElementById('audReportCode').value = '';
+                    const alertBox = document.getElementById('tt20AuditAlert');
+                    if (alertBox) { alertBox.textContent = ''; alertBox.classList.add('d-none'); }
+                    tt20AuditModal?.show();
+                });
+            });
+        }
+
+        function renderControlledLogs() {
+            const tbody = document.getElementById('tblTt20LogsBody');
+            if (!tbody) return;
+            if (!controlledLogs.length) {
+                tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted py-4">Chưa có bản ghi nhật ký thuốc kiểm soát đặc biệt.</td></tr>';
+                return;
+            }
+            tbody.innerHTML = controlledLogs.map(log => {
+                const tType = String(log.TransactionType || '').toUpperCase();
+                const badgeCls = tType === 'AUDIT' ? 'bg-warning text-dark' : (tType === 'IMPORT' ? 'bg-success' : 'bg-primary');
+                const chg = num(log.QuantityChange);
+                const chgStr = chg > 0 ? `+${chg}` : String(chg);
+                const refDoc = [log.HandoverReportCode, log.NationalCode].filter(Boolean).join(' · ') || '—';
+                return `
+      <tr>
+        <td class="small">${fmtDate(log.RecordedAt)}</td>
+        <td><span class="badge ${badgeCls}">${esc(tType)}</span></td>
+        <td>
+          <div class="fw-semibold">${esc(log.DrugName)}</div>
+          <div class="small text-muted">Lô: <code>${esc(log.BatchCode)}</code></div>
+        </td>
+        <td class="text-end fw-semibold">${esc(chgStr)}</td>
+        <td class="text-end">${esc(log.CabinetPhysicalStock ?? '—')} / ${esc(log.SystemStock ?? '—')}</td>
+        <td class="small">${esc(refDoc)}</td>
+        <td class="small">${esc(log.PerformedBy || '—')}</td>
       </tr>
     `;
             }).join('');
         }
 
+        document.getElementById('frmTt20Audit')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const alertBox = document.getElementById('tt20AuditAlert');
+            if (alertBox) { alertBox.textContent = ''; alertBox.classList.add('d-none'); }
+
+            const DrugID = Number(document.getElementById('audDrugId').value || 0);
+            const BatchID = Number(document.getElementById('audBatchId').value || 0);
+            const CabinetPhysicalStock = Number(document.getElementById('audPhysicalStock').value);
+            const HandoverReportCode = document.getElementById('audReportCode').value.trim();
+
+            if (!DrugID || !BatchID || !Number.isFinite(CabinetPhysicalStock) || CabinetPhysicalStock < 0) {
+                if (alertBox) { alertBox.textContent = 'Vui lòng nhập số lượng tồn thực tế hợp lệ (≥ 0).'; alertBox.classList.remove('d-none'); }
+                return;
+            }
+
+            const btn = document.getElementById('btnSaveTt20Audit');
+            btn.disabled = true;
+            try {
+                const res = await api('POST', '/inventory/controlled-audit', {
+                    DrugID, BatchID, CabinetPhysicalStock, HandoverReportCode: HandoverReportCode || null
+                });
+                toast(res?.message || 'Đã ghi nhận biên bản kiểm kê tủ TT 20/2017.');
+                tt20AuditModal?.hide();
+                const logRes = await api('GET', '/inventory/controlled-logs');
+                controlledLogs = Array.isArray(logRes?.logs) ? logRes.logs : [];
+                renderControlledLogs();
+            } catch (err) {
+                if (alertBox) { alertBox.textContent = err.message; alertBox.classList.remove('d-none'); }
+                toast(err.message, true);
+            } finally {
+                btn.disabled = false;
+            }
+        });
+
         function populateDrugSelect() {
             const sel = document.getElementById('selBatchDrug');
             sel.innerHTML = '<option value="">-- Chọn thuốc --</option>' +
-                invDrugs.map(d => `<option value="${esc(d.DrugID)}">${esc(d.DrugName)} (${esc(d.DrugCode)})</option>`).join('');
+                invDrugs.map(d => {
+                    const tag = flag(d.IsControlled) ? ' [KSĐB - TT20]' : '';
+                    return `<option value="${esc(d.DrugID)}">${esc(d.DrugName)} (${esc(d.DrugCode)})${tag}</option>`;
+                }).join('');
         }
 
+        document.getElementById('selBatchDrug')?.addEventListener('change', (e) => {
+            const dObj = invDrugs.find(x => String(x.DrugID) === String(e.target.value));
+            const lbl = document.getElementById('lblBatchNote');
+            const inp = document.getElementById('inpBatchNote');
+            if (dObj && flag(dObj.IsControlled)) {
+                if (lbl) lbl.innerHTML = 'Mã Biên bản giao nhận Phụ lục IX (TT 20/2017) <span class="text-danger">*</span>';
+                if (inp && !inp.value.trim()) {
+                    const dStr = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+                    inp.value = 'BBGN-TT20-' + dStr;
+                }
+            } else {
+                if (lbl) lbl.textContent = 'Mã Biên bản giao nhận Phụ lục IX / Chứng từ nhập kho';
+            }
+        });
+
         function clearBatchErrors() {
-            ['selBatchDrug', 'inpBatchNumber', 'inpExpiryDate', 'inpBatchQty', 'inpUnitCost'].forEach(id => {
+            ['selBatchDrug', 'inpBatchNumber', 'inpManufactureDate', 'inpExpiryDate', 'inpBatchQty', 'inpUnitCost', 'inpBatchNote'].forEach(id => {
                 document.getElementById(id)?.classList.remove('field-invalid');
             });
-            ['errBatchDrug', 'errBatchNumber', 'errExpiryDate', 'errBatchQty', 'errUnitCost'].forEach(id => {
+            ['errBatchDrug', 'errBatchNumber', 'errManufactureDate', 'errExpiryDate', 'errBatchQty', 'errUnitCost', 'errBatchNote'].forEach(id => {
                 const el = document.getElementById(id);
                 if (el) el.textContent = '';
             });
@@ -554,62 +751,89 @@
             clearBatchErrors();
 
             const drugId = document.getElementById('selBatchDrug').value;
-            const BatchNumber = document.getElementById('inpBatchNumber').value.trim();
+            const dObj = invDrugs.find(x => String(x.DrugID) === String(drugId)) || {};
+            const BatchCode = document.getElementById('inpBatchNumber').value.trim().toUpperCase();
+            const ManufactureDate = document.getElementById('inpManufactureDate').value;
             const ExpiryDate = document.getElementById('inpExpiryDate').value;
             const Quantity = num(document.getElementById('inpBatchQty').value);
-            const UnitCost = num(document.getElementById('inpUnitCost').value);
-            const Note = document.getElementById('inpBatchNote').value.trim();
+            const ImportPrice = num(document.getElementById('inpUnitCost').value);
+            const HandoverReportCode = document.getElementById('inpBatchNote').value.trim();
 
             let ok = true;
             if (!drugId) { setBatchErr('selBatchDrug', 'errBatchDrug', 'Vui lòng chọn thuốc.'); ok = false; }
-            if (!BatchNumber) { setBatchErr('inpBatchNumber', 'errBatchNumber', 'Vui lòng nhập số lô.'); ok = false; }
+            if (!BatchCode) { setBatchErr('inpBatchNumber', 'errBatchNumber', 'Vui lòng nhập số lô.'); ok = false; }
+            if (!ManufactureDate) { setBatchErr('inpManufactureDate', 'errManufactureDate', 'Vui lòng chọn ngày sản xuất.'); ok = false; }
             if (!ExpiryDate) { setBatchErr('inpExpiryDate', 'errExpiryDate', 'Vui lòng chọn hạn dùng.'); ok = false; }
+            if (ManufactureDate && ExpiryDate && ExpiryDate <= ManufactureDate) {
+                setBatchErr('inpExpiryDate', 'errExpiryDate', 'Hạn dùng phải lớn hơn ngày sản xuất.');
+                ok = false;
+            }
             if (Quantity <= 0) { setBatchErr('inpBatchQty', 'errBatchQty', 'Số lượng phải lớn hơn 0.'); ok = false; }
-            if (UnitCost <= 0) { setBatchErr('inpUnitCost', 'errUnitCost', 'Giá nhập phải lớn hơn 0.'); ok = false; }
+            if (ImportPrice <= 0) { setBatchErr('inpUnitCost', 'errUnitCost', 'Giá nhập phải lớn hơn 0.'); ok = false; }
+            if (flag(dObj.IsControlled) && !HandoverReportCode) {
+                setBatchErr('inpBatchNote', 'errBatchNote', 'Thuốc kiểm soát đặc biệt bắt buộc nhập Mã biên bản giao nhận Phụ lục IX.');
+                ok = false;
+            }
             if (!ok) return;
 
             const payload = {
                 DrugID: Number(drugId),
-                BatchNumber,
+                BatchCode,
+                ManufactureDate,
                 ExpiryDate,
                 Quantity,
-                UnitCost,
-                Note
+                ImportPrice,
+                HandoverReportCode: HandoverReportCode || null
             };
 
             const btn = document.getElementById('btnSubmitBatch');
             btn.disabled = true;
             try {
                 if (USE_MOCK) {
-                    const dObj = invDrugs.find(x => String(x.DrugID) === String(drugId)) || {};
                     batches.push({
                         BatchID: String(batches.length + 10),
                         DrugID: String(drugId),
                         DrugCode: dObj.DrugCode || '',
                         DrugName: dObj.DrugName || ('Drug #' + drugId),
-                        BatchNumber,
+                        BatchCode,
                         ExpiryDate,
-                        Quantity: String(Quantity),
-                        UnitCost: String(UnitCost),
+                        CurrentStock: String(Quantity),
+                        ImportPrice: String(ImportPrice),
                         IsControlled: String(dObj.IsControlled ?? '0'),
                         ControlledType: dObj.ControlledType || 'C'
                     });
                 } else {
                     await api('POST', '/inventory/batches', payload);
-                    const res = await api('GET', '/inventory/batches');
-                    batches = Array.isArray(res?.data) ? res.data : (Array.isArray(res) ? res : batches);
+                    const res = await api('GET', '/inventory/expiring-batches?days=3650');
+                    batches = Array.isArray(res?.batches) ? res.batches : (Array.isArray(res?.data) ? res.data : batches);
+                    try {
+                        const logRes = await api('GET', '/inventory/controlled-logs');
+                        controlledLogs = Array.isArray(logRes?.logs) ? logRes.logs : controlledLogs;
+                    } catch (ignore) {}
                 }
 
                 renderInvStats();
                 renderFefo();
                 renderTt20();
+                renderControlledLogs();
                 document.getElementById('frmImportBatch').reset();
-                toast('Đã nhập lô ' + BatchNumber + ' vào kho FEFO.');
+                toast('Đã nhập lô ' + BatchCode + ' vào kho FEFO.');
                 bootstrap.Tab.getOrCreateInstance(document.getElementById('tab-fefo-btn')).show();
             } catch (err) {
                 toast(err.message, true);
             } finally {
                 btn.disabled = false;
+            }
+        });
+
+        document.getElementById('btnReloadTt20Logs')?.addEventListener('click', async () => {
+            try {
+                const logRes = await api('GET', '/inventory/controlled-logs');
+                controlledLogs = Array.isArray(logRes?.logs) ? logRes.logs : [];
+                renderControlledLogs();
+                toast('Đã cập nhật nhật ký TT 20/2017.');
+            } catch (err) {
+                toast(err.message, true);
             }
         });
 
@@ -620,14 +844,21 @@
                     batches = MOCK_BATCHES;
                 } else {
                     const dRes = await api('GET', '/inventory/drugs');
-                    invDrugs = Array.isArray(dRes?.data) ? dRes.data : [];
-                    const bRes = await api('GET', '/inventory/batches');
-                    batches = Array.isArray(bRes?.data) ? bRes.data : (Array.isArray(bRes) ? bRes : []);
+                    const dArr = dRes?.data || dRes?.drugs || []; invDrugs = Array.isArray(dArr) ? dArr : [];
+                    const bRes = await api('GET', '/inventory/expiring-batches?days=3650');
+                    const bArr = bRes?.batches || bRes?.expiring_batches || bRes?.data || []; batches = Array.isArray(bArr) ? bArr : [];
+                    try {
+                        const logRes = await api('GET', '/inventory/controlled-logs');
+                        controlledLogs = Array.isArray(logRes?.logs) ? logRes.logs : [];
+                    } catch (e) {
+                        controlledLogs = [];
+                    }
                 }
                 populateDrugSelect();
                 renderInvStats();
                 renderFefo();
                 renderTt20();
+                renderControlledLogs();
             } catch (e) {
                 toast(e.message, true);
             }
