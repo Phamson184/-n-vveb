@@ -175,7 +175,7 @@
   </style>
 </head>
 
-<body data-page-roles="ADMIN,DOCTOR,PHARMACIST,CASHIER">
+<body data-page-roles="ADMIN,PHARMACIST,DOCTOR,CASHIER">
   <div class="app-shell d-flex min-vh-100">
     <!-- SIDEBAR DÙNG CHUNG -->
     <aside class="sidebar">
@@ -191,20 +191,20 @@
 
       <div class="nav-group">
         <div class="nav-label">Dược lâm sàng &amp; Bán hàng</div>
-        <a class="nav-item" href="pos.html" data-roles="ADMIN,DOCTOR,PHARMACIST,CASHIER"><i
+        <a class="nav-item" href="pos.html" data-roles="ADMIN,PHARMACIST,DOCTOR,CASHIER"><i
             class="fa-solid fa-cash-register"></i> Kê đơn &amp; POS</a>
-        <a class="nav-item" href="prescriptions.html" data-roles="ADMIN,DOCTOR,PHARMACIST,CASHIER"><i
+        <a class="nav-item" href="prescriptions.html" data-roles="ADMIN,PHARMACIST,DOCTOR,CASHIER"><i
             class="fa-solid fa-file-prescription"></i> Đơn thuốc GPP</a>
-        <a class="nav-item" href="patients.html" data-roles="ADMIN,DOCTOR,PHARMACIST,CASHIER"><i
+        <a class="nav-item" href="patients.html" data-roles="ADMIN,PHARMACIST,DOCTOR,CASHIER"><i
             class="fa-solid fa-user-injured"></i> Hồ sơ Dược bạ 360°</a>
       </div>
 
       <div class="nav-group">
         <div class="nav-label">Kho dược &amp; Pháp lý</div>
         <a class="nav-item" href="products.html"><i class="fa-solid fa-pills"></i> Danh mục &amp; DDI</a>
-        <a class="nav-item" href="inventory.html" data-roles="ADMIN,PHARMACIST,WAREHOUSE"><i
+        <a class="nav-item" href="inventory.html" data-roles="ADMIN,PHARMACIST,WAREHOUSE,CASHIER"><i
             class="fa-solid fa-boxes-stacked"></i> Kho FEFO &amp; TT 20/2017</a>
-        <a class="nav-item" href="audit.html" data-roles="ADMIN,PHARMACIST,WAREHOUSE"><i
+        <a class="nav-item" href="audit.html" data-roles="ADMIN"><i
             class="fa-solid fa-clock-rotate-left"></i> Thanh tra Temporal</a>
       </div>
 
@@ -274,7 +274,7 @@
                     <option value="CTRL">Kiểm soát đặc biệt (TT 20)</option>
                   </select>
                   <button type="button" class="btn btn-sm btn-outline-primary" id="btnOpenOcr"
-                    data-roles="ADMIN,DOCTOR,PHARMACIST,CASHIER">
+                    data-roles="ADMIN,PHARMACIST,DOCTOR,CASHIER">
                     <i class="fa-solid fa-file-lines me-1"></i> Nhập từ OCR
                   </button>
                 </div>
@@ -296,7 +296,7 @@
                 <h2 class="h6 fw-bold mb-0">Giỏ kê đơn <span class="badge bg-secondary ms-1"
                     id="cartCountBadge">0</span></h2>
                 <button type="button" class="btn btn-sm btn-outline-danger" id="btnClearCart"
-                  data-roles="ADMIN,DOCTOR,PHARMACIST,CASHIER">
+                  data-roles="ADMIN,PHARMACIST,DOCTOR,CASHIER">
                   <i class="fa-solid fa-trash me-1"></i> Xóa giỏ (F4)
                 </button>
               </div>
@@ -395,7 +395,7 @@
             </div>
 
             <button type="button" class="btn btn-primary w-100 py-2 fw-bold" id="btnSubmitRx"
-              data-roles="ADMIN,DOCTOR,PHARMACIST,CASHIER">
+              data-roles="ADMIN,PHARMACIST,DOCTOR,CASHIER">
               <i class="fa-solid fa-paper-plane me-1"></i> Tạo đơn (F3)
             </button>
           </div>
